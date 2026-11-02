@@ -13,6 +13,7 @@
   "serverB": {
     "hostname": "TIMESERIES-SERVER",
     "questDbRoot": "C:\\QuestDB",
+    "influxDbRoot": "C:\\InfluxDB",
     "questDbHttpEndpoint": "http://127.0.0.1:9000",
     "influxDbEndpoint": "http://127.0.0.1:8086",
     "enableExternalConnections": false
