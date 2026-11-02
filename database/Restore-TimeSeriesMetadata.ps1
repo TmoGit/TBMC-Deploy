@@ -1,0 +1,4 @@
+[CmdletBinding()] param([Parameter(Mandatory)][string]$ArtifactDir,[Parameter(Mandatory)][string]$IdentityKey,[string]$QuestDbEndpoint='http://127.0.0.1:9000')
+$ErrorActionPreference='Stop';$age=(Get-Command age.exe -ErrorAction Stop).Source;$a=Join-Path $ArtifactDir 'questdb-schema.json.age'
+if(-not(Test-Path $a)){throw 'QuestDB schema artifact is missing.'};$tmp=Join-Path $env:TEMP ('tbmc-schema-'+[guid]::NewGuid()+'.json')
+try{& $age --decrypt --identity $IdentityKey --output $tmp $a;if($LASTEXITCODE-ne 0){throw 'Schema decryption failed'};$schema=Get-Content $tmp -Raw|ConvertFrom-Json;if(@($schema).Count -ne 11){throw 'Unexpected QuestDB schema table count'};Write-Host "Validated $(@($schema).Count) QuestDB table definitions; historical measurements are not restored."}finally{Remove-Item $tmp -Force -ErrorAction SilentlyContinue}
