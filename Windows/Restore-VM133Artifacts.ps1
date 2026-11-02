@@ -15,7 +15,7 @@ try {
         & $age --decrypt --identity $IdentityKey --output $dst $src
         if ($LASTEXITCODE -ne 0) { throw "Decryption failed: $src" }
     }
-    Get-ChildItem $ArtifactDir -Filter '*.age' | Where-Object Name -match '^(gateway|modules|commissioning|ignition)\.conf\.age$' | ForEach-Object {
+    Get-ChildItem $ArtifactDir -Filter '*.age' | Where-Object Name -match '^(gateway\.xml|modules\.json|commissioning\.json|ignition\.conf)\.age$' | ForEach-Object {
         $target = Join-Path $work $_.Name.Substring(0, $_.Name.Length - 4)
         & $age --decrypt --identity $IdentityKey --output $target $_.FullName
         if ($LASTEXITCODE -ne 0) { throw "Decryption failed: $($_.Name)" }
