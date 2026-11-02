@@ -8,3 +8,5 @@ artifacts/
 *.sql
 *.key
 *.pem
+
+staging/
