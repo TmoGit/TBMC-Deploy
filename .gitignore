@@ -1,0 +1,10 @@
+artifacts/
+*.gwbk
+*.bak
+*.license
+*.ipl
+*.zip
+*.7z
+*.sql
+*.key
+*.pem
