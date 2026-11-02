@@ -1,11 +1,5 @@
-[CmdletBinding()]
-param([Parameter(Mandatory)][string]$Installer,[string]$Config="$PSScriptRoot\\..\\config\\deployment.example.json",[switch]$AllowExisting)
-$ErrorActionPreference='Stop'
-if(-not (Test-Path $Installer)){throw "Ignition installer not found: $Installer"}
-if(-not(([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator))){throw 'Run as Administrator.'}
-if(-not (Test-Path $Config)){throw "Deployment config not found: $Config"}
-$existing=Get-Service Ignition -ErrorAction SilentlyContinue
-if($existing -and -not $AllowExisting){throw 'Existing Ignition service detected. Review destination before proceeding.'}
-$p=Start-Process $Installer -ArgumentList '/quiet' -Wait -PassThru
-if($p.ExitCode -ne 0){throw "Ignition installer exit code $($p.ExitCode)"}
-Write-Host 'Ignition installed; restore MariaDB before enabling ignitionDB.'
+[CmdletBinding()] param([Parameter(Mandatory)][string]$ConfigPath,[string]$InstallerPath,[string]$AgeIdentityPath,[switch]$DryRun,[switch]$Resume,[switch]$ValidateOnly,[switch]$AllowExisting)
+$ErrorActionPreference='Stop';Set-StrictMode -Version Latest
+. "$PSScriptRoot\..\shared\Test-Prerequisites.ps1";. "$PSScriptRoot\..\shared\Get-VerifiedInstaller.ps1";. "$PSScriptRoot\..\shared\Install-Dependencies.ps1"
+if(-not(Test-Path $ConfigPath)){throw "Config not found: $ConfigPath"};$cfg=Get-Content $ConfigPath -Raw|ConvertFrom-Json;$state=Join-Path (Split-Path $ConfigPath) 'ignition-install.state.json';$log=Join-Path (Split-Path $ConfigPath) 'ignition-install.log';Start-Transcript $log -Append|Out-Null
+try{$pre=Test-TbmcPrerequisites 'Ignition/MariaDB' -DryRun:$DryRun;if($ValidateOnly){& "$PSScriptRoot\Test-Ignition.ps1" -IgnitionDir $cfg.serverA.ignitionInstallDir;return};if(-not $AllowExisting -and (Get-Service MariaDB,Ignition -ErrorAction SilentlyContinue)){throw 'Existing MariaDB or Ignition service detected; approve -AllowExisting explicitly.'};if(-not $DryRun -and -not $AgeIdentityPath){throw 'Age identity key is required'};if(-not $cfg.ignitionVersion){throw 'Exact ignitionVersion is required; refusing latest-version substitution.'};$m=Get-TbmcVerifiedInstaller $cfg.mariaDbInstallerName '10.11' $InstallerPath $cfg.mariaDbInstallerUrl $cfg.mariaDbInstallerSha256 -DryRun:$DryRun;$g=Get-TbmcVerifiedInstaller $cfg.ignitionInstallerName $cfg.ignitionVersion $InstallerPath $cfg.ignitionInstallerUrl $cfg.ignitionInstallerSha256 -DryRun:$DryRun;if(-not $DryRun){Invoke-TbmcInstaller $m.Path $cfg.mariaDbInstallerArguments;Invoke-TbmcInstaller $g.Path $cfg.ignitionInstallerArguments;& "$PSScriptRoot\..\database\Restore-MariaDB.ps1" -ArtifactDir $cfg.artifactDirectory -IdentityKey $AgeIdentityPath;& "$PSScriptRoot\Restore-Ignition.ps1" -ArtifactDir $cfg.artifactDirectory -IdentityKey $AgeIdentityPath};& "$PSScriptRoot\Test-Ignition.ps1" -IgnitionDir $cfg.serverA.ignitionInstallDir;Write-TbmcState $state @{Completed=(Get-Date).ToUniversalTime().ToString('o');Components=@('MariaDB','Ignition','GatewayArtifacts')}}finally{Stop-Transcript|Out-Null}

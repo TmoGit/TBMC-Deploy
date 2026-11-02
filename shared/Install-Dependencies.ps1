@@ -1,0 +1,2 @@
+function Invoke-TbmcInstaller { [CmdletBinding()] param([Parameter(Mandatory)][string]$File,[string]$Arguments='',[switch]$DryRun); if($DryRun){Write-Host "DRY RUN: $File $Arguments";return};$p=Start-Process $File -ArgumentList $Arguments -Wait -PassThru;if($p.ExitCode -notin 0,1641,3010){throw "$File exited $($p.ExitCode)"} }
+function Write-TbmcState { param([string]$Path,[hashtable]$State) $State|ConvertTo-Json -Depth 8|Set-Content $Path -Encoding UTF8 }

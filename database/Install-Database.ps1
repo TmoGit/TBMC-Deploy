@@ -1,23 +1,5 @@
-[CmdletBinding()]
-param(
-    [string]$QuestDbInstaller,
-    [string]$InfluxDbInstaller,
-    [string]$MariaDbInstaller,
-    [string]$Config = "$PSScriptRoot\\..\\config\\deployment.example.json",
-    [switch]$AllowExisting
-)
-$ErrorActionPreference = 'Stop'
-if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) { throw 'Run as Administrator.' }
-if (-not $AllowExisting -and (Get-Service MariaDB,QuestDB,InfluxDB -ErrorAction SilentlyContinue)) { throw 'Existing database services detected. Review the destination and use -AllowExisting only with explicit approval.' }
-if (-not (Test-Path $Config)) { throw "Deployment config not found: $Config" }
-foreach ($item in @(
-    @{Name='QuestDB'; Path=$QuestDbInstaller},
-    @{Name='InfluxDB'; Path=$InfluxDbInstaller},
-    @{Name='MariaDB'; Path=$MariaDbInstaller}
-)) {
-    if ($item.Path) {
-        if (-not (Test-Path $item.Path)) { throw "$($item.Name) installer not found: $($item.Path)" }
-        Write-Host "Installer supplied for $($item.Name): $($item.Path)"
-    } else { Write-Warning "$($item.Name) installer was not supplied; obtain the approved version before deployment." }
-}
-Write-Host 'No database service was started and no live endpoint was configured by this validation script.'
+[CmdletBinding()] param([Parameter(Mandatory)][string]$ConfigPath,[string]$InstallerPath,[string]$AgeIdentityPath,[switch]$DryRun,[switch]$Resume,[switch]$ValidateOnly,[switch]$AllowExisting)
+$ErrorActionPreference='Stop';Set-StrictMode -Version Latest
+. "$PSScriptRoot\..\shared\Test-Prerequisites.ps1";. "$PSScriptRoot\..\shared\Get-VerifiedInstaller.ps1";. "$PSScriptRoot\..\shared\Install-Dependencies.ps1"
+if(-not(Test-Path $ConfigPath)){throw "Config not found: $ConfigPath"};$cfg=Get-Content $ConfigPath -Raw|ConvertFrom-Json;$state=Join-Path (Split-Path $ConfigPath) 'database-install.state.json';$log=Join-Path (Split-Path $ConfigPath) 'database-install.log';Start-Transcript $log -Append|Out-Null
+try{$pre=Test-TbmcPrerequisites 'Time-Series Databases' -DryRun:$DryRun;if($ValidateOnly){& "$PSScriptRoot\Test-Database.ps1";return};if(-not $AllowExisting -and (Get-Service QuestDB,InfluxDB -ErrorAction SilentlyContinue)){throw 'Existing QuestDB or InfluxDB service detected; approve -AllowExisting explicitly.'};if($cfg.questDbVersion -ne '9.3.3'){throw 'questDbVersion must be exactly 9.3.3'};if($cfg.influxDbVersion -ne '2.8.0'){throw 'influxDbVersion must be exactly 2.8.0'};$q=Get-TbmcVerifiedInstaller $cfg.questDbInstallerName '9.3.3' $InstallerPath $cfg.questDbInstallerUrl $cfg.questDbInstallerSha256 -DryRun:$DryRun;$i=Get-TbmcVerifiedInstaller $cfg.influxDbInstallerName '2.8.0' $InstallerPath $cfg.influxDbInstallerUrl $cfg.influxDbInstallerSha256 -DryRun:$DryRun;if(-not $DryRun){Invoke-TbmcInstaller $q.Path $cfg.questDbInstallerArguments;Invoke-TbmcInstaller $i.Path $cfg.influxDbInstallerArguments};& "$PSScriptRoot\Test-Database.ps1";Write-TbmcState $state @{Completed=(Get-Date).ToUniversalTime().ToString('o');Components=@('QuestDB','InfluxDB')}}finally{Stop-Transcript|Out-Null}
