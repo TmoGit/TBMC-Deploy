@@ -2,9 +2,14 @@
 param(
     [string]$QuestDbInstaller,
     [string]$InfluxDbInstaller,
-    [string]$MariaDbInstaller
+    [string]$MariaDbInstaller,
+    [string]$Config = "$PSScriptRoot\\..\\config\\deployment.example.json",
+    [switch]$AllowExisting
 )
 $ErrorActionPreference = 'Stop'
+if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) { throw 'Run as Administrator.' }
+if (-not $AllowExisting -and (Get-Service MariaDB,QuestDB,InfluxDB -ErrorAction SilentlyContinue)) { throw 'Existing database services detected. Review the destination and use -AllowExisting only with explicit approval.' }
+if (-not (Test-Path $Config)) { throw "Deployment config not found: $Config" }
 foreach ($item in @(
     @{Name='QuestDB'; Path=$QuestDbInstaller},
     @{Name='InfluxDB'; Path=$InfluxDbInstaller},

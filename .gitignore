@@ -10,3 +10,5 @@ artifacts/
 *.pem
 
 staging/
+config/deployment.local.json
+*.log

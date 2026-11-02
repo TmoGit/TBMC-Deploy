@@ -1,0 +1,1 @@
+Copy `deployment.example.json` to a local configuration file outside Git, then replace hostnames, paths, ports, installer locations, and the age identity-key path. Never commit the local file, passwords, tokens, or private keys.

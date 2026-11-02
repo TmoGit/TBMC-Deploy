@@ -1,0 +1,24 @@
+{
+  "serverA": {
+    "hostname": "IGNITION-SERVER",
+    "ignitionInstallDir": "C:\\Program Files\\Inductive Automation\\Ignition",
+    "mariaDbInstallDir": "C:\\Program Files\\MariaDB 10.11",
+    "mariaDbHost": "127.0.0.1",
+    "mariaDbPort": 3306,
+    "mariaDbDatabase": "ignition_config",
+    "ignitionGatewayName": "Ignition",
+    "ignitionHttpPort": 8088,
+    "enableExternalConnections": false
+  },
+  "serverB": {
+    "hostname": "TIMESERIES-SERVER",
+    "questDbRoot": "C:\\QuestDB",
+    "questDbHttpEndpoint": "http://127.0.0.1:9000",
+    "influxDbEndpoint": "http://127.0.0.1:8086",
+    "enableExternalConnections": false
+  },
+  "softwareDirectory": "C:\\TBMC-Deploy\\installers",
+  "artifactDirectory": "C:\\TBMC-Deploy\\artifacts",
+  "ageIdentityKey": "C:\\Secure\\tbmc-deploy.key",
+  "firewallRules": false
+}
