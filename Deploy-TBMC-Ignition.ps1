@@ -1,138 +1,285 @@
-#requires -Version 5.1
+﻿#requires -Version 5.1
 <#
 .SYNOPSIS
- Single-entry TBMC deployment for Ignition server, on an existing Windows Server.
+ One-click, self-contained Ignition TBMC setup for an existing Windows Server.
 .DESCRIPTION
- Extracts a locally supplied TBMC-Deploy GitHub ZIP (if not already staged),
- validates the package, prepares directories, runs the repository installer
- dry-run, then invokes the repository installer for real if preflight succeeds.
- Never bypasses the underlying installer's safeguards.
-.EXAMPLE
- .\Deploy-TBMC-Ignition.ps1 -ZipPath 'E:\TBMC-Deploy-main.zip'
-.EXAMPLE
- .\Deploy-TBMC-Ignition.ps1 -ZipPath 'E:\TBMC-Deploy-main.zip' -ConfigFile 'E:\client.json' -AgeIdentityPath 'E:\deploy.key'
-.EXAMPLE
- .\Deploy-TBMC-Ignition.ps1 -ZipPath 'E:\TBMC-Deploy-main.zip' -DryRunOnly
+ Run this script from the extracted TBMC-Deploy-main folder on the Windows Desktop.
+ It discovers the folder, stages it at C:\TBMC\TBMC-Deploy, prepares support folders,
+ copies a supplied client.json and/or age identity key if present on the Desktop,
+ checks the underlying installation entry point, runs its dry run, and, after an
+ explicit confirmation, launches the actual installer/restorer.
+
+ No Proxmox access is needed. This cannot manufacture missing software packages,
+ the age private key, client values, or the unknown Ignition version.
 #>
 [CmdletBinding()]
 param(
- [string]$ZipPath,
- [string]$DestinationRoot = 'C:\TBMC',
- [string]$ConfigFile,
- [string]$AgeIdentityPath,
- [string]$InstallerPath,
- [switch]$DryRunOnly,
- [switch]$Resume
+    [string]$DestinationRoot = 'C:\TBMC',
+    [switch]$DryRunOnly,
+    [switch]$Resume
 )
+
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $Role = 'Ignition'
-$Entry = 'ignition\Install-Ignition.ps1'
-function Assert-Admin {
- $id=[Security.Principal.WindowsIdentity]::GetCurrent()
- $p=New-Object Security.Principal.WindowsPrincipal($id)
- if (-not $p.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) { throw 'Run Windows PowerShell as Administrator.' }
+$RelativeEntry = 'ignition\Install-Ignition.ps1'
+
+function Test-IsAdministrator {
+    $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
+    $principal = New-Object Security.Principal.WindowsPrincipal($identity)
+    return $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 }
-function Resolve-Existing([string]$p,[string]$name) {
- if (-not (Test-Path -LiteralPath $p -PathType Leaf)) { throw "$name not found: $p" }
- return (Resolve-Path -LiteralPath $p).ProviderPath
+
+# Right-click > Run with PowerShell also works when the user is not already elevated.
+if (-not (Test-IsAdministrator)) {
+    Write-Host 'Requesting administrator approval (Windows UAC)...' -ForegroundColor Yellow
+    $ps = Join-Path $PSHOME 'powershell.exe'
+    $launch = '-NoProfile -ExecutionPolicy Bypass -File "' + $PSCommandPath + '"'
+    if ($DryRunOnly) { $launch += ' -DryRunOnly' }
+    if ($Resume) { $launch += ' -Resume' }
+    if ($DestinationRoot -ne 'C:\TBMC') { $launch += ' -DestinationRoot "' + $DestinationRoot + '"' }
+    try {
+        $proc = Start-Process -FilePath $ps -Verb RunAs -ArgumentList $launch -Wait -PassThru
+        exit $proc.ExitCode
+    }
+    catch {
+        Write-Host ('Administrator elevation was not approved: ' + $_.Exception.Message) -ForegroundColor Red
+        exit 1
+    }
 }
-function Assert-Under([string]$path,[string]$base) {
- $b=[IO.Path]::GetFullPath($base).TrimEnd('\','/')+'\'
- $f=[IO.Path]::GetFullPath($path)
- if (-not $f.StartsWith($b,[StringComparison]::OrdinalIgnoreCase)) { throw "Unsafe ZIP entry: $path" }
+
+function Test-TbmcRepository([string]$Candidate) {
+    if ([string]::IsNullOrWhiteSpace($Candidate)) { return $false }
+    if (-not (Test-Path -LiteralPath $Candidate -PathType Container)) { return $false }
+    return ((Test-Path -LiteralPath (Join-Path $Candidate 'ignition\Install-Ignition.ps1') -PathType Leaf) -and
+            (Test-Path -LiteralPath (Join-Path $Candidate 'database\Install-Database.ps1') -PathType Leaf))
 }
-function Get-SingleRepo([string]$staging) {
- $paths=@($staging)+@(Get-ChildItem -LiteralPath $staging -Directory | ForEach-Object {$_.FullName})
- $matches=@($paths | Where-Object {
-    (Test-Path -LiteralPath (Join-Path $_ 'ignition\Install-Ignition.ps1')) -and
-    (Test-Path -LiteralPath (Join-Path $_ 'database\Install-Database.ps1'))
- })
- if ($matches.Count -ne 1) {throw 'Archive must contain one TBMC-Deploy folder with both orchestrators.'}
- return $matches[0]
+
+function Get-DesktopFolders {
+    $paths = New-Object 'System.Collections.Generic.List[string]'
+    $paths.Add([Environment]::GetFolderPath([Environment+SpecialFolder]::DesktopDirectory))
+    if ($env:USERPROFILE) { $paths.Add((Join-Path $env:USERPROFILE 'Desktop')) }
+    if ($env:PUBLIC) { $paths.Add((Join-Path $env:PUBLIC 'Desktop')) }
+    if ($env:OneDrive) { $paths.Add((Join-Path $env:OneDrive 'Desktop')) }
+    if ($env:OneDriveCommercial) { $paths.Add((Join-Path $env:OneDriveCommercial 'Desktop')) }
+    return @($paths | Where-Object { $_ -and (Test-Path -LiteralPath $_ -PathType Container) } | Select-Object -Unique)
 }
-function Assert-Parse([string]$scriptPath) {
- $tokens=$null; $parseErrors=$null
- [void][Management.Automation.Language.Parser]::ParseFile($scriptPath,[ref]$tokens,[ref]$parseErrors)
- if ($parseErrors.Count -gt 0) {throw "PowerShell syntax errors: $scriptPath"}
+
+function Find-ExtractedRepository {
+    $candidates = New-Object 'System.Collections.Generic.List[string]'
+    $candidates.Add($PSScriptRoot)
+    $candidates.Add((Join-Path $PSScriptRoot 'TBMC-Deploy-main'))
+    $candidates.Add((Join-Path $PSScriptRoot 'TBMC-Deploy'))
+    foreach ($desktop in @(Get-DesktopFolders)) {
+        $candidates.Add((Join-Path $desktop 'TBMC-Deploy-main'))
+        $candidates.Add((Join-Path $desktop 'TBMC-Deploy'))
+        foreach ($dir in @(Get-ChildItem -LiteralPath $desktop -Directory -ErrorAction SilentlyContinue |
+                     Where-Object { $_.Name -like 'TBMC-Deploy*' })) {
+            $candidates.Add($dir.FullName)
+        }
+    }
+    foreach ($candidate in @($candidates | Select-Object -Unique)) {
+        if (Test-TbmcRepository $candidate) { return (Resolve-Path -LiteralPath $candidate).ProviderPath }
+    }
+    return $null
 }
-Assert-Admin
-$root=[IO.Path]::GetFullPath($DestinationRoot)
-$repo=Join-Path $root 'TBMC-Deploy'
-$installers=if($InstallerPath){$InstallerPath}else{Join-Path $root 'Installers'}
-$key=if($AgeIdentityPath){$AgeIdentityPath}else{Join-Path $root 'Secure\deploy.key'}
-foreach($dir in @($root,$installers,(Join-Path $root 'Logs'),(Join-Path $root 'Backups'),(Join-Path $root 'Secure'))){
- if(-not(Test-Path -LiteralPath $dir)){New-Item -ItemType Directory -Path $dir -Force | Out-Null}
+
+function Assert-PowerShellSyntax([string]$Path) {
+    $tokens = $null
+    $parseErrors = $null
+    [void][Management.Automation.Language.Parser]::ParseFile($Path, [ref]$tokens, [ref]$parseErrors)
+    if (@($parseErrors).Count -gt 0) {
+        $details = @($parseErrors | Select-Object -First 3 | ForEach-Object { $_.Message }) -join '; '
+        throw ('PowerShell syntax errors in ' + $Path + ': ' + $details)
+    }
 }
-if(-not(Test-Path -LiteralPath (Join-Path $repo $Entry))){
- if (-not $ZipPath) {
-   $zips=@(Get-ChildItem -LiteralPath $PSScriptRoot -File -Filter '*.zip' | Where-Object {$_.Name -match 'TBMC.?Deploy'})
-   if($zips.Count -ne 1){throw 'Supply -ZipPath to the TBMC-Deploy ZIP (or place exactly one matching ZIP beside this script).'}
-   $ZipPath=$zips[0].FullName
- }
- $zip=Resolve-Existing $ZipPath 'Repository ZIP'
- $staging=Join-Path $root ('_extract_'+[guid]::NewGuid().ToString('N'))
- New-Item -ItemType Directory -Path $staging | Out-Null
- Add-Type -AssemblyName System.IO.Compression
- Add-Type -AssemblyName System.IO.Compression.FileSystem
- try {
-   $archive=[IO.Compression.ZipFile]::OpenRead($zip)
-   try {
-     $sum=[long]0
-     foreach($e in $archive.Entries){
-       $relative=$e.FullName.Replace('/','\')
-       if([string]::IsNullOrWhiteSpace($relative)){continue}
-       if([IO.Path]::IsPathRooted($relative) -or $relative.StartsWith('\')){throw "Unsafe ZIP path: $relative"}
-       $dest=Join-Path $staging $relative
-       Assert-Under $dest $staging
-       $sum += $e.Length
-       if($sum -gt 10GB){throw 'ZIP expands over 10 GB; check package before deployment.'}
-       if($e.FullName.EndsWith('/')){New-Item -ItemType Directory -Path $dest -Force | Out-Null;continue}
-       New-Item -ItemType Directory -Path (Split-Path -Parent $dest) -Force | Out-Null
-       [IO.Compression.ZipFileExtensions]::ExtractToFile($e,$dest,$false)
-     }
-   } finally {$archive.Dispose()}
-   $source=Get-SingleRepo $staging
-   Assert-Parse (Join-Path $source $Entry)
-   if(Test-Path -LiteralPath $repo){throw "Existing repository folder at $repo is incomplete. Back it up or remove it manually; refusing overwrite."}
-   Move-Item -LiteralPath $source -Destination $repo
- } finally {if(Test-Path -LiteralPath $staging){Remove-Item -LiteralPath $staging -Recurse -Force}}
- Write-Host "Extracted TBMC-Deploy to $repo" -ForegroundColor Cyan
+
+function Copy-TreeWithoutJunctions([string]$Source, [string]$Destination) {
+    New-Item -ItemType Directory -Path $Destination -Force | Out-Null
+    # Never copy deploy.key into the repository: it belongs outside Git.
+    & robocopy.exe $Source $Destination /E /XJ /R:2 /W:1 /COPY:DAT /DCOPY:DAT /NP /NJH /NJS /NFL /NDL /XF deploy.key | Out-Null
+    $result = $LASTEXITCODE
+    $global:LASTEXITCODE = 0
+    if ($result -ge 8) { throw ('File staging failed; robocopy exit code ' + $result) }
 }
-$entryPath=Join-Path $repo $Entry
-Assert-Parse $entryPath
-$configDir=Join-Path $repo 'config'
-$configDest=Join-Path $configDir 'client.json'
-if($ConfigFile){
- $provided=Resolve-Existing $ConfigFile 'Client deployment configuration'
- if((Test-Path -LiteralPath $configDest) -and ((Resolve-Path -LiteralPath $configDest).ProviderPath -ne $provided)){
-   throw "Configuration already exists at $configDest. Refusing to overwrite; review it or use existing configuration."
- }
- if(-not(Test-Path -LiteralPath $configDest)){Copy-Item -LiteralPath $provided -Destination $configDest}
+
+function Protect-KeyFile([string]$Path) {
+    # Readable only by current account, local Administrators, and SYSTEM.
+    $acl = Get-Acl -LiteralPath $Path
+    $acl.SetAccessRuleProtection($true, $false)
+    $currentSid = [Security.Principal.WindowsIdentity]::GetCurrent().User
+    $sids = @($currentSid,
+              (New-Object Security.Principal.SecurityIdentifier('S-1-5-18')),
+              (New-Object Security.Principal.SecurityIdentifier('S-1-5-32-544')))
+    foreach ($sid in $sids) {
+        $rule = [System.Security.AccessControl.FileSystemAccessRule]::new(
+            $sid, [System.Security.AccessControl.FileSystemRights]::FullControl,
+            [System.Security.AccessControl.AccessControlType]::Allow)
+        $acl.SetAccessRule($rule)
+    }
+    Set-Acl -LiteralPath $Path -AclObject $acl
 }
-if(-not(Test-Path -LiteralPath $configDest)){
- $template=Join-Path $configDir 'deployment.example.json'
- if(-not(Test-Path -LiteralPath $template)){throw 'No client.json or deployment.example.json in repository.'}
- Copy-Item -LiteralPath $template -Destination $configDest
- Write-Warning "Created $configDest from example. Review all required values before live installation."
+
+function Confirm-Installation([string]$RoleLabel) {
+    try {
+        Add-Type -AssemblyName System.Windows.Forms
+        $answer = [System.Windows.Forms.MessageBox]::Show(
+            "Dry run completed. Start the LIVE $RoleLabel installation and restoration on this Windows machine?`n`nChoose No to exit without installing anything.",
+            'TBMC deployment - approval required',
+            [System.Windows.Forms.MessageBoxButtons]::YesNo,
+            [System.Windows.Forms.MessageBoxIcon]::Warning,
+            [System.Windows.Forms.MessageBoxDefaultButton]::Button2)
+        return ($answer -eq [System.Windows.Forms.DialogResult]::Yes)
+    }
+    catch {
+        $answer = Read-Host 'To start LIVE installation, type INSTALL (otherwise press Enter)'
+        return ($answer -eq 'INSTALL')
+    }
 }
-try {$null=Get-Content -LiteralPath $configDest -Raw | ConvertFrom-Json}
-catch{throw "Invalid JSON configuration: $configDest ($($_.Exception.Message))"}
-if(-not(Test-Path -LiteralPath $key -PathType Leaf)){
- throw "age private identity key is missing: $key. Copy it securely from the source host (never commit it to Git)."
-}
-Write-Host "`nPreparing $Role using $entryPath" -ForegroundColor Cyan
-Write-Host "Configuration: $configDest"
-Write-Host "Offline installers: $installers"
-Write-Host 'Running mandatory installation dry run...' -ForegroundColor Yellow
-Push-Location $repo
+
 try {
- $params=@{ConfigPath=$configDest; InstallerPath=$installers; AgeIdentityPath=$key}
- & $entryPath @params -DryRun
- if(-not $?){throw 'Deployment dry run returned an unsuccessful status.'}
- if($DryRunOnly){Write-Host 'Dry run completed; no live installation requested.' -ForegroundColor Green;return}
- Write-Host 'Dry run finished. Starting deployment orchestrator...' -ForegroundColor Yellow
- if($Resume){& $entryPath @params -Resume}else{& $entryPath @params}
- if(-not $?){throw 'Deployment orchestrator returned an unsuccessful status.'}
- Write-Host "`n$Role orchestration returned successfully. Run service/application validation and review logs before cutover." -ForegroundColor Green
-}finally{Pop-Location}
+    Write-Host "`nTBMC Deployment: $Role Server" -ForegroundColor Cyan
+    Write-Host 'Step 1/5 - Locate extracted repository on the Windows desktop'
+    $root = [IO.Path]::GetFullPath($DestinationRoot)
+    $repo = Join-Path $root 'TBMC-Deploy'
+    $source = Find-ExtractedRepository
+    if (-not $source -and -not (Test-TbmcRepository $repo)) {
+        throw 'Cannot find TBMC-Deploy-main on this Windows desktop. Unzip the GitHub repository to the Desktop and run the script from inside that folder.'
+    }
+    if ($source) { Write-Host ('Found source: ' + $source) }
+
+    Write-Host 'Step 2/5 - Prepare C:\TBMC folders and stage deployment files'
+    foreach ($folder in @($root, (Join-Path $root 'Installers'), (Join-Path $root 'Backups'),
+                         (Join-Path $root 'Logs'), (Join-Path $root 'Secure'))) {
+        New-Item -ItemType Directory -Path $folder -Force | Out-Null
+    }
+    if (Test-TbmcRepository $repo) {
+        Write-Host ('Using previously staged repository: ' + $repo) -ForegroundColor Yellow
+        Write-Host 'Existing client configuration and deployment journals have been preserved.'
+    }
+    else {
+        if (Test-Path -LiteralPath $repo) {
+            throw ('An incomplete folder already exists at ' + $repo + '. Refusing to overwrite it.')
+        }
+        if (-not $source) { throw 'No extracted repository folder was found.' }
+        Copy-TreeWithoutJunctions $source $repo
+        Write-Host ('Repository staged at: ' + $repo) -ForegroundColor Green
+    }
+
+    $entryPath = Join-Path $repo $RelativeEntry
+    Assert-PowerShellSyntax $entryPath
+    $configDir = Join-Path $repo 'config'
+    $configOut = Join-Path $configDir 'client.json'
+    $configCreatedFromTemplate = $false
+    if (-not (Test-Path -LiteralPath $configOut -PathType Leaf)) {
+        $copied = $false
+        foreach ($folder in @($PSScriptRoot) + @(Get-DesktopFolders)) {
+            $externalConfig = Join-Path $folder 'client.json'
+            if (Test-Path -LiteralPath $externalConfig -PathType Leaf) {
+                Copy-Item -LiteralPath $externalConfig -Destination $configOut
+                $copied = $true
+                Write-Host ('Client configuration copied from: ' + $externalConfig)
+                break
+            }
+        }
+        if (-not $copied) {
+            $template = Join-Path $configDir 'deployment.example.json'
+            if (-not (Test-Path -LiteralPath $template -PathType Leaf)) {
+                throw 'Missing config\deployment.example.json and no client.json was supplied.'
+            }
+            Copy-Item -LiteralPath $template -Destination $configOut
+            $configCreatedFromTemplate = $true
+            Write-Warning 'Created client.json from the EXAMPLE template. It must be reviewed before live installation.'
+        }
+    }
+    try { $null = Get-Content -LiteralPath $configOut -Raw | ConvertFrom-Json }
+    catch { throw ('Invalid config\client.json: ' + $_.Exception.Message) }
+    $templatePath = Join-Path $configDir 'deployment.example.json'
+    $configIsTemplate = $false
+    if (Test-Path -LiteralPath $templatePath -PathType Leaf) {
+        $configIsTemplate = ((Get-FileHash -LiteralPath $configOut -Algorithm SHA256).Hash -eq
+                             (Get-FileHash -LiteralPath $templatePath -Algorithm SHA256).Hash)
+    }
+
+    # Automatically stage a separately supplied installer folder when present.
+    $installerDest = Join-Path $root 'Installers'
+    foreach ($folder in @($PSScriptRoot) + @(Get-DesktopFolders)) {
+        foreach ($name in @('TBMC-Installers','Installers')) {
+            $possible = Join-Path $folder $name
+            if ((Test-Path -LiteralPath $possible -PathType Container) -and
+                -not ($possible.TrimEnd('\') -ieq $installerDest.TrimEnd('\'))) {
+                Copy-TreeWithoutJunctions $possible $installerDest
+                Write-Host ('Offline installers staged from: ' + $possible)
+            }
+        }
+    }
+
+    Write-Host 'Step 3/5 - Find the age decryption identity, if supplied'
+    $key = Join-Path $root 'Secure\deploy.key'
+    if (-not (Test-Path -LiteralPath $key -PathType Leaf)) {
+        $keyCandidates = New-Object 'System.Collections.Generic.List[string]'
+        foreach ($folder in @($PSScriptRoot) + @(Get-DesktopFolders)) {
+            $keyCandidates.Add((Join-Path $folder 'deploy.key'))
+        }
+        foreach ($possible in @($keyCandidates | Select-Object -Unique)) {
+            if (Test-Path -LiteralPath $possible -PathType Leaf) {
+                Copy-Item -LiteralPath $possible -Destination $key
+                Write-Host ('Private key staged securely from: ' + $possible)
+                Write-Warning 'After deployment, securely remove any unprotected Desktop copy of deploy.key.'
+                break
+            }
+        }
+    }
+    if (Test-Path -LiteralPath $key -PathType Leaf) { Protect-KeyFile $key }
+
+    Write-Host 'Step 4/5 - Run the repository orchestrator preflight'
+    Write-Host ('Entry: ' + $entryPath)
+    Write-Host ('Config: ' + $configOut)
+    Write-Host ('Offline installer directory: ' + $installerDest)
+    if (-not (Test-Path -LiteralPath $key -PathType Leaf)) {
+        throw ('Missing private age key. Place deploy.key on the Desktop, then run THIS SAME script again. It will stage the file at ' + $key)
+    }
+
+    Push-Location $repo
+    try {
+        $arguments = @{
+            ConfigPath = $configOut
+            InstallerPath = $installerDest
+            AgeIdentityPath = $key
+        }
+        $global:LASTEXITCODE = 0
+        & $entryPath @arguments -DryRun
+        if (-not $? -or $LASTEXITCODE -ne 0) {
+            throw 'The underlying installer dry run failed. Check the message above for missing files, versions, hashes, or settings.'
+        }
+        Write-Host 'Dry run succeeded.' -ForegroundColor Green
+
+        if ($DryRunOnly) {
+            Write-Host 'DryRunOnly was selected. No application installation was started.' -ForegroundColor Green
+            exit 0
+        }
+        if ($configCreatedFromTemplate -or $configIsTemplate) {
+            throw ('The configuration is still identical to the example template: ' + $configOut + '. Supply verified client settings, installer versions and hashes; then rerun the SAME launcher.')
+        }
+        Write-Host 'Step 5/5 - Request approval for live installation'
+        if (-not (Confirm-Installation $Role)) {
+            Write-Host 'Live installation cancelled. Preparation is complete; rerun this launcher later.' -ForegroundColor Yellow
+            exit 0
+        }
+        $global:LASTEXITCODE = 0
+        if ($Resume) { & $entryPath @arguments -Resume }
+        else { & $entryPath @arguments }
+        if (-not $? -or $LASTEXITCODE -ne 0) {
+            throw 'Installer did not return a clean success status. Review its logs before proceeding.'
+        }
+        Write-Host "`n$Role installation orchestrator finished. Review application validation before enabling live integrations." -ForegroundColor Green
+        exit 0
+    }
+    finally { Pop-Location }
+}
+catch {
+    Write-Host "`nTBMC preparation or deployment stopped safely:" -ForegroundColor Red
+    Write-Host $_.Exception.Message -ForegroundColor Red
+    Write-Host 'You can rerun this same script after resolving the issue; existing files are preserved.' -ForegroundColor Yellow
+    exit 1
+}
