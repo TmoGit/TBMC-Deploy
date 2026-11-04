@@ -1,0 +1,32 @@
+Continue the migration investigation autonomously. Do not ask me to supply another backup until you have verified the existing artifact against the original source records.
+
+The original `ignition_config` MariaDB dump was captured on Proxmox and recorded with:
+
+- Decrypted source size: 60,934,812 bytes
+- Decrypted SHA-256: `0C0E7BE2BCDD260C01AA2CD9ADDF516D071E9C32E9CA20BDAD456E8E2AA94885`
+- Published commit: `d12e901d60263d947108823048e6a071c15d5522`
+
+Perform the following investigation automatically:
+
+1. Locate all existing encrypted MariaDB backup artifacts in the deployment repository, local staging directories, and downloaded archives.
+2. Compare their encrypted hashes with the published transfer manifest.
+3. Decrypt the appropriate contextual database artifact into a restricted temporary directory.
+4. Compare its decrypted SHA-256 and byte count against the original source values above.
+5. Inspect the complete SQL dump structure, including database creation, table definitions, INSERT statements, routines, triggers, events, and termination.
+6. Confirm whether the dump is genuinely incomplete or whether the verification parser incorrectly interpreted a large INSERT statement or other SQL content.
+7. If possible, perform a non-destructive validation using an isolated disposable MariaDB 10.11 environment. Do not overwrite the destination database.
+8. Inspect all relevant restoration scripts and correct faulty artifact selection, extraction, or parsing logic.
+9. Preserve existing destination data and continue any independent, safe preparation or validation work.
+
+**Decision logic:**
+
+- If the decrypted hash differs from the original source hash, identify the wrong or damaged artifact and locate the correct published version.
+- If the hash and size match but SQL content is incomplete, conclude that the original logical backup itself is defective. Do not attempt to fabricate missing records.
+- If the backup is complete and the problem is in validation logic, repair that logic and continue the approved migration process.
+- If a new source backup is genuinely required, prepare the exact recovery procedure using the original Ignition Server on Proxmox host `morrison`, but request authorization before starting the source VM.
+
+Do not ask me to locate files already in the deployment package. Do not request manual operations that you can perform using your current access.
+
+Do not restart source VMs, overwrite the destination MariaDB database, or modify running Ignition services without authorization.
+
+Provide a concise finding identifying whether the issue is artifact selection, data corruption, incomplete original export, or incorrect verification logic, with supporting evidence. Continue independently through all safe steps.
