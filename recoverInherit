@@ -1,0 +1,598 @@
+I've combined both commissions into one integrated Codex assignment. It will recover Gateway administrator access if necessary, diagnose and repair the TBMC “Project Not Runnable” error, and verify that the application launches correctly.
+
+I also adjusted the execution sequence so Codex doesn't unnecessarily reset the Gateway password if administrative access has already been restored.
+
+# CODEX COMMISSION — TBMC Ignition Gateway Administrator Recovery, Project Repair & Validation
+
+## Mission
+
+You are the lead Ignition deployment and commissioning engineer responsible for resolving two outstanding issues on the client's existing Ignition Gateway:
+
+1. Recover or verify Gateway administrator access.
+2. Diagnose and correct the **TBMC Project Not Runnable** error.
+
+Your objective is to leave the TBMC application accessible and operational, with its original project architecture, configuration, and dependencies preserved.
+
+**Work autonomously wherever possible. Do not stop after identifying a problem. Investigate it, implement a safe correction, verify the result, and continue.**
+
+Only request authorization for genuinely privileged, destructive, service-interrupting, security-sensitive, or operationally risky changes.
+
+## 1. Target environment
+
+| Item                  | Configuration                                                                                                    |
+| --------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| Windows Server        | 172.16.81.201                                                                                                    |
+| Ignition Gateway      | 8.3.4                                                                                                            |
+| Gateway URL           | [http://172.16.81.201:8088](http://172.16.81.201:8088)                                                           |
+| TBMC Perspective URL  | [http://172.16.81.201:8088/data/perspective/client/TBMC](http://172.16.81.201:8088/data/perspective/client/TBMC) |
+| MariaDB               | 10.11                                                                                                            |
+| Contextual database   | ignition_config                                                                                                  |
+| Deployment repository | C:\TBMC\TBMC-Deploy                                                                                              |
+| Logs                  | C:\TBMC\Logs                                                                                                     |
+| Backups               | C:\TBMC\Backups                                                                                                  |
+
+You are executing in VS Code directly on the destination Windows Ignition Server.
+
+Both Ignition and MariaDB are already installed.
+
+**Do not reinstall either application. Do not restart the original Proxmox VMs.**
+
+The TBMC migration involves four projects:
+
+- `TBMC`
+- `TBMC_CT_DEMO`
+- `SCADA_Template_Project`
+- `samplequickstart`
+
+Do not assume that all projects have been fully restored until their resources and configuration have been verified.
+
+## 2. Operational autonomy and approval policy
+
+The user has already authorized non-destructive investigation, script corrections, diagnostics, backups, and preparation.
+
+Proceed automatically with:
+
+- Repository inspection
+- Log analysis
+- PowerShell diagnostics
+- Gateway health checks
+- Module and project inventory
+- Configuration comparisons
+- Script corrections
+- Read-only database verification
+- Non-destructive backup operations
+- Validation and reporting
+
+Do not repeatedly request approval for these routine tasks.
+
+Full Access in Codex does not override Windows security, Gateway authentication, MariaDB authentication, or required user consent.
+
+For operations requiring elevation, prepare a consolidated elevated execution sequence instead of requesting elevation for every command.
+
+**Request one consolidated authorization before performing changes that include:**
+
+- Gateway password recovery
+- Gateway service restart
+- Gateway security configuration changes
+- Project inheritance or enabled-state changes
+- Project resource overwrites
+- Destructive database changes
+- Production integration activation
+
+Once authorized, continue autonomously within the approved scope.
+
+If a newly discovered material risk is outside that scope, request additional authorization.
+
+Do not use insecure workarounds or bypass authentication to avoid asking for required credentials.
+
+## 3. Phase A — Environment inspection and baseline
+
+Begin by inspecting the local environment.
+
+### Windows and services
+
+1. Confirm the machine identity and IP configuration.
+2. Locate the actual Ignition installation directory.
+3. Locate the installed `gwcmd.bat` utility.
+4. Verify Ignition is running version 8.3.4.
+5. Verify MariaDB service health.
+6. Identify current Windows account privileges.
+7. Identify Gateway HTTP/HTTPS ports.
+8. Verify Gateway web availability.
+9. Check relevant Windows event logs.
+10. Identify any ongoing migration, restoration, or database operations.
+
+Do not interrupt active operations.
+
+### Deployment inventory
+
+Inspect:
+
+- `C:\TBMC\TBMC-Deploy\ignition`
+- `C:\TBMC\TBMC-Deploy\Windows`
+- `C:\TBMC\TBMC-Deploy\database`
+- `C:\TBMC\TBMC-Deploy\config`
+- Existing backup and restoration manifests
+
+Identify the actual deployed Gateway configuration, project directories, modules, and supporting resources.
+
+Record the current system state before changing anything.
+
+### Database verification
+
+Read-only checks should establish:
+
+- Whether `ignition_config` exists
+- Whether the expected 20 contextual tables exist
+- Whether representative records are populated
+- Whether MariaDB is responding normally
+- Whether the Gateway database connection is configured correctly
+
+Do not rerun the contextual database restoration unless a separately diagnosed problem makes it necessary and the user authorizes it.
+
+## 4. Phase B — Preserve the existing Gateway
+
+Before changing Gateway authentication or project settings:
+
+1. Identify the Gateway installation and data directories.
+2. Record Ignition service configuration.
+3. Identify the current Gateway security configuration.
+4. Capture a supported Gateway backup where access and the installed utility permit it.
+5. Save backups under `C:\TBMC\Backups`.
+6. Compute backup checksums.
+7. Verify backup files were successfully created and are readable.
+8. Preserve relevant project configuration and metadata.
+9. Document rollback procedures.
+
+Use supported Ignition backup methods rather than assuming that copying the installation directory constitutes a complete Gateway backup.
+
+If no valid Gateway backup can be obtained, record the limitation and request approval before making material configuration changes.
+
+Do not overwrite existing backups.
+
+Never place passwords, private keys, database credentials, or other secrets in reports.
+
+## 5. Phase C — Verify or recover administrator access
+
+**First determine whether Gateway administrative access has already been restored.**
+
+If a functioning administrator account exists and can access the necessary Gateway configuration, do not reset its password.
+
+Proceed directly to project diagnosis.
+
+### Conditional password recovery
+
+If administrator access is unavailable, use the official Ignition 8.3 password recovery procedure.
+
+Documentation:
+
+[https://www.docs.inductiveautomation.com/docs/8.3/platform/gateway/gateway-command-line-utility-gwcmd](https://www.docs.inductiveautomation.com/docs/8.3/platform/gateway/gateway-command-line-utility-gwcmd)
+
+Locate and inspect the installed Gateway command-line utility and verify the syntax supported by the installed version.
+
+The documented recovery operations include:
+
+`gwcmd -p`
+
+`gwcmd -r`
+
+Adapt these commands to the actual Windows installation.
+
+Before initiating recovery:
+
+1. Verify the backup status.
+2. Confirm no active restoration operation will be interrupted.
+3. Identify any restart-related operational impacts.
+4. Request one consolidated authorization for the reset and required restart.
+
+After authorization:
+
+1. Execute the official password recovery operation.
+2. Verify the operation completed successfully.
+3. Restart the Gateway using a supported method.
+4. Confirm the Windows service returns to Running.
+5. Confirm the Gateway web interface responds.
+6. Verify whether the partial commissioning screen is available.
+
+### Administrator commissioning
+
+If the partial commissioning screen appears, direct the authorized user to:
+
+[http://localhost:8088](http://localhost:8088)
+
+or:
+
+[http://172.16.81.201:8088](http://172.16.81.201:8088)
+
+The user will establish administrator credentials through the Gateway interface.
+
+Do not invent default credentials, generate hardcoded passwords, or request that passwords be pasted into Codex chat.
+
+### Restore normal authentication
+
+After access is recovered:
+
+1. Identify any temporary recovery user source.
+2. Identify any temporary recovery Identity Provider.
+3. Determine the intended permanent authentication configuration.
+4. Compare against preserved original settings.
+5. Restore permanent administrator access as appropriate.
+6. Verify Gateway and Designer administrative permissions.
+7. Test permanent administrator login before removing temporary recovery access.
+8. Remove temporary authentication resources only after the permanent configuration is proven functional.
+
+Preserve the original security architecture wherever possible.
+
+Do not unnecessarily change network exposure, roles, user permissions, or production authentication integrations.
+
+## 6. Phase D — Diagnose TBMC Project Not Runnable
+
+The Gateway is reporting that the `TBMC` project is not runnable.
+
+Determine the exact cause before making changes.
+
+### Project configuration
+
+Inspect the project through supported Gateway administration interfaces and available restored source metadata.
+
+For every restored project, determine:
+
+- Whether it exists
+- Whether it is enabled
+- Whether it is marked Inheritable
+- Its assigned parent project
+- Its dependent child projects
+- Its available Perspective resources
+- Its available Vision resources
+- Its Gateway-scoped resources
+- Whether it has unresolved project errors
+
+Pay particular attention to `TBMC`.
+
+### Inheritance investigation
+
+An Ignition project marked **Inheritable** may be intended as a shared parent project rather than a directly runnable application.
+
+Determine whether `TBMC` is:
+
+1. An ordinary runnable application project incorrectly marked Inheritable.
+2. An intentionally inheritable parent project whose child project must be launched.
+3. A correctly configured project whose runnable state is affected by missing resources, modules, or another loading/configuration problem.
+
+Compare its current settings with the original source configuration wherever source evidence exists.
+
+**Do not blindly disable Inheritable.**
+
+Changing inheritance incorrectly can break shared resources and other TBMC projects.
+
+If `TBMC` is intentionally a shared parent, identify the correct child application and its launch URL instead of changing its architecture.
+
+### Enabled-state investigation
+
+Verify that `TBMC` is enabled.
+
+If disabled, determine whether that was intentional for source isolation, migration, or commissioning.
+
+Do not enable it in a way that activates live industrial connections.
+
+### Perspective investigation
+
+Inspect:
+
+- Perspective module status
+- Project Perspective resources
+- Page configuration
+- Default/root page
+- Page-to-view mappings
+- Primary views
+- Referenced child views
+- Project inheritance dependencies
+- Authentication and page security
+- Missing resource or script errors
+
+Confirm that a browser-accessible page is actually configured.
+
+Do not assume the project is a Perspective application solely because a Perspective URL was previously supplied.
+
+### Vision investigation
+
+Inspect available Vision resources and determine whether `TBMC` is primarily a Vision application.
+
+If it is a Vision application rather than Perspective, identify the correct supported Vision launch method.
+
+Do not force a Perspective configuration onto an intentionally Vision-only project.
+
+### Gateway diagnostics
+
+Examine:
+
+- Gateway logs
+- Project loading errors
+- Missing resource errors
+- Module dependency errors
+- Project inheritance errors
+- Perspective startup errors
+- Authentication failures
+- Scripting exceptions
+- Database connection faults
+
+Identify the actual condition preventing TBMC from running.
+
+Distinguish between a project that is not runnable and one that is runnable but has a broken Perspective page, invalid authentication, or runtime errors.
+
+## 7. Phase E — Diagnose module and dependency health
+
+Verify required modules and dependencies are present and operating correctly.
+
+Pay particular attention to:
+
+- Perspective
+- Vision
+- OPC UA
+- Required PLC drivers
+- MQTT Engine
+- MQTT Transmission
+- SQL Bridge or other database-related modules
+- Historian integration modules
+- Reporting and notification modules
+- Custom project dependencies
+
+Compare installed modules against the restored source inventory.
+
+Identify:
+
+- Missing modules
+- Incompatible versions
+- Failed module startups
+- Licensing limitations
+- Required custom libraries
+- Missing JDBC drivers
+- Broken inherited project references
+
+Do not assume a module is healthy merely because its files exist.
+
+Use supported Ignition module-management procedures for any corrections.
+
+Do not automatically download unverified modules or bypass licensing.
+
+Keep PLC, MQTT, external historian, and notification connections disabled until cutover authorization.
+
+## 8. Phase F — Implement the appropriate correction
+
+Once the root cause is identified, determine the smallest supported change needed.
+
+Potential corrections include:
+
+- Enabling a project that was unintentionally disabled
+- Correcting an unintended Inheritable setting
+- Correcting a broken parent project assignment
+- Restoring missing project configuration
+- Restoring missing Perspective pages or views from verified artifacts
+- Correcting invalid page mappings
+- Repairing module dependencies
+- Correcting supported Gateway security configuration
+- Repairing destination-specific database connection settings
+- Fixing a failed project load caused by missing resources
+
+Do not apply every potential correction indiscriminately.
+
+Choose the fix supported by actual evidence.
+
+### Change requirements
+
+Before modifying project configuration:
+
+1. Preserve the existing configuration.
+2. Record the observed root cause.
+3. Identify the intended corrected state.
+4. Verify the change does not activate unwanted external connections.
+5. Request authorization for changes to inheritance, project resources, or other material Gateway configuration.
+6. Apply only the approved changes through supported mechanisms.
+7. Verify their effect.
+8. Roll back if verification fails and the rollback is safe.
+
+Do not replace an entire Gateway configuration when a targeted project correction is sufficient.
+
+Do not overwrite the contextual MariaDB database to resolve a project-runnability problem.
+
+## 9. Phase G — Validate TBMC application operation
+
+After applying the appropriate correction, perform complete verification.
+
+### Gateway health
+
+Verify:
+
+- Ignition Gateway is running.
+- Gateway administration is accessible.
+- Permanent administrator credentials work.
+- Temporary recovery security is cleaned up as appropriate.
+- Gateway logs contain no unresolved critical errors introduced by the recovery.
+
+### Project health
+
+Verify:
+
+- `TBMC` is present.
+- `TBMC_CT_DEMO` is present.
+- `SCADA_Template_Project` is present.
+- `samplequickstart` is present.
+- Project parent/child relationships are correct.
+- Project enabled/inheritable settings are correct.
+- Required resources have loaded.
+- No unresolved critical project errors remain.
+
+### TBMC runtime
+
+If TBMC is a Perspective application, verify the applicable launch URL, initially:
+
+[http://172.16.81.201:8088/data/perspective/client/TBMC](http://172.16.81.201:8088/data/perspective/client/TBMC)
+
+If the default path is incorrect, identify the actual page path.
+
+If TBMC is an intentionally inheritable parent, provide the correct runnable child project URL.
+
+If TBMC is a Vision application, provide the correct Vision launch method.
+
+Where access permits, perform an actual application session test—not merely an HTTP status check.
+
+Confirm:
+
+- Initial application view loads.
+- Required navigation works.
+- Required components render.
+- Project scripts initialize without critical failures.
+- Relevant database queries work.
+- No unexpected authentication or permission failures occur.
+
+If interactive verification is unavailable, explicitly mark it NOT TESTED rather than PASS.
+
+### Database
+
+Confirm:
+
+- MariaDB remains operational.
+- `ignition_config` is preserved.
+- Its 20 expected tables remain present.
+- Ignition can connect to the contextual database.
+- No unrelated database changes occurred.
+
+### External connections
+
+Verify that no live production integrations were inadvertently enabled.
+
+Do not enable live PLC, MQTT, historian, notification, or external system communications solely to make a project appear healthy.
+
+## 10. Phase H — Execution and self-correction
+
+Maintain a task journal throughout execution.
+
+For each stage:
+
+1. Record the operation performed.
+2. Record relevant diagnostic results.
+3. Capture command exit status.
+4. Verify the expected outcome.
+5. Record corrections made.
+6. Continue automatically when successful.
+
+When a step fails:
+
+1. Inspect the precise failure.
+2. Determine the root cause.
+3. Fix correctable script or configuration problems.
+4. Validate the correction.
+5. Retry the affected step rather than restarting the full workflow.
+6. Continue once successful.
+
+Avoid repeated retries without changing the underlying cause.
+
+Do not suppress errors or claim success based solely on a command returning without visible output.
+
+Do not change unrelated functioning systems.
+
+## 11. Phase I — Final reports
+
+Generate:
+
+`C:\TBMC\Logs\TBMC-Gateway-Password-Recovery.md`
+
+`C:\TBMC\Logs\TBMC-Project-Runnability-Report.md`
+
+`C:\TBMC\Logs\TBMC-Gateway-Recovery-Results.json`
+
+`C:\TBMC\Logs\TBMC-Gateway-Recovery-Execution.log`
+
+### Password recovery report
+
+Include:
+
+- Gateway version and original service status
+- Backup location and verification
+- Whether password recovery was required
+- Recovery commands executed, if applicable
+- Restart outcome
+- Administrator access verification
+- Temporary authentication cleanup status
+- Final security configuration status
+- Remaining limitations
+
+### Project runnability report
+
+Include:
+
+- Original error message
+- Root cause
+- Original TBMC project configuration
+- Corrected project configuration
+- Project inheritance relationships
+- Perspective or Vision identification
+- Modules and dependencies
+- Corrections made
+- Actual launch URL
+- Runtime test results
+- Outstanding limitations
+
+### Overall results
+
+Use these statuses:
+
+- PASS
+- FAIL
+- BLOCKED
+- NOT TESTED
+- REQUIRES AUTHORIZATION
+
+Include a summary table covering:
+
+| Component             | Verification                         |
+| --------------------- | ------------------------------------ |
+| Gateway access        | Permanent admin login                |
+| Gateway service       | Running and responsive               |
+| TBMC                  | Runnable or correct child identified |
+| Perspective/Vision    | Correct runtime available            |
+| Other projects        | Present and preserved                |
+| Modules               | Installed and healthy                |
+| MariaDB               | Running and preserved                |
+| External integrations | Remain isolated                      |
+| Overall result        | Verified application readiness       |
+
+Do not mark the application fully operational without evidence from runtime testing.
+
+## 12. Completion criteria
+
+The commission is complete when:
+
+1. Gateway administrator access is verified.
+2. The appropriate permanent authentication configuration is working.
+3. Temporary recovery authentication is removed or appropriately controlled.
+4. The TBMC Project Not Runnable error has been resolved or its correct runnable child has been identified.
+5. The appropriate application launch method is verified.
+6. Project inheritance and resources are preserved.
+7. Required modules and project dependencies are healthy.
+8. MariaDB remains operational and unchanged except for separately approved corrections.
+9. External industrial connections remain safely isolated.
+10. Reports and rollback information are available.
+
+If a genuine blocker prevents completion, provide the specific blocker, supporting evidence, and minimum action required from the user.
+
+Do not call the entire migration complete merely because the project is runnable; broader commissioning and production connectivity remain separate activities.
+
+## 13. Begin execution
+
+Start immediately with:
+
+1. Inspecting the Gateway and Windows environment.
+2. Determining whether administrator access is already available.
+3. Capturing the current Gateway and project configuration.
+4. Diagnosing the exact TBMC Project Not Runnable condition.
+
+**If administrator access is already functioning, skip password recovery entirely.**
+
+Proceed through all safe diagnostic and repair-preparation steps autonomously. Bundle necessary approvals wherever possible, then implement and verify the approved corrective actions.
+
+**The objective is a working, validated TBMC application—not another diagnostic report without a resolution.**
+
+My recommendation: Run this in the existing Codex session on `172.16.81.201`, not a new session, so it can use the migration findings and corrections already made.
+
+The most important change is that Gateway password recovery is now conditional. Codex should first determine why TBMC is not runnable; if administrative access is already working, it should focus entirely on fixing the project.
