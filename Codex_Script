@@ -1,0 +1,402 @@
+# CODEX COMMISSION — TBMC IGNITION SERVER MIGRATION AND VALIDATION
+
+## Mission
+
+You are the lead deployment engineer responsible for completing the TBMC Ignition Server migration on this Windows machine.
+
+**Your objective is to autonomously inspect, repair, execute, and verify the existing deployment package until the Ignition Server is restored and operational.**
+
+Do not simply provide instructions, generate plans, or repeatedly ask me to execute PowerShell commands.
+
+You are authorized to investigate and modify the local deployment scripts, repair configuration and path issues, execute non-destructive diagnostics, and prepare the restoration automatically.
+
+Ask for my approval only when an action could interrupt services, overwrite existing application/database data, alter security or network settings, or otherwise create a material operational risk.
+
+Do not repeatedly stop for minor missing paths, script errors, incorrect filenames, dependency mismatches, or other issues you can resolve safely.
+
+## 1. Current environment
+
+You are running in VS Code directly on the destination Windows Ignition Server.
+
+Deployment repository:
+
+`C:\TBMC\TBMC-Deploy`
+
+Deployment configuration:
+
+`C:\TBMC\TBMC-Deploy\config\client.json`
+
+Encrypted migration artifacts:
+
+`C:\TBMC\TBMC-Deploy\artifacts`
+
+Decryption identity:
+
+`C:\TBMC\Secure\deploy.key`
+
+Age executable:
+
+`C:\TBMC\Tools\age\age.exe`
+
+Deployment logs:
+
+`C:\TBMC\Logs`
+
+### Software already installed
+
+- Ignition Gateway 8.3.4, build 2026030309
+- MariaDB 10.11
+- Both Windows services have previously been confirmed running
+- Age v1.3.2 has previously been detected
+
+**Do not reinstall Ignition or MariaDB.**
+
+Verify the actual installed versions and service status before proceeding.
+
+QuestDB and InfluxDB belong on the separate time-series database infrastructure. Do not install either on this server.
+
+## 2. Inspect the entire deployment repository
+
+Perform a complete examination of the local deployment directory.
+
+Inspect:
+
+- `ignition/`
+- `Windows/`
+- `artifacts/`
+- `config/`
+- `shared/`
+- All restoration manifests and checksum files
+- Relevant documentation and installation scripts
+
+Read and understand the actual PowerShell implementation.
+
+Pay particular attention to:
+
+`ignition/Restore-Ignition.ps1`
+
+`Windows/Restore-VM133Artifacts.ps1`
+
+The first script delegates to the second. Inspect both before attempting restoration.
+
+Identify the exact supported parameters, internal script dependencies, required artifact paths, and restoration operations.
+
+Do not assume the scripts are correct merely because they were previously committed to GitHub.
+
+Avoid using the old V1/V2/V3/V4 desktop launchers unless specific reusable logic is needed.
+
+## 3. Establish a baseline
+
+Before changing the destination environment:
+
+1. Verify Windows administrative privileges and available disk capacity.
+2. Confirm the installed Ignition version, service status, Gateway directory, and active Gateway configuration.
+3. Confirm the installed MariaDB version, service status, database paths, and current database contents.
+4. Identify all existing destination databases and application resources.
+5. Confirm age decryption is available.
+6. Inventory every encrypted deployment artifact.
+7. Validate encrypted artifact hashes against the repository manifests.
+8. Verify the existence and completeness of the four required Ignition projects.
+9. Check the seven encrypted module archive chunks and their expected assembly order.
+10. Inspect the current configuration for external connections.
+
+Do not modify existing database records or overwrite application resources during this stage.
+
+Produce a baseline report.
+
+## 4. Repair the deployment scripts
+
+You are authorized to fix incorrect or incomplete local scripts.
+
+Examples include:
+
+- Incorrect parameter names
+- Hardcoded paths
+- Incorrect installer assumptions
+- Missing PowerShell properties
+- Invalid wildcard expansion
+- PowerShell execution-policy handling
+- Incorrect age executable locations
+- Incorrect encrypted artifact references
+- Missing restoration stages
+- Broken dependency ordering
+- Incorrect module archive assembly
+- Invalid JSON configuration handling
+- Incomplete logging or error handling
+
+Preserve the original files before modifying them.
+
+Do not weaken encryption, checksum verification, authentication, or operational safety controls.
+
+Use the actual verified repository contents, not hypothetical filenames.
+
+Resolve safe, recoverable issues autonomously.
+
+Run PowerShell syntax checks after modifying scripts and verify the corrected behavior through non-destructive tests.
+
+Do not repeatedly retry the same failing operation without changing the underlying cause.
+
+## 5. Prepare the complete restoration workflow
+
+The source Ignition Server contained the following components.
+
+### MariaDB contextual database
+
+Database:
+
+`ignition_config`
+
+Restore requirements:
+
+- Complete schema
+- All contextual and operational records
+- Equipment and batch configuration
+- Audit records
+- Stored procedures and functions
+- Triggers
+- Scheduled events
+- Required application privileges
+
+The migration package includes an encrypted MariaDB logical backup and a separate system/privilege backup.
+
+Do not blindly restore global administrative privileges over the destination MariaDB installation.
+
+Verify the current destination database before approving any overwrite.
+
+### Ignition projects
+
+Restore and verify:
+
+- TBMC
+- TBMC_CT_DEMO
+- SCADA_Template_Project
+- samplequickstart
+
+Preserve all available project resources, scripts, Named Queries, Perspective views, Vision resources, and configuration.
+
+### Ignition modules
+
+Restore all captured modules appropriate to the original Gateway, including:
+
+- MQTT Engine
+- MQTT Transmission
+- Perspective
+- Vision
+- OPC UA
+- Historian and InfluxDB modules
+- SQL-related modules
+- Required PLC drivers
+- Reporting and notification modules
+- Custom module dependencies
+
+Verify module versions and compatibility with Ignition 8.3.4.
+
+### Gateway resources
+
+Restore applicable:
+
+- Gateway configuration
+- Gateway resource directories
+- JDBC configuration and dependencies
+- Required certificates and keystores
+- Commissioning configuration
+- Gateway scripts and supporting files
+- CSV historian configuration and captured data
+
+No native `.gwbk` was obtained from the source.
+
+Therefore, inspect the available supplemental artifacts and determine what can actually be restored using supported methods.
+
+Do not claim full Gateway restoration merely because files were copied successfully.
+
+## 6. Create a safe execution plan
+
+Construct the actual restoration sequence based on the available scripts and verified artifacts.
+
+Use this dependency order unless inspection establishes a better one:
+
+1. Backup existing destination application and database configuration.
+2. Validate and decrypt source artifacts into a restricted temporary working directory.
+3. Verify decrypted file integrity and backup completeness.
+4. Validate MariaDB backup format and restore compatibility.
+5. Restore the contextual database and approved privileges.
+6. Restore supported Ignition Gateway configuration.
+7. Restore the four Ignition projects.
+8. Restore custom modules and required dependencies.
+9. Restore supporting resources and certificates.
+10. Apply destination-specific database connection settings.
+11. Restart affected services only when required and approved.
+12. Execute functional verification.
+13. Clean up temporary plaintext artifacts securely.
+
+Ensure restored Gateway configurations do not automatically connect to live PLCs, MQTT brokers, external historians, production databases, or notification systems without approval.
+
+**Before the first operation that could overwrite destination data or interrupt a running service, present a concise summary of the changes, backup/rollback provisions, and expected impact, then request one consolidated authorization.**
+
+After approval, proceed through the approved sequence without unnecessary interruptions.
+
+If a newly discovered risk falls outside the approved scope, request additional authorization.
+
+## 7. Execute and self-correct
+
+Execute the actual restoration using PowerShell and the existing repository.
+
+You may create corrected supporting scripts when necessary.
+
+For each operation:
+
+- Record its start time.
+- Record the exact operation performed.
+- Verify successful completion.
+- Capture output and errors.
+- Confirm expected files or database objects exist.
+- Continue automatically when successful.
+
+When an operation fails:
+
+1. Inspect the exact error and relevant source code.
+2. Determine the root cause.
+3. Implement a safe correction.
+4. Validate the correction.
+5. Retry the affected step, not the entire migration.
+6. Continue when successful.
+
+Do not repeat an unsuccessful operation indefinitely.
+
+Do not use broad exception suppression or mark failed steps as complete.
+
+Do not claim a migration stage succeeded without evidence.
+
+## 8. Perform complete deployment verification
+
+After restoration, independently validate the deployed system.
+
+### Windows services
+
+Confirm:
+
+- Ignition starts successfully.
+- MariaDB starts successfully.
+- Both services have appropriate startup configurations.
+- Required application ports are available.
+- No critical service errors are present.
+
+### MariaDB
+
+Verify:
+
+- `ignition_config` exists.
+- Required tables and records are populated.
+- Stored procedures, triggers, and events are present.
+- Required application accounts and privileges are functional.
+- Ignition database connectivity is successful.
+
+Compare database object counts and representative record counts against available source backup evidence.
+
+### Ignition
+
+Verify:
+
+- Gateway is running Ignition 8.3.4.
+- All four required projects are present.
+- Required modules are installed, licensed as applicable, and healthy.
+- JDBC connections are configured for the destination.
+- Named Queries and project resources are present.
+- Gateway logs show no unresolved critical restoration errors.
+- The Gateway can access its contextual database.
+
+Avoid activating live external industrial connections during testing.
+
+### Restoration completeness
+
+Produce a component-by-component comparison:
+
+SOURCE ARTIFACT → RESTORATION ACTION → DESTINATION VERIFICATION → RESULT
+
+Use the following statuses:
+
+- PASS
+- FAIL
+- NOT TESTED
+- BLOCKED
+- REQUIRES AUTHORIZATION
+
+Do not mark missing or untested functionality as PASS.
+
+## 9. Final deliverables
+
+Create:
+
+`C:\TBMC\Logs\TBMC-Ignition-Migration-Report.md`
+
+`C:\TBMC\Logs\TBMC-Ignition-Migration-Results.json`
+
+`C:\TBMC\Logs\TBMC-Ignition-Migration-Execution.log`
+
+Also maintain a resumable execution journal so completed steps are not unnecessarily repeated.
+
+The final Markdown report must document:
+
+1. Installed software versions
+2. Existing environment baseline
+3. Deployment scripts examined and corrected
+4. Encrypted artifacts discovered and verified
+5. MariaDB restoration results
+6. Ignition project restoration results
+7. Module restoration results
+8. Gateway configuration restoration results
+9. Verification results
+10. Unresolved issues and limitations
+11. Any required licenses or external dependencies
+12. Services and connections intentionally left disabled
+13. Rollback and recovery instructions
+14. Overall migration readiness
+
+Do not write passwords, private keys, decrypted credentials, or confidential database records into logs.
+
+## 10. Interaction and autonomy requirements
+
+I want this to be a minimally supervised deployment.
+
+**Do not ask me to:**
+
+- Edit PowerShell scripts
+- Manually fix JSON fields
+- Rename installer files
+- Run commands you can execute
+- Locate artifacts already present in the repository
+- Diagnose errors you can inspect locally
+- Repeatedly approve harmless diagnostic commands
+
+Ask me only when:
+
+- Administrator elevation requires my action
+- A required secret or authorization cannot be obtained through an approved mechanism
+- A destructive database or Gateway overwrite is required
+- A service interruption or reboot is required
+- A firewall, network, or security change is required
+- A major software compatibility decision is required
+- An external production connection could be activated
+- A material problem cannot be safely resolved automatically
+
+Preserve existing client data unless an overwrite is explicitly authorized.
+
+Do not restart or modify the original Proxmox VMs.
+
+Do not upload private keys, plaintext database backups, or confidential source configurations to external services.
+
+Do not perform destructive source-control operations.
+
+## 11. Begin execution
+
+Start by inspecting the repository and the two actual restore entry points.
+
+Perform the baseline assessment, validate artifacts, repair the scripts, and prepare the restoration.
+
+When ready to modify the running Ignition or MariaDB environment, request a single consolidated authorization covering the proposed restoration and rollback procedure.
+
+After approval, continue the restoration and verification autonomously within that scope.
+
+**The objective is a functioning, validated TBMC Ignition Server—not another collection of partially working deployment launchers.**
+
+Continue through completion and report only genuine blockers requiring my intervention.
