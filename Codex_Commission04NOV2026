@@ -1,0 +1,168 @@
+This is a major milestone. We now have a complete, successfully test-restored MariaDB export containing all 20 contextual database tables. That resolves the original truncated-backup problem.
+
+The next step is to get the corrected backup onto the client Ignition Server and let Codex resume the migration.
+
+## Updated migration status
+
+| Component              | Status                                         |
+| ---------------------- | ---------------------------------------------- |
+| Ignition 8.3.4         | Installed and running on client server         |
+| MariaDB 10.11          | Installed and running on client server         |
+| Contextual database    | &#x20;New backup captured                      |
+| Database structure     | &#x20;All 20 tables restored in isolated test  |
+| Encrypted backup       | &#x20;Published to GitHub                      |
+| Source Ignition Server | &#x20;Safely stopped                           |
+| Source Database Server | &#x20;Stopped                                  |
+| Client restoration     | Pending new artifact transfer and verification |
+
+The replacement SQL backup is approximately 1.31 GB, distributed across 14 encrypted parts.
+
+The remaining source row-count uncertainty should be documented, but the successful isolated restore is substantially stronger evidence than we had previously.
+
+## Next: Give Codex on the client Ignition Server this commission
+
+# TBMC — Resume Client Ignition Migration with Corrected Database Backup
+
+The original MariaDB backup problem has been resolved on source Proxmox host `morrison`.
+
+A complete replacement backup has been captured, tested, encrypted, and published.
+
+## Verified source recovery
+
+- Engine: MariaDB 10.11.16
+- Database: `ignition_config`
+- Tables: 20 InnoDB tables
+- Plaintext size: 1,313,012,605 bytes
+- Plaintext SHA-256: `8a8911bf5672b269c067221ec2407df41965d3520024e42e872551bca8d14b5a`
+- Encrypted SHA-256: `d045ecbd94114fd9b90d2a53d586026b7a40886e00221e44244abf95d3f3b44f`
+- Encryption: age, existing public recipient
+- Artifact: 14 encrypted parts
+- Isolated MariaDB 10.11 restoration: PASSED
+- Restored table count: 20
+- GitHub commit: `e7dcf81`
+
+Repository:\
+[https://github.com/TmoGit/TBMC-Deploy](https://github.com/TmoGit/TBMC-Deploy)
+
+Both original source VMs are stopped. Do not restart them.
+
+## Phase 1 — Update the client deployment package
+
+The client Windows server currently contains an older local deployment package.
+
+1. Inspect the existing repository and local script modifications.
+2. Preserve any corrections made by the client Codex session.
+3. Retrieve the updated deployment files from the approved GitHub repository.
+4. Verify commit `e7dcf81` or a later approved commit.
+5. Transfer or synchronize the 14 replacement encrypted backup parts.
+6. Update the restoration scripts and manifests.
+7. Do not overwrite local client configuration, secrets, or useful script corrections.
+8. Do not reactivate the defective original backup.
+
+If GitHub authentication or file transfer requires intervention, request it once. Complete all other independent work.
+
+## Phase 2 — Verify the new database backup
+
+Before touching the installed database:
+
+1. Verify all 14 encrypted parts are present.
+2. Validate their individual checksums using the published manifest.
+3. Reassemble the encrypted artifact in the documented order.
+4. Verify the assembled encrypted SHA-256.
+5. Decrypt using the existing local age identity.
+6. Confirm the decrypted file size is exactly 1,313,012,605 bytes.
+7. Confirm the plaintext SHA-256 matches the verified source hash.
+8. Confirm the SQL dump has its completion marker.
+9. Verify the complete 20-table structure.
+10. Confirm sufficient available storage for restoration and rollback.
+
+Fail safely if any check fails.
+
+The new encrypted artifact was not independently decrypted on the Proxmox host. Therefore, successful decryption and matching plaintext SHA-256 on this client server are mandatory before restoration.
+
+## Phase 3 — Prepare the client restore
+
+Ignition and MariaDB are already installed. Do not reinstall them.
+
+Inspect and update the actual restoration scripts, including:
+
+- `database/Restore-MariaDB.ps1`
+- `ignition/Restore-Ignition.ps1`
+- `Windows/Restore-VM133Artifacts.ps1`
+- All subordinate restoration scripts
+
+Correct broken parameters, paths, artifact references, and dependencies.
+
+Preserve the current destination before making changes.
+
+Back up any existing MariaDB databases, Ignition configuration, projects, and Gateway resources that could be affected.
+
+Perform safe non-destructive validation automatically.
+
+Before modifying destination data or interrupting services, request one consolidated authorization showing the exact restore operations, expected downtime, and rollback procedure.
+
+## Phase 4 — Execute the approved migration
+
+After authorization:
+
+1. Restore the complete `ignition_config` database.
+2. Verify all 20 tables and their contents.
+3. Compare restored records with the available verified source evidence.
+4. Restore approved MariaDB application permissions.
+5. Restore the four Ignition projects.
+6. Restore compatible Ignition modules and dependencies.
+7. Restore Gateway configurations and supplemental resources using supported procedures.
+8. Configure destination-specific MariaDB connections.
+9. Verify the Ignition Gateway can access `ignition_config`.
+10. Verify required application functionality.
+
+Keep external PLC, MQTT, historian, and production integrations disabled until explicitly authorized.
+
+Do not silently replace existing destination records or global administrative privileges.
+
+## Phase 5 — Validate and report
+
+Perform actual restoration checks, not just script checks.
+
+Report the status of:
+
+- MariaDB service
+- Ignition service
+- 20 contextual database tables
+- Database record population
+- All four Ignition projects
+- Installed modules
+- Gateway resources
+- Database connections
+- Gateway error logs
+- Remaining missing licenses or integrations
+
+Document the limitation that exact source `COUNT(*)` comparisons were not completed for two multi-million-row tables. Do not claim exact source/destination row parity without verified source counts.
+
+Generate the final migration report:
+
+`C:\TBMC\Logs\TBMC-Ignition-Migration-Report.md`
+
+## Autonomy requirements
+
+Continue autonomously through all non-destructive operations.
+
+Repair scripts, resolve known configuration mismatches, and retry corrected operations without repeatedly asking for approval.
+
+Only request intervention for missing authorized access, new material risks, destructive changes, service interruptions, or required credentials.
+
+Do not ask me to locate files already available in the repository.
+
+Do not restart the Proxmox source VMs.
+
+Do not declare the migration complete until the contextual database and Ignition application have been functionally restored and validated.
+
+**Begin by synchronizing the corrected backup and proving its decrypted SHA-256 matches the verified source.**
+
+### One thing I want to emphasize
+
+Don't let Codex restore the old 60 MB database dump. The new 1.31 GB artifact is the authoritative contextual backup, and the client should verify its decrypted checksum before any destination database changes.
+
+Once that verification succeeds, we're ready to proceed with the actual application migration, subject to the one planned authorization for overwriting destination data and restarting services.
+
+We're no longer troubleshooting whether the original contextual database was captured. We're now working toward completing and validating the client installation.
