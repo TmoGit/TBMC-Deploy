@@ -1,0 +1,323 @@
+# TBMC migration ??consolidated commission completion report
+
+Prepared: 2026-11-05 06:16:52 Asia/Taipei (UTC+08:00)
+
+## 1. Review conclusion
+
+**The authenticated database restoration, contained Gateway restoration, primary TBMC Perspective launch, permanent administrator access, local auditing, and Supervisor account/access work have passed their recorded tests. Production commissioning is not complete.** External PLC, MQTT, historian and production transports remain deliberately disabled. Paid-module licensing, broader workflow acceptance, source-secret reprovisioning and full rollback rehearsal remain open.
+
+This document consolidates all commissions and subsequent account work. It distinguishes completed work from deferred, untested and unavailable items. It is the current review index; earlier reports remain unchanged historical evidence. Fresh checks performed for this report were read-only. No service, account, database or project configuration was changed to compile it. Passwords, password hashes, private keys and business records are excluded.
+
+### Completion matrix
+
+| Commission / obligation | Current disposition | Evidence / practical limit |
+|---|---|---|
+| Investigate original MariaDB artifact | PASS ??original export defective | Original decrypted size/hash matched; dangling INSERT comma; isolated engine rejected SQL. Not a transfer failure. |
+| Correct SQL selection, extraction and validation | PASS | Authenticated replacement pinned; streaming lexer; stdin import; explicit mutation gates; tamper/missing-part tests. |
+| Independent full database test restore | PASS | MariaDB 10.11 disposable named-pipe environment; exit 0; 20 exact table counts. |
+| Actual destination contextual database restore | PASS | Import exit 0; all 20 counts matched independent artifact restore. |
+| Preserve destination data and privileges | PASS | Prechange encrypted SQL and Gateway snapshots; no source mysql privilege restore. No application schema existed at baseline. |
+| Restore four projects and 33 module archives | PASS for captured resources | File counts and module archive hashes verified. Three nonprimary projects remain disabled. |
+| Gateway startup, local JDBC and representative Named Queries | PASS | RUNNING; native scalar checks and two TBMC Named Queries succeeded. |
+| Verify permanent Gateway administrator | PASS | Existing credentials accepted; read/write authorization verified; no password recovery/reset required. |
+| Correct TBMC Project Not Runnable | PASS | TBMC enabled, native authenticated scan loaded change; original inheritance preserved. |
+| Real Perspective session | PASS for tested routes | Root/Main rendered; Supervisor audit route rendered after account/mapping work. Full screen/process suite not exercised. |
+| Supervisor account and source application grants | PASS | Created on explicit approval; role Supervisor only; native login and audit page passed. No Administrator role granted. |
+| Local audit logging | PASS | Existing local audit_events table receives session/authentication rows; pruning/automatic table creation disabled. |
+| Industrial isolation | PRESERVED | Explicit containment configuration and socket snapshots; no production connection activation performed. |
+| Rollback preparation | PASS for material/procedure | Backup hashes/readability verified; actual Gateway rollback rehearsal NOT TESTED. |
+| Complete production operation | OPEN | Licensing, integrations, secrets, operator/process acceptance and remaining diagnostics require completion. |
+
+## 2. Target, scope and current read-only snapshot
+
+- Destination: TP-IGN01, 172.16.81.201, Windows; Ignition installation C:\Program Files\Inductive Automation\Ignition.
+- Observed Gateway version: Ignition standard 8.3.4 (b2026030309).
+- MariaDB destination/test binaries: 10.11.11; corrected source export: 10.11.16.
+- Authoritative deployed scripts: C:\TBMC\TBMC-Deploy. Working review copy: C:\Users\user\Desktop\TBMC-Deploy-main.
+- Reports: C:\TBMC\Logs. Private staging/credentials: C:\TBMC\Secure.
+- Primary project: [TBMC Perspective](http://172.16.81.201:8088/data/perspective/client/TBMC).
+- Gateway: [administration](http://172.16.81.201:8088).
+- Fresh Gateway health: **RUNNING**. Fresh database table count: **20**, batch_setup rows: **51**, audit_events rows: **15**.
+- Owned diagnostic browser control listeners remaining: **0**. Established nonloopback connections on monitored industrial ports in the Gateway Java process snapshot: **0**. This is not continuous traffic monitoring or a test of all possible protocols.
+
+| Service | State at report generation | Startup |
+|---|---|---|
+| Ignition | Running | Auto |
+| MariaDB | Running | Auto |
+
+No Ignition or MariaDB reinstall was performed. Ignition was stopped/restarted during the first restoration and startup repairs; later project/account work did not restart it. MariaDB was not restarted. No source Proxmox VM was started or modified by this work. Source host morrison access was unavailable during investigation; a recovery procedure was prepared but not executed. The subsequently published corrected backup made source acquisition unnecessary for this restoration.
+
+## 3. Artifact investigation and replacement provenance
+
+### Original defective export ??retained forensic finding
+
+Original plaintext: 60,934,812 bytes, SHA256 0C0E7BE2BCDD260C01AA2CD9ADDF516D071E9C32E9CA20BDAD456E8E2AA94885. Authenticated decryption matched both exactly. Six encrypted copies across deployment repositories and a downloaded ZIP collapsed to contextual/system hashes, each matching its local published manifest. Contextual encrypted hash: BBAFED0A77FDCDCE914ED09F9C22D73B34D696A6C8774E70684F65B630DC0FC6. System encrypted hash: 9B60E316E72BF2878A1FB283D8E8DF39A0E12A8B9F99AC2A750B6FC8024952B7.
+
+The old supplied commit d12e901d60263d947108823048e6a071c15d5522 was supported by supplied/local source records; its remote object was not independently fetched. The original dump contained one table, 56 terminated INSERTs plus one pending INSERT beginning at line 1,333,906. EOF ended in a comma requiring another tuple. Balanced quotes/parentheses ruled out the suspected large-INSERT lexer issue. An independent unchanged import failed with ERROR 1064/SQLSTATE 42000 at the same line. Its partial disposable import was never promoted. No records were fabricated.
+
+### Corrected authoritative replacement
+
+Repository TmoGit/TBMC-Deploy; independently resolved pinned commit **e7dcf81d7cdc65181fed79fcf49c738cfc2ab5b8**. Fourteen encrypted parts .000??013 were individually verified, assembled, then authenticated-decrypted in restricted staging.
+
+| Verification | Accepted value |
+|---|---|
+| Encrypted size | 1,313,333,349 bytes |
+| Encrypted SHA256 | D045ECBD94114FD9B90D2A53D586026B7A40886E00221E44244ABF95D3F3B44F |
+| Plaintext size | 1,313,012,605 bytes |
+| Plaintext SHA256 | 8A8911BF5672B269C067221EC2407DF41965D3520024E42E872551BCA8D14B5A |
+| Full streaming inspection | 12,382,657 lines; 1,471 statements; 1,271 INSERTs; 20 tables |
+| EOF / completion | NORMAL lexical state; completion marker present; no pending statement |
+| Views / routines / triggers / events | 0 / 0 / 0 / 0 |
+
+The replacement, rather than the defective original or system privilege dump, was used for destination restoration. Individual parts remain at C:\TBMC\Incoming\e7dcf81; encrypted assembly remains in the restricted corrected-backup work directory.
+
+## 4. Database restoration and data validation
+
+The disposable test used installed MariaDB binaries and a new restricted datadir, unique authenticated named pipe, no TCP listener, events/replication/binlog/local infile disabled, and no service registration. The full import exited 0; the disposable server was stopped. The destination baseline had only information_schema, mysql, performance_schema and sys, with no ignition_config schema. All destination databases were backed up and the encrypted backup round trip verified before import.
+
+The destination import ran 2026-11-05 04:38:59??4:40:01 UTC+08:00, exited 0, and matched every independent artifact count below. These are **restore-time counts**, not current production counters or exact source-live parity. Exact accepted live-source counts for the two large tables were unavailable. New local audit activity legitimately increases audit_events after restoration.
+
+| Table | Destination at restore | Independent artifact restore | Match |
+|---|---:|---:|---|
+| alarm_events | 4640863 | 4640863 | PASS |
+| alarm_event_data | 7737387 | 7737387 | PASS |
+| audit_events | 0 | 0 | PASS |
+| batch_card_config | 4 | 4 | PASS |
+| batch_control_audit | 920 | 920 | PASS |
+| batch_equipment | 237 | 237 | PASS |
+| batch_equipment_claims | 853 | 853 | PASS |
+| batch_setup | 51 | 51 | PASS |
+| cache_batch_reporting | 8 | 8 | PASS |
+| cache_batch_reporting_json | 292 | 292 | PASS |
+| cache_cardparams1_batch | 5 | 5 | PASS |
+| cache_cardparams2_upstream | 5 | 5 | PASS |
+| cache_cardparams3_downstream | 5 | 5 | PASS |
+| cache_cardparams4_analytics | 5 | 5 | PASS |
+| cache_cardparams5_reserved | 0 | 0 | PASS |
+| equipment_status_card | 32 | 32 | PASS |
+| process_batch_card | 4 | 4 | PASS |
+| process_status_card | 12 | 12 | PASS |
+| room_card_config | 4 | 4 | PASS |
+| test_single_param | 1 | 1 | PASS |
+
+Application account tbmc_ignition_eb33916a was newly provisioned with schema-scoped privileges. Existing administrators were preserved; source global mysql users/privileges were not imported. The only application JDBC destination enabled was ignitionDB at jdbc:mariadb://127.0.0.1:3306/ignition_config, with a destination-native encrypted secret generated by system.secrets.encrypt.
+
+Actual Gateway scalar queries passed. Actual restored TBMC Named Queries qEnabledCards and BatchCards/GetEnabledRoomConfigs each returned four rows. Returned business records were not exported into reports. Fresh report-generation checks repeated only table inventory, batch_setup and audit counts, not the expensive whole-database comparison.
+
+## 5. Gateway restoration and configuration changes
+
+| Area | Applied change / reason |
+|---|---|
+| Resource placement | Source projects -> data/projects; supplemental resources -> data/config/resources; module archives -> user-lib/modules. |
+| Prechange preservation | Original data/user-lib files hash-compared in snapshot; original ACL descriptors preserved for rollback; backup copies restricted. |
+| First startup | Fresh core collection could not initialize from prepopulated source tree; failed tree preserved, native core initialized, contained source resources merged while preserving config-mode.json. |
+| Temporary module whitelist | Used for safe initial native commissioning, then removed; persisted module enablement state corrected from captured positive startup configuration. |
+| Commissioning | Permanent generated tbmc_admin credential kept private; native UI connection/finish steps completed; one-time password removed from service configuration. |
+| Secrets/security | Destination host identity, security, certificates and secrets retained. Source IdP/user-source/API-token/key material not blindly overlaid. Later Supervisor grants were selectively restored on explicit account authorization. |
+| Local dependencies | Inert local store-and-forward support and default tag provider made available; 360 captured tag definitions remain disabled. |
+| MQTT configuration | Global config objects loaded to avoid fallback defaults; enableEngine=false, enableTransmission=false, per-server connection/RPC/primary-host/alarm publishing disabled. Reference objects alone do not activate transport. |
+| Other industrial resources | OPC/device/historian profiles and Gateway Network disabled; source Gateway timers/tag-change/message handlers disabled. |
+| CSV_IN | Preserved under C:\TBMC\RestoredResources\CSV_IN; processing disabled. |
+| Controlled test project | TBMC_MigrationValidation retained for audit; completed validation timer disabled. |
+| Local audit profile | Internal Audit 1 enabled against existing local audit_events; pruneEnabled=false and autoCreate=false. No restored records pruned or table recreated. Sample audit profile remains disabled. |
+
+Source certificate/supplemental directories contained no certificates, and source local encryption keys were not supplied. Destination security was preserved; missing source integration secrets must be reprovisioned before use. No source private keys or decrypted database records were sent to public services.
+
+## 6. Projects, architecture and actual browser acceptance
+
+Fresh on-disk inventory:
+
+| Project | Files | Enabled | Inheritable | Parent |
+|---|---:|---|---|---|
+| TBMC | 494 | True | False | (none) |
+| TBMC_CT_DEMO | 764 | False | False | (none) |
+| SCADA_Template_Project | 466 | False | False | (none) |
+| samplequickstart | 652 | False | False | (none) |
+
+At initial restoration all four were disabled intentionally for containment. Source descriptors were enabled=true, inheritable=false, parent empty. TBMC's disabled flag caused Project Not Runnable. Only TBMC was enabled in the next commission; an authenticated native filesystem scan with its session CSRF token loaded the change. No inheritance conversion, project rename or deletion was needed. File-count matches establish captured-file restoration, not full functional equivalence of every resource.
+
+The source trees contain TBMC 24 Named Queries/370 Perspective files/5 Vision files; TBMC_CT_DEMO 23/478/5; SCADA_Template_Project 23/354/5; samplequickstart 7/625/2. A case-sensitive dictionary parser successfully audited 110 TBMC view JSON files. Windows PowerShell's inability to parse valid empty/case-distinct keys was handled by changing the parser, not corrupting those files. Source manual trial-reset code was identified; no reset action was invoked and no license bypass was performed.
+
+Actual headless Edge sessions, with loopback-only control and restricted profiles, established:
+
+| Test | Result | Evidence |
+|---|---|---|
+| Native tbmc_admin login | PASS | Existing permanent password; read=true/write=true from native authorization endpoint. |
+| Root Perspective route | PASS | 54 rendered components; no Project Not Runnable/access-denied/login-required error. |
+| /Main | PASS | 54 rendered components; three flex containers. |
+| Browser runtime during initial route tests | PASS | Zero runtime exceptions/console errors; three WebSockets observed. |
+| /audit_trail as Administrator alone | Expected denial | Source requires Authenticated/Supervisor, not Gateway Administrator. No permission relaxed. |
+| /audit_trail as new Supervisor | PASS | Native login succeeded; 53 rendered components; no denial/login-required/not-runnable flag. |
+| Other Perspective pages / all interactions | NOT TESTED | Charts, alarms, reports, edits, write actions and process controls not comprehensively exercised. |
+| Vision client sessions | NOT TESTED | Captured resources restored; client launch/workflows not tested. |
+| Other three projects | RESTORED, DISABLED | No interactive acceptance claimed. |
+
+Industrial containment can produce empty, stale or bad-quality process panels and missing UDT warnings. Rendering proves application runnability, not live control/data acquisition acceptance.
+
+## 7. Accounts and Supervisor authorization
+
+Fresh native user-source inventory:
+
+| Username | Native roles |
+|---|---|
+| tbmc_admin | Administrator |
+| Supervisor | Supervisor |
+
+The user initially requested a Supervisor password reset. Inspection found no such destination account. After explicit approval to create it, the native Gateway user-management UI created Supervisor with the user-requested password and assigned only the Supervisor role. The password is intentionally omitted from this report.
+
+The source application uses custom Authenticated/Supervisor and Authenticated/User security levels. These two original definitions and only the source username grant for Supervisor were selectively restored into the destination IdP. The permanent Administrator account, existing security and unrelated source identities were preserved. Supervisor was not granted the Gateway Administrator role. The source username mapping grants Supervisor both custom application levels; its native role remains Supervisor.
+
+Mapping backup: C:\TBMC\Secure\corrected-backup-20261105-042546\supervisor-mapping-20261105-060844. It contains prechange security-levels.json and identity-provider.json in restricted storage. Successful login/render evidence is dated 2026-11-05T06:09:14.0317049+08:00. The mapping preparation JSON still says PREPARED because it records the file-preparation phase; the later login validation JSON is the completion evidence. Full negative testing of every Gateway API as Supervisor was not performed.
+
+## 8. Modules and licensing
+
+All 33 restored module archive hashes matched captured source files. Native runtime inventory at the first commission's verification reported 25 ACTIVE and 8 INACTIVE; 30 Trial and 3 Free. This is a timestamped historical runtime inventory, not a fresh license query made for this report. No paid entitlement was provided/activated, trial reset performed or unsigned-module bypass enabled. Trial expiration can affect subsequent operation.
+
+| Module | Version | Recorded native state | Recorded license |
+|---|---|---|---|
+| Alarm Notification | 7.3.4 | ACTIVE | Trial |
+| Allen-Bradley Driver | 7.3.4 | ACTIVE | Trial |
+| BACnet Driver | 3.3.4 | ACTIVE | Trial |
+| DNP3 Driver | 2.3.4 | INACTIVE | Trial |
+| Enterprise Administration | 5.3.4 | INACTIVE | Trial |
+| Event Streams | 1.3.4 | ACTIVE | Trial |
+| Historian Core | 1.3.4 | ACTIVE | Trial |
+| IEC 61850 Driver | 2.3.4 | INACTIVE | Trial |
+| Kymera InfluxDB Module | 2.83.2 | ACTIVE | Trial |
+| Legacy DNP3 Driver | 5.3.4 | INACTIVE | Trial |
+| Logix Driver | 6.3.4 | ACTIVE | Trial |
+| MariaDB JDBC Driver | 1.3.4 | ACTIVE | Free |
+| Micro800 Driver | 2.3.4 | INACTIVE | Trial |
+| Mitsubishi Driver | 2.3.4 | INACTIVE | Trial |
+| Modbus Driver | 8.3.4 | ACTIVE | Trial |
+| MQTT Engine | 5.0.2 | ACTIVE | Trial |
+| MQTT Transmission | 5.0.2 | ACTIVE | Trial |
+| MSSQL JDBC Driver | 1.3.4 | ACTIVE | Free |
+| Omron Driver | 5.3.4 | INACTIVE | Trial |
+| OPC-UA | 10.3.4 | ACTIVE | Trial |
+| OpcCom | 7.3.4 | ACTIVE | Trial |
+| Perspective | 3.3.4 | ACTIVE | Trial |
+| PostgreSQL JDBC Driver | 1.3.4 | ACTIVE | Free |
+| Reporting | 7.3.4 | ACTIVE | Trial |
+| SFC | 6.3.4 | INACTIVE | Trial |
+| Siemens Drivers | 7.3.4 | ACTIVE | Trial |
+| SMS Notification | 7.3.4 | ACTIVE | Trial |
+| SQL Bridge | 11.3.4 | ACTIVE | Trial |
+| SQL Historian | 1.3.4 | ACTIVE | Trial |
+| Symbol Factory | 8.3.4 | ACTIVE | Trial |
+| UDP and TCP Drivers | 7.3.4 | ACTIVE | Trial |
+| Vision | 12.3.4 | ACTIVE | Trial |
+| Voice Notification | 7.3.4 | ACTIVE | Trial |
+
+Inactive modules require applicability/compatibility/license review before declaring any dependent function ready. An installed archive or ACTIVE module alone does not prove license entitlement or successful external integration.
+
+## 9. Script corrections and validation coverage
+
+- Replaced line-regex SQL classification with quote/comment/escape/delimiter-aware lexers. Added streaming SqlStreamStructure.cs for the 1.31 GB export. Fixed false routine/event recognition from stored SQL inside mysql system-table INSERTs.
+- Corrected authoritative artifact selection and ordered assembly; reject missing/tampered parts and wrong plaintext hash/size. Old defective artifact is never an automatic fallback.
+- Corrected MariaDB import to binary stdin, rather than treating a SQL filename as a database argument. Captured real process exit status and sanitized native errors without SQL row excerpts.
+- Added restricted credential handling, schema-scoped account provisioning, isolated import verification and exact destination table comparisons.
+- Repaired optional StatusPing details handling, first-boot core initialization/merge, module enablement persistence and safe native JDBC secret generation.
+- Added guarded execution/resumption, including completed-restore recognition before looking for intentionally cleaned plaintext. Default validation and -WhatIf do not mutate live state; explicit ExecuteRestore/ExecuteRollback gates remain.
+- Reviewed entry points: database/Restore-MariaDB.ps1, database/Restore-Database.ps1, Windows/Restore-VM133Artifacts.ps1 and ignition/Restore-Ignition.ps1. Local configuration/secrets preserved when syncing corrected scripts into actual deployment repository.
+- Recorded tests passed: PowerShell syntax, SQL regression fixtures (large/multiline INSERTs, doubled/escaped quotes, semicolons in values, custom delimiters, EOF comments, malformed EOF), published manifest order, missing-chunk and tampering rejection, nonmutating entry points, privacy checks and reviewed-script hash sync.
+- Final project-recovery checks parsed 41 migration PowerShell scripts and synchronized ten reviewed account/project/browser helper scripts. Restore-SupervisorMapping.ps1 was subsequently used from the working copy. Fresh review found that this later helper is not present in C:\TBMC\TBMC-Deploy\migration; the executed working-copy helper remains available. This is an open script-packaging item, not a failure of the verified live account change. See TBMC-Supervisor-Helper-Sync-Review.json. This report-generation helper also resides in the working copy.
+
+## 10. Errors, corrections and unresolved diagnostics
+
+Historical failures remain in logs. The defective original SQL and initial core-collection commissioning failure were diagnosed, corrected through replacement/native initialization, and retested successfully. Stale state in the owned diagnostic browser was cleared; valid administrator credentials did not require resetting.
+
+The later native whole-config scan logged two missing cached resource-copy files, a disabled database-translator update NullPointerException, and MQTT_Remote missing-server-set dependency. Local database queries, auditing and Perspective sessions succeeded afterward. These scan-time findings were disclosed, not erased or treated as fully resolved. Earlier first-commission statements of zero new errors apply only to their earlier observation window. They must not be read as a lifetime clean-log guarantee. Review these categories during final operational commissioning before enabling their affected resources.
+
+No Windows service failures were observed in the recorded migration audit. Current read-only report checks confirm service health, not uninterrupted uptime or a fresh full event-log investigation. Source morrison DNS/SSH access was unavailable during the original investigation; source acquisition scripts were prepared, not run.
+
+## 11. Backups, retained material and rollback
+
+Freshly verified encrypted baseline backup files:
+
+| Path | Encrypted SHA256 matches recorded value | SHA256 |
+|---|---|---|
+| C:\TBMC\Secure\destination-restore-20261105-043858\all-destination.sql.age | True | 05C44A2DE4DA413E06D13973F663F1D0A5DA2DF664807690B649CA29C6201767 |
+| C:\TBMC\Secure\corrected-backup-20261105-042546\postrestore-gateway.gwbk.age | True | 622735B1C0F91030ECFBFDBBA8005C0BC23342BF610F4B3D1C195541E5E7F26E |
+
+Additional protected recovery material:
+
+- Original Gateway snapshot: C:\TBMC\Secure\corrected-backup-20261105-042546\gateway-prechange, including original-snapshot-acls.json. Original file hashes were verified before replacement.
+- Project-repair backup root: C:\TBMC\Backups\GatewayProjectRepair-20261105-053637. Its before-project-repair.gwbk.age is a verified copy of the earlier postrestore snapshot, not a newly captured post-account snapshot. Descriptor copies and Internal-Audit-1-before are retained there.
+- Supervisor mapping prechange files: C:\TBMC\Secure\corrected-backup-20261105-042546\supervisor-mapping-20261105-060844.
+- Original/replacement encrypted artifacts, source staging, failed-core resource tree, manifests, journals and stopped disposable datadirs remain protected for review.
+- Gateway administrator and database application credentials remain in restricted local files identified by the earlier JSON records. No credential values are included here.
+
+**Backup coverage limit:** the encrypted native Gateway backup predates TBMC enablement, local audit-profile enablement and Supervisor creation/mapping. Subsequent descriptor/configuration snapshots document changes, but there is no recorded fresh native Gateway backup containing the complete final Supervisor state. Native backup decryption/readability passed; actual native Gateway restore rehearsal remains NOT TESTED. A current encrypted Gateway/database backup and isolated restore rehearsal are recommended before production handover.
+
+### Rollback options ??prepared, not executed
+
+1. TBMC flag only: restore saved TBMC.project.json, verify prechange hash from TBMC-Project-Enabled-Correction.json, then run the native authenticated project scan. This returns primary project to disabled containment.
+2. Local audit correction: restore both profile files from Internal-Audit-1-before, scan configuration; preserve newly written audit rows. Do not delete audit rows to simulate the original empty state.
+3. Supervisor work: use native admin UI to remove/disable the new Supervisor user and remove its now-unused role if appropriate; restore only affected security-level/IdP files from the private mapping backup after checking for intervening changes, then scan. Do not replace the existing administrator user source wholesale.
+4. Full Gateway: use reviewed migration/Restore-DestinationRollback.ps1 with explicit -ExecuteRollback in an elevated maintenance session. It stops Ignition, preserves the failed deployment, restores original data/user-lib and original ACLs, and restarts only when appropriate. Its effect is the pre-migration Gateway, not the final repaired application. Database is preserved by default.
+5. Database: retain the restored schema unless a separately chosen rollback explicitly requires its removal/replacement. It did not exist at baseline. The prechange all-destination dump includes system material and must not be blindly imported over a healthy destination. Use an authenticated, separately reviewed schema-specific restore strategy; never import source global privileges as a shortcut.
+
+Five verified temporary plaintext SQL/native backup files were deleted during first-commission maintenance. The project-repair plaintext readability copy was later verified and deleted. Encrypted originals remain. Older forensic plaintext/stopped datadirs and browser profiles may remain in restricted staging; no recursive blanket cleanup or physical erasure is claimed. Both diagnostic browser instances were closed; report-time listener check is above.
+
+## 12. Report reconciliation and remaining acceptance checklist
+
+| Earlier statement | Current interpretation |
+|---|---|
+| Original artifact investigation: INCOMPLETE ORIGINAL EXPORT | Still correct for the old 60 MB dump; not a current blocker after authenticated replacement restore. |
+| Initial migration report: all four projects disabled | Historical containment state; TBMC is now enabled, other three remain disabled. |
+| Initial report: interactive sessions NOT TESTED | Superseded for root/Main and Supervisor audit route only. |
+| Restore table: audit_events=0 | Correct at restore; local authentication/audit writes subsequently populated it. Current count is above. |
+| Project report: Supervisor page NOT TESTED | Superseded by TBMC-Supervisor-Login-Validation.json PASS. Broader Supervisor controls still untested. |
+| Supervisor mapping JSON: PREPARED | Preparation record; later native login and rendered page establish completed operation. |
+| First-commission audit: no recent Gateway errors | Limited to earlier window; later configuration-scan errors remain documented. |
+| Initial system dump appeared to contain standalone routines/events | Corrected lexer found 31 CREATE TABLEs and zero standalone routine/event definitions; stored mysql records are not a safe contextual replacement. |
+
+Before declaring full production completion, review and close:
+
+- [x] Corrected artifact identity, authentication, complete structure and isolated import.
+- [x] Destination contextual schema import and exact artifact-count comparison.
+- [x] Captured projects/modules restored and rollback baseline retained.
+- [x] Gateway native health, local JDBC and two representative Named Queries.
+- [x] TBMC primary project enabled and actual root/Main rendered.
+- [x] Administrator native read/write access verified without password reset.
+- [x] Supervisor created on explicit approval and protected audit page rendered.
+- [x] Local auditing functional, pruning/table creation disabled.
+- [x] Production/industrial transports kept disabled.
+- [ ] Resolve applicable paid-module entitlements and inactive module requirements.
+- [ ] Review disclosed resource-cache/translator/MQTT dependency scan errors.
+- [ ] Reprovision unavailable source integration secrets/certificates as required.
+- [ ] Validate all required Perspective/Vision pages, role boundaries, alarms, reports, writes and batch workflows with approved test cases.
+- [ ] Decide whether/when the other three projects should be enabled; assess their automation first.
+- [ ] Approve and validate PLC/MQTT/historian/production integrations in a controlled cutover.
+- [ ] Capture a new encrypted final-state Gateway/database backup and rehearse isolated recovery.
+- [ ] Package the later Supervisor mapping helper into the authoritative deployment script set after review; the working-copy script and live-login evidence are preserved.
+- [ ] Review restricted staging retention/cleanup and operator credential handover.
+- [ ] Obtain operational owner acceptance. ProductionReady remains **false**.
+
+## 13. Evidence index
+
+All files below are in C:\TBMC\Logs unless specified. Relative Markdown links work when this report is opened from that directory. Machine-readable report snapshot and evidence hashes accompany this report; credentials and business-record contents are excluded.
+
+| Evidence | Purpose |
+|---|---|
+| [Original artifact investigation](TBMC-MariaDB-Artifact-Investigation.md) / corresponding JSON | Defective original export provenance and independent failure. |
+| [Corrected artifact verification](TBMC-Corrected-Backup-Verification.json) | Pinned replacement identity, exact size/hash, streaming structure. |
+| [Isolated full restore](TBMC-Corrected-Backup-Isolated-Test.json) | Independent import and per-table counts. |
+| [Destination restore](TBMC-Contextual-Restore.json) | Actual import, backup hashes and exact restore-time counts. |
+| [Initial migration report](TBMC-Ignition-Migration-Report.md) / Results / Journal / Execution | First commission's component history and initial containment acceptance. |
+| [Native Gateway validation](TBMC-Gateway-Functional-Validation.json) / [runtime inventory](TBMC-Gateway-Final-Verification.json) | Local JDBC, Named Queries, module state/license inventory. |
+| [First maintenance](TBMC-Final-Maintenance.json) | Encrypted native backup, deletion records, containment. |
+| [Acceptance gate](TBMC-Restoration-Acceptance-Gate.json) | Contained restoration passed before next commission began. |
+| [Administrator verification](TBMC-Gateway-Administrator-Verification.json) / [password report](TBMC-Gateway-Password-Recovery.md) | Native authorization; reset unnecessary. |
+| [Project recovery](TBMC-Project-Runnability-Report.md) / [results](TBMC-Gateway-Recovery-Results.json) / execution | Flag correction, backup, audit changes, historical limits. |
+| [Project correction](TBMC-Project-Enabled-Correction.json) / [automatic script audit](TBMC-Project-Automatic-Script-Audit.json) | Enabled-flag hashes and view/startup review. |
+| [Browser route validation](TBMC-Perspective-Browser-Validation.json) | Real root/Main sessions; initial protected-route denial. |
+| [Local audit correction](TBMC-Local-Audit-Correction.json) | Local-only profile, pruning disabled and inserted audit rows. |
+| [Supervisor preparation](TBMC-Supervisor-Account.json) / [successful login](TBMC-Supervisor-Login-Validation.json) | Scoped source mapping backup and protected-page acceptance. |
+| [Final project checks](TBMC-Project-Recovery-Final-Checks.json) / [script sync](TBMC-Final-Script-Sync.json) | Syntax, privacy, script hashes, diagnostic closure. |
+| [Current report snapshot](TBMC-Consolidated-Review-Snapshot.json) | Fresh service/database/account/project/backup/listener observations. |
+| [Later helper packaging review](TBMC-Supervisor-Helper-Sync-Review.json) | Working-copy Supervisor helper exists; later helper absent from authoritative deployment script directory. |
+| [Consolidated evidence hashes](TBMC-Consolidated-Evidence-Index.json) | SHA256 integrity index for historical evidence used in review. |
+| [Privacy check](TBMC-Report-Privacy-Check.json) | Exact generated credential/private-key marker scan. |
+| [Source recovery procedure](TBMC-Source-Recovery-Procedure.md) | Prepared contingency; source VM never started by this work. |
