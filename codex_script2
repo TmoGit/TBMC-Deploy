@@ -1,0 +1,33 @@
+Continue the TBMC Ignition migration with maximum autonomy.
+
+I have already authorized you to inspect and modify deployment scripts, resolve configuration problems, execute diagnostics, validate artifacts, and correct non-destructive issues. Do not repeatedly ask for permission to perform those activities.
+
+**MariaDB authentication**
+
+Search existing approved local credential stores and secure configuration files for a working MariaDB administrative account. Do not expose credentials or attempt to bypass authentication.
+
+If credentials are genuinely unavailable, prepare a restricted MariaDB client configuration and request the missing credential once through an appropriate secure local mechanism. Never ask me to paste passwords into chat.
+
+**Windows elevation**
+
+Continue all operations that do not require Administrator privileges.
+
+For privileged operations, prepare one coordinated elevated execution workflow covering the necessary Gateway restoration, service operations, and MariaDB restoration steps.
+
+Do not repeatedly request elevation for individual commands. I will authorize the necessary Windows elevation once through the normal UAC process.
+
+**Execution policy**
+
+- Resolve routine script errors and path problems autonomously.
+- Execute non-destructive preparation and validation without additional questions.
+- Do not reinstall Ignition or MariaDB.
+- Preserve existing destination databases and Gateway resources until backed up.
+- Prepare a complete rollback procedure.
+- Present one consolidated authorization request before modifying live databases, overwriting Gateway resources, or interrupting services.
+- After authorization, complete all operations within that approved scope without further interruptions.
+- Only ask again if a new material risk, unavailable secret, or genuinely necessary system authorization is encountered.
+- Keep external PLC, MQTT, historian, and production connections disabled.
+
+Do not stop after identifying a problem. Correct it, test the correction, and continue.
+
+The objective remains a fully restored and validated TBMC Ignition Server, with a final migration report under `C:\TBMC\Logs`.
