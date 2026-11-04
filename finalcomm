@@ -1,0 +1,810 @@
+# CODEX COMMISSION — TBMC FINAL COMMISSIONING, HARDENING & PRODUCTION READINESS
+
+## Mission
+
+You are the lead Ignition commissioning engineer responsible for completing the remaining post-migration validation and preparing the TBMC industrial application for production acceptance.
+
+The primary restoration has been completed successfully. **Do not start the migration again.**
+
+Your job is to inspect the installed environment, preserve the final restored state, resolve outstanding technical issues, validate application functionality, and produce a documented production-readiness assessment.
+
+**Operate with maximum practical autonomy. Investigate, correct, test, and continue without repeatedly asking for permission for routine operations.**
+
+This is a production-readiness commission, not authorization to activate live industrial communications.
+
+---
+
+## 1. Target environment
+
+| Item | Configuration |
+|---|---|
+| Server | TP-IGN01 |
+| IP address | 172.16.81.201 |
+| Ignition Gateway | 8.3.4, build 2026030309 |
+| MariaDB destination | 10.11.11 |
+| Contextual database | ignition_config |
+| Gateway URL | http://172.16.81.201:8088 |
+| TBMC application | http://172.16.81.201:8088/data/perspective/client/TBMC |
+| Deployment repository | C:\TBMC\TBMC-Deploy |
+| Working review copy | C:\Users\user\Desktop\TBMC-Deploy-main |
+| Reports | C:\TBMC\Logs |
+| Secure storage | C:\TBMC\Secure |
+| Backups | C:\TBMC\Backups |
+
+You are operating in VS Code on the destination Windows Server.
+
+Ignition and MariaDB are already installed and operational.
+
+**Do not reinstall Ignition or MariaDB. Do not restart the original Proxmox VMs 132 or 133.**
+
+## 2. Previously verified migration state
+
+The previous migration and recovery commissions established:
+
+- Complete replacement MariaDB backup successfully restored.
+- All 20 contextual database tables verified against an independent isolated restore.
+- All four Ignition project resource trees restored.
+- TBMC enabled and runnable.
+- TBMC Perspective root page and `/Main` rendered successfully.
+- Supervisor account created and `/audit_trail` page successfully rendered.
+- Permanent Gateway administrator verified; no password reset necessary.
+- Local JDBC connection `ignitionDB` operating.
+- Representative TBMC Named Queries passed.
+- Local audit logging functioning.
+- Industrial connections deliberately disabled.
+- Original deployment and rollback material preserved.
+
+Three nonprimary projects remain disabled:
+
+- TBMC_CT_DEMO
+- SCADA_Template_Project
+- samplequickstart
+
+Do not enable them automatically.
+
+The report identified 33 restored module archives, with a historical inventory of 25 ACTIVE and 8 INACTIVE modules. Thirty were recorded as Trial and three as Free.
+
+These historical findings are a starting point. Verify the current live state independently.
+
+## 3. Primary source of truth
+
+Begin by reading:
+
+`C:\TBMC\Logs\TBMC-Consolidated-Review-Snapshot.json`
+
+Locate and review the consolidated commission completion report and its supporting evidence in `C:\TBMC\Logs`.
+
+Also examine:
+
+- TBMC-Ignition-Migration-Report.md
+- TBMC-Project-Runnability-Report.md
+- TBMC-Gateway-Password-Recovery.md
+- TBMC-Gateway-Functional-Validation.json
+- TBMC-Gateway-Final-Verification.json
+- TBMC-Perspective-Browser-Validation.json
+- TBMC-Supervisor-Login-Validation.json
+- TBMC-Consolidated-Evidence-Index.json
+- TBMC-Supervisor-Helper-Sync-Review.json
+
+Use actual existing filenames and discover the corresponding files if naming differs.
+
+Do not reconstruct or repeat successfully completed work unnecessarily.
+
+Preserve historical evidence and create new reports for this commission.
+
+---
+
+# PHASE 1 — BASELINE AND CURRENT-STATE VERIFICATION
+
+Perform non-destructive inspection.
+
+### Windows services
+
+Verify:
+
+1. Ignition is Running.
+2. MariaDB is Running.
+3. Both services have the intended startup configuration.
+4. Actual installed versions are correct.
+5. Gateway responds through its configured port.
+6. Required local ports and services are healthy.
+7. Sufficient free disk capacity exists for backups and temporary staging.
+8. No conflicting restore, upgrade, or maintenance jobs are running.
+
+Inspect recent service failures, crashes, and Windows Event Viewer errors.
+
+### Database
+
+Verify:
+
+- `ignition_config` exists.
+- All 20 expected tables exist.
+- Application database credentials function.
+- Representative Named Queries execute.
+- Local auditing continues to insert records.
+- Table population is reasonable relative to the prior restored counts.
+- There are no new schema or permission errors.
+
+Do not expect audit row counts to remain unchanged after restoration.
+
+Do not perform repeated expensive `COUNT(*)` queries across multimillion-row tables merely for routine health checks. Use existing verified restore evidence and targeted checks where appropriate.
+
+### Gateway
+
+Verify:
+
+- TBMC is enabled.
+- TBMC is not Inheritable.
+- No unintended parent project is assigned.
+- All four project resource trees remain intact.
+- Other three projects remain disabled.
+- Local audit profile is operational.
+- Permanent administrator authentication works.
+- Supervisor authentication and application permissions work.
+- Existing industrial isolation remains intact.
+
+Record the current baseline before making changes.
+
+---
+
+# PHASE 2 — CAPTURE A NEW FINAL-STATE BACKUP
+
+**This is the highest-priority activity.**
+
+Earlier native Gateway backups were captured before the final TBMC, auditing, and Supervisor changes.
+
+We now need a new recovery point representing the actual working system.
+
+## Gateway backup
+
+Use the supported native Ignition Gateway backup mechanism for the installed version.
+
+1. Identify the supported backup command or administrative API.
+2. Verify the installed version's documented options.
+3. Create a complete native Gateway backup reflecting the current state.
+4. Preserve TBMC project configuration, security settings, audit configuration, modules, and Gateway resources covered by that backup format.
+5. Store the backup in a restricted local directory.
+6. Encrypt the backup with the approved existing encryption mechanism.
+7. Verify the encrypted artifact's SHA-256.
+8. Verify encrypted backup readability and decryption into restricted staging where authorized.
+9. Document backup contents and limitations.
+10. Retain the previous backup generation.
+
+Do not assume every private key, license, or external integration secret is automatically included.
+
+Do not replace the existing known-good backups.
+
+## MariaDB backup
+
+Capture a new consistent backup of the current destination contextual database.
+
+Include:
+
+- All 20 contextual tables.
+- Current audit records.
+- Current application configuration and data.
+- Relevant schema definitions.
+- Applicable schema-scoped permissions documented separately.
+
+Do not indiscriminately export or restore global MariaDB system privileges.
+
+Use the supported MariaDB backup method, preserve correct exit statuses, and validate the export's completion.
+
+Encrypt the backup and record plaintext and encrypted hashes without exposing database contents.
+
+Avoid unnecessary service interruption or database locking.
+
+If the chosen consistent-backup method would materially disrupt active services, request approval before proceeding.
+
+## Isolated recovery verification
+
+When resources permit, validate the new backup in an isolated disposable environment with:
+
+- No live production network access.
+- No connection to industrial equipment.
+- No overwriting of the installed database or Gateway.
+- No service registration conflicting with the live installation.
+
+For MariaDB, verify import exit status, schema, and representative data.
+
+For the Gateway backup, verify its integrity and supported recovery method. If an independent Gateway restore rehearsal cannot be performed safely on this server, document it as NOT TESTED and prepare a reproducible isolated rehearsal procedure rather than overwriting the running Gateway.
+
+**Do not restart or replace the production Gateway merely to test rollback.**
+
+Deliver:
+
+`C:\TBMC\Logs\TBMC-Final-State-Backup-Report.md`
+
+Include exact backup paths, hashes, verification results, retention recommendations, and recovery limitations.
+
+---
+
+# PHASE 3 — RESOLVE OUTSTANDING GATEWAY DIAGNOSTICS
+
+The consolidated migration report documented three unresolved Gateway diagnostic categories:
+
+1. Missing cached resource-copy files.
+2. Disabled database-translator update NullPointerException.
+3. MQTT_Remote missing-server-set dependency.
+
+Investigate each issue independently.
+
+For each:
+
+- Identify the actual current log entries.
+- Determine whether the issue is still recurring or only historical.
+- Identify the affected Ignition module, configuration resource, or project.
+- Trace the error to its configuration or code dependency.
+- Compare against available source artifacts.
+- Determine whether it is consequential or benign while containment is active.
+- Implement safe corrective actions where supported.
+- Verify the result through current logs and functional checks.
+
+Do not suppress logs to make the Gateway appear healthy.
+
+Do not delete configuration resources without understanding dependencies.
+
+Do not enable external database, MQTT, OPC, or historian transports merely to eliminate diagnostic messages.
+
+If an error is expected because its integration is intentionally disabled, classify it accurately as DEFERRED / CONTAINED rather than falsely marking it repaired.
+
+Create:
+
+`C:\TBMC\Logs\TBMC-Gateway-Diagnostic-Closure.md`
+
+For each issue include:
+
+- Original error.
+- Current recurrence.
+- Root cause.
+- Correction or containment decision.
+- Supporting evidence.
+- Final status.
+- Remaining actions.
+
+---
+
+# PHASE 4 — MODULE HEALTH AND LICENSING
+
+Inspect the current live module inventory.
+
+Previous evidence identified 33 restored module archives with 25 ACTIVE and 8 INACTIVE.
+
+Pay special attention to:
+
+- Perspective
+- Vision
+- SQL Bridge
+- SQL Historian
+- Reporting
+- OPC-UA
+- Relevant PLC drivers
+- MQTT Engine
+- MQTT Transmission
+- Kymera InfluxDB
+- Alarm Notification
+- MariaDB JDBC Driver
+
+For every installed module, document:
+
+1. Module name.
+2. Installed version.
+3. Current runtime state.
+4. License state.
+5. Trial expiration or limitations, if exposed.
+6. Whether TBMC actually depends on the module.
+7. Whether the module is required for initial production acceptance.
+8. Whether an inactive state is expected.
+9. Any remediation needed.
+
+Differentiate between:
+
+- Installed and functioning.
+- Installed but inactive.
+- Active under Trial.
+- Fully licensed.
+- Not required for TBMC.
+- Required but unavailable.
+
+Do not reset trials, bypass module licensing, modify license files, or attempt unauthorized activation.
+
+Do not install replacement modules without compatibility and source verification.
+
+Create:
+
+`C:\TBMC\Logs\TBMC-Module-License-Assessment.md`
+
+Provide a prioritized list of required license purchases, transfers, or activation actions.
+
+---
+
+# PHASE 5 — COMPLETE TBMC APPLICATION ACCEPTANCE TESTING
+
+Perform a systematic audit of the restored TBMC project.
+
+## Discover the application
+
+Inspect the actual project resources and identify:
+
+- Perspective pages.
+- Perspective views.
+- Vision windows.
+- Navigation structure.
+- Named Queries.
+- Gateway scripts.
+- Session scripts.
+- Custom properties.
+- Expression bindings.
+- Database dependencies.
+- Security-level requirements.
+- External data dependencies.
+
+Generate an inventory rather than guessing which screens exist.
+
+## Browser acceptance testing
+
+Use supported browser automation where available, operating through existing authorized accounts.
+
+Test all discoverable application routes that can be exercised safely.
+
+At minimum, include:
+
+- Root page.
+- Main dashboard.
+- Audit trail.
+- Batch setup screens.
+- Equipment views.
+- Process status displays.
+- Reporting views.
+- Navigation menus.
+- Role-protected pages.
+
+Use the actual project definitions to identify the corresponding routes.
+
+Test:
+
+1. Page loads.
+2. Visible component rendering.
+3. Navigation.
+4. Missing resources.
+5. Browser console errors.
+6. Perspective session errors.
+7. Named Query failures.
+8. Authentication requirements.
+9. Appropriate authorization boundaries.
+10. Data quality indicators.
+
+Confirm that local contextual database-backed screens display appropriate records.
+
+Distinguish a page that renders correctly but displays disconnected industrial data from a broken application page.
+
+Industrial data quality may remain Bad or Stale while the system is intentionally disconnected.
+
+Do not mask this distinction.
+
+## Security testing
+
+Verify role-based access for:
+
+- Administrator.
+- Supervisor.
+- Unauthenticated users where applicable.
+
+Use non-destructive positive and negative tests.
+
+Confirm Supervisor does not inadvertently obtain Gateway administrative privileges.
+
+Do not elevate user roles merely to make a page accessible.
+
+Do not log passwords or session tokens.
+
+## Database and workflow validation
+
+Test representative read-only application workflows, including:
+
+- Batch configuration retrieval.
+- Equipment configuration retrieval.
+- Process-status configuration.
+- Reporting configuration.
+- Audit log retrieval.
+
+For operations that would write records, trigger controls, alter batches, acknowledge live alarms, or change equipment state:
+
+**Do not execute against live production resources without explicit approval.**
+
+Where feasible, use isolated disposable test data or a verified simulation environment.
+
+Do not inject fabricated production records into the restored contextual database just to pass acceptance tests.
+
+## Test outcomes
+
+Every route or function must be classified:
+
+- PASS
+- FAIL
+- BLOCKED
+- NOT TESTED
+- DEFERRED — INDUSTRIAL ISOLATION
+- REQUIRES AUTHORIZATION
+
+A rendered page alone does not prove all its controls work.
+
+Create:
+
+`C:\TBMC\Logs\TBMC-Application-Acceptance-Report.md`
+
+Include route inventory, functional test evidence, identified failures, screenshots where useful, and required follow-up.
+
+---
+
+# PHASE 6 — INTEGRATION READINESS WITHOUT PRODUCTION ACTIVATION
+
+Prepare the industrial system for controlled cutover.
+
+**Do not activate connections in this phase.**
+
+Inspect the restored configuration for:
+
+- PLC and device connections.
+- OPC-UA servers and clients.
+- MQTT Engine.
+- MQTT Transmission.
+- MQTT brokers and server sets.
+- Historian targets.
+- InfluxDB integrations.
+- Gateway Network connections.
+- SQL transaction groups.
+- Tag providers and UDTs.
+- Gateway timers.
+- Tag-change scripts.
+- Gateway message handlers.
+- Notification pipelines.
+- File watchers and CSV processors.
+
+### Build an integration inventory
+
+For each integration, document:
+
+- Logical name.
+- Type.
+- Intended endpoint.
+- Current state.
+- Project or Gateway dependency.
+- Credential or certificate requirements.
+- Source configuration evidence.
+- Safety considerations.
+- Expected communication direction.
+- Whether it can write to equipment or external systems.
+- Recommended commissioning sequence.
+- Verification method.
+- Rollback/disconnect method.
+
+Do not disclose credentials.
+
+Review the restored 360 captured tag definitions that were previously left disabled.
+
+Identify missing source secrets and certificates, but do not invent or bypass them.
+
+### Cutover sequencing
+
+Prepare a staged commissioning plan.
+
+Recommended progression, subject to actual dependency review:
+
+1. Local application database and audit verification.
+2. Read-only external dependency connectivity.
+3. Historian and data-source connectivity.
+4. OPC/device read-only verification.
+5. MQTT subscriptions and publishing verification using approved test resources.
+6. Controlled application write tests.
+7. Alarming and notification acceptance.
+8. Production operating acceptance.
+
+The order must be adjusted where the actual architecture requires it.
+
+Clearly distinguish read-only connections from systems that may issue commands or publish live operational messages.
+
+Before any live connection activation, require explicit operational authorization identifying the endpoint, allowed functions, maintenance window, rollback action, and responsible owner.
+
+A generic prior approval to repair scripts is not authorization to energize production integrations.
+
+Create:
+
+`C:\TBMC\Logs\TBMC-Integration-Cutover-Plan.md`
+
+---
+
+# PHASE 7 — REPOSITORY AND SCRIPT CONSOLIDATION
+
+The previous report identified an outstanding packaging item:
+
+The Supervisor mapping helper exists in the working copy but is not fully synchronized into the authoritative deployment script directory.
+
+Inspect:
+
+`C:\Users\user\Desktop\TBMC-Deploy-main`
+
+and:
+
+`C:\TBMC\TBMC-Deploy`
+
+Reconcile the reviewed helper scripts and migration tools.
+
+Perform:
+
+1. File inventory.
+2. Hash comparisons.
+3. Version and syntax checks.
+4. Dependency verification.
+5. Identification of local modifications.
+6. Review of the missing Supervisor mapping helper.
+7. Safe synchronization into the authoritative deployment directory.
+8. Non-destructive validation.
+
+Preserve the current working Gateway configuration.
+
+Do not blindly overwrite scripts or configuration files that contain newer local corrections.
+
+Do not re-execute Supervisor account creation or mapping merely because the helper was copied.
+
+Do not include local credential files, plaintext database exports, private keys, or unencrypted Gateway backups in source control.
+
+If publishing to GitHub is appropriate, prepare a reviewed commit containing only safe source changes. Request authorization before publishing if the resulting change could disclose confidential deployment information or modify an externally used release.
+
+Create:
+
+`C:\TBMC\Logs\TBMC-Deployment-Repository-Reconciliation.md`
+
+---
+
+# PHASE 8 — SECURITY, RETENTION AND OPERATIONAL HARDENING
+
+Review the restored environment for handover readiness.
+
+### Accounts and access
+
+Verify:
+
+- Permanent Gateway administrator exists and authenticates.
+- Supervisor account functions.
+- No unnecessary temporary recovery account remains.
+- Required application security-level mappings are intact.
+- Gateway security is not exposed beyond approved network boundaries.
+- MariaDB application account has appropriately scoped privileges.
+- No unnecessary plaintext credentials are stored in project files.
+
+Do not change existing authorized passwords unless necessary and explicitly approved.
+
+### Backup retention
+
+Review existing:
+
+- Encrypted migration artifacts.
+- Historical Gateway backups.
+- Current Gateway backup.
+- Database backups.
+- Temporary decrypted files.
+- Disposable MariaDB test directories.
+- Migration staging.
+- Browser automation profiles.
+- Temporary credentials.
+
+Identify obsolete materials.
+
+Do not automatically delete valuable recovery material.
+
+Prepare a cleanup manifest specifying:
+
+- Path.
+- Purpose.
+- Sensitivity.
+- Recovery relevance.
+- Recommended retention.
+- Safe disposal method.
+
+Securely remove only items whose disposal is explicitly authorized and whose removal will not impair rollback.
+
+Do not claim guaranteed physical erasure from ordinary file deletion on SSD or virtualized storage.
+
+### Operational controls
+
+Review:
+
+- Service startup.
+- Disk capacity.
+- Log retention.
+- Backup scheduling.
+- Clock/timezone synchronization.
+- Gateway audit coverage.
+- Windows firewall posture.
+- MariaDB authentication configuration.
+- Recovery documentation.
+- Operator/admin credential handover.
+
+Do not change firewall rules or external network exposure without authorization.
+
+---
+
+# PHASE 9 — FINAL READINESS ASSESSMENT
+
+Produce a full commissioning status matrix.
+
+| Area | Required outcome |
+|---|---|
+| Gateway service | Healthy |
+| MariaDB | Healthy |
+| Current Gateway backup | Verified |
+| Current database backup | Verified |
+| Isolated recovery rehearsal | Verified or explicitly outstanding |
+| TBMC project | Runnable |
+| Perspective navigation | Tested |
+| Supervisor authentication | Verified |
+| Role boundaries | Tested |
+| Local JDBC and Named Queries | Operational |
+| Audit logging | Operational |
+| Gateway diagnostics | Resolved or dispositioned |
+| Required modules | Healthy |
+| Licensing | Confirmed or documented as blocker |
+| External integrations | Ready for separately authorized cutover |
+| Rollback | Documented |
+| Production acceptance | Explicit owner decision |
+
+Use meaningful statuses:
+
+- PASS
+- FAIL
+- BLOCKED
+- NOT TESTED
+- DEFERRED
+- REQUIRES AUTHORIZATION
+
+### Production-readiness gates
+
+A production-ready determination requires evidence that:
+
+1. Required application functionality has been tested.
+2. Required module licensing is valid.
+3. Security and account access are correct.
+4. Backup and recovery provisions are adequate.
+5. Critical diagnostics are resolved or accepted.
+6. Required source credentials and certificates are provisioned.
+7. Industrial connection tests have passed under approved conditions.
+8. Operational owners have accepted the application.
+
+**Do not declare ProductionReady=true based only on a healthy Gateway or functioning Perspective pages.**
+
+Until live integration commissioning and operational acceptance are completed, report:
+
+`ProductionReady = false`
+
+You may separately report:
+
+`ContainedApplicationReady = true`
+
+if all non-production application tests pass.
+
+---
+
+# PHASE 10 — FINAL DELIVERABLES
+
+Generate the following files under:
+
+`C:\TBMC\Logs`
+
+1. `TBMC-Final-State-Backup-Report.md`
+2. `TBMC-Gateway-Diagnostic-Closure.md`
+3. `TBMC-Module-License-Assessment.md`
+4. `TBMC-Application-Acceptance-Report.md`
+5. `TBMC-Integration-Cutover-Plan.md`
+6. `TBMC-Deployment-Repository-Reconciliation.md`
+7. `TBMC-Security-Retention-Review.md`
+8. `TBMC-Production-Readiness-Report.md`
+9. `TBMC-Production-Readiness-Results.json`
+10. `TBMC-Final-Commissioning-Execution.log`
+
+Include a resumable task journal.
+
+The final production-readiness report must have:
+
+- Executive summary.
+- Work completed.
+- Verified current system state.
+- Backup and recovery assessment.
+- Project and module assessment.
+- Application test coverage.
+- Outstanding defects.
+- License requirements.
+- External integration readiness.
+- Recommended cutover sequence.
+- Remaining risk register.
+- Required owner decisions.
+- Final readiness classification.
+
+Never include credentials, passwords, private keys, session tokens, or confidential database records in reports.
+
+---
+
+# AUTONOMY AND APPROVAL POLICY
+
+The user has granted Codex Full Access within the available environment.
+
+Use that access to perform the authorized work with minimal intervention.
+
+**Do not repeatedly ask permission for:**
+
+- Reading deployment files.
+- Inspecting logs.
+- Running harmless PowerShell diagnostics.
+- Checking Gateway status.
+- Performing read-only database checks.
+- Reviewing project resources.
+- Diagnosing modules.
+- Testing read-only Perspective pages.
+- Fixing non-destructive local scripts.
+- Creating reports.
+- Creating properly isolated backups.
+- Verifying checksums.
+- Preparing commissioning and cutover procedures.
+
+Resolve recoverable issues yourself.
+
+When something fails:
+
+1. Capture the actual error.
+2. Inspect relevant code or configuration.
+3. Determine root cause.
+4. Apply a safe correction within existing authorization.
+5. Retest.
+6. Continue.
+
+Do not repeatedly stop after diagnosing issues that you are capable of correcting.
+
+Do not bypass authentication or Windows security controls.
+
+**Ask for explicit authorization before:**
+
+- Restarting or interrupting a running service.
+- Changing Gateway authentication or security permissions.
+- Modifying live application or production data.
+- Overwriting Gateway resources.
+- Enabling PLC, OPC, MQTT, historian, or external integrations.
+- Executing live write/control operations.
+- Changing firewall or network security configuration.
+- Deleting recovery backups or sensitive staging data.
+- Performing a production cutover.
+
+Bundle related changes into a single approval request wherever possible, showing the intended changes, impact, backup coverage, and rollback.
+
+Windows UAC or credential prompts may still require authorized human interaction.
+
+After approval, execute the approved sequence autonomously.
+
+---
+
+# EXECUTION INSTRUCTIONS — BEGIN NOW
+
+Start immediately.
+
+**Priority 1:** Capture and verify a new encrypted backup of the final working Gateway and MariaDB state.
+
+**Priority 2:** Investigate and resolve the remaining Gateway diagnostic errors.
+
+**Priority 3:** Assess module health, licensing, and required production dependencies.
+
+**Priority 4:** Perform comprehensive safe Perspective and application acceptance tests.
+
+**Priority 5:** Prepare staged industrial integration commissioning, without activating live connections.
+
+**Priority 6:** Reconcile the deployment repository, review security and retention, and produce the final readiness assessment.
+
+Do not rerun the successful contextual database migration.
+
+Do not reset the functioning administrator or Supervisor accounts.
+
+Do not enable the three disabled nonprimary projects without a specific need and authorization.
+
+Do not activate industrial communications during this commission.
+
+Proceed through all safe work independently and stop only for genuinely required authorization or a blocker that cannot be resolved safely.
+
+**Success means the TBMC Gateway has a verified final-state recovery point, a validated application, a documented resolution of remaining technical defects, and a clear, evidence-based path to production cutover.**
