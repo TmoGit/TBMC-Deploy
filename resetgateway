@@ -1,0 +1,171 @@
+# CODEX COMMISSION — TBMC Ignition Gateway Administrator Recovery
+
+## Objective
+
+Recover administrator access to the existing Ignition Gateway 8.3.4 on the client Windows Server.
+
+Target:
+- Host: 172.16.81.201
+- Application: Ignition Gateway 8.3.4
+- Installation: Existing Windows Server installation
+- MariaDB: Already installed
+- Deployment directory: C:\TBMC\TBMC-Deploy
+- Reports directory: C:\TBMC\Logs
+
+You are executing locally on the Windows Ignition Server through VS Code.
+
+**Perform the recovery with minimal user intervention. Do not reinstall Ignition or MariaDB.**
+
+## Phase 1 — Inspect the environment
+
+1. Confirm you are running on the expected Windows host.
+2. Identify the Ignition installation directory.
+3. Locate `gwcmd.bat` or the installed Gateway command-line utility.
+4. Confirm the installed Ignition version.
+5. Verify the Ignition Windows service exists and record its status.
+6. Determine whether the current shell has Administrator privileges.
+7. Inspect the current Gateway port configuration and local health.
+8. Check whether a migration, restoration, database import, or Gateway backup is currently running.
+
+Do not interrupt active migration or database operations.
+
+If elevation is required, prepare one elevated operation rather than repeatedly requesting Administrator access.
+
+## Phase 2 — Preserve current configuration
+
+Before initiating password recovery:
+
+1. Record the current Gateway service status and configuration paths.
+2. Capture a Gateway backup using the installed supported `gwcmd` utility where possible.
+3. Store the backup in a restricted directory under C:\TBMC\Backups.
+4. Confirm backup completion and file integrity.
+5. Record current security settings from available authorized configuration information.
+6. Preserve existing projects, modules, licenses, and MariaDB configuration.
+
+Do not expose passwords, private keys, tokens, or sensitive security configuration in logs.
+
+If a reliable backup cannot be created, report that limitation and request approval before continuing.
+
+## Phase 3 — Reset Gateway administrator access
+
+Use Inductive Automation's official Ignition 8.3 Gateway password recovery procedure.
+
+Official documentation:
+https://www.docs.inductiveautomation.com/docs/8.3/platform/gateway/gateway-command-line-utility-gwcmd
+
+The documented recovery commands are:
+
+`gwcmd -p`
+
+followed by:
+
+`gwcmd -r`
+
+Adapt execution to the actual Windows installation directory and installed command utility.
+
+Before executing the reset:
+
+- Confirm that the Gateway backup is valid or that the recovery risk has been approved.
+- Confirm no deployment or restoration operations are running.
+- Present one consolidated authorization for the Gateway security reset and service restart.
+
+After authorization:
+
+1. Execute the official password recovery command.
+2. Verify the command completes successfully.
+3. Restart the Gateway using the supported method.
+4. Wait for the Gateway service to return to a healthy state.
+5. Verify the Gateway web interface responds.
+
+Do not modify MariaDB passwords, database records, Windows accounts, or unrelated security configurations.
+
+## Phase 4 — Complete administrator commissioning
+
+After the Gateway restarts, Ignition should present its official partial commissioning process.
+
+Open or provide:
+
+http://localhost:8088
+
+If accessing remotely, use:
+
+http://172.16.81.201:8088
+
+Use the actual configured port if different.
+
+The authorized user will create the new temporary administrator username and password through the Gateway interface.
+
+**Do not generate a known/default administrator password or write credentials into scripts, logs, or chat.**
+
+If this browser interaction requires the user, request that single action and continue after completion.
+
+## Phase 5 — Restore normal security configuration
+
+The Ignition password recovery procedure can create a temporary user source and Identity Provider.
+
+After administrator access has been recovered:
+
+1. Identify the temporary recovery user source and Identity Provider.
+2. Compare Gateway security settings against the preserved pre-reset configuration.
+3. Determine the intended permanent administrator account and authentication source.
+4. Restore the intended Gateway security and authentication configuration.
+5. Verify the permanent administrator can successfully authenticate.
+6. Confirm Designer and Gateway permissions function correctly.
+7. Remove temporary recovery authentication resources only after permanent access is proven.
+8. Avoid weakening Gateway security or exposing administrative access to unauthorized networks.
+
+Do not delete or disable the temporary recovery identity before verified permanent administrative access exists.
+
+## Phase 6 — Validation
+
+Verify:
+
+- Ignition Gateway 8.3.4 is running.
+- Gateway administration is accessible using authorized credentials.
+- The four TBMC projects remain intact where previously restored.
+- Existing modules are preserved.
+- Gateway configuration remains functional.
+- MariaDB remains operational and unchanged.
+- Existing JDBC connection configurations are preserved.
+- No unexpected Gateway security errors occur.
+- No live PLC, MQTT, historian, or production integrations were newly activated.
+
+Do not confuse successful administrator login with complete TBMC application migration.
+
+## Phase 7 — Reporting
+
+Create:
+
+C:\TBMC\Logs\TBMC-Gateway-Password-Recovery.md
+
+Include:
+
+- Original Gateway version
+- Original service status
+- Backup location and integrity
+- Recovery commands executed
+- Restart results
+- Administrator access verification
+- Temporary identity cleanup status
+- Final Gateway security configuration status
+- Project and module preservation checks
+- Outstanding issues
+
+Never include actual passwords or credential material.
+
+## Autonomy requirements
+
+Perform all safe inspections, backups, validation, script corrections, and reporting automatically.
+
+Do not repeatedly request permission for harmless commands.
+
+Request user intervention only for:
+
+- Necessary Windows Administrator elevation
+- Approval of the password reset and Gateway restart
+- Entering new credentials through the secure Gateway interface
+- A newly discovered material risk
+
+After approval, proceed through the authorized recovery steps without unnecessary interruptions.
+
+**Begin by inspecting the local Ignition installation and confirming that Gateway password recovery can be performed safely.**
