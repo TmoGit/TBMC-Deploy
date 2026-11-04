@@ -1,0 +1,42 @@
+# MariaDB artifact investigation
+
+Finding: **INCOMPLETE ORIGINAL EXPORT**. Artifact selection and transferred-byte integrity are correct. The old verification logic needed improvements, but those improvements do not cure the source SQL defect.
+
+## Provenance and integrity
+
+- Original source record: 60,934,812 bytes; SHA256 0C0E7BE2BCDD260C01AA2CD9ADDF516D071E9C32E9CA20BDAD456E8E2AA94885.
+- Fresh authenticated decryption: 60934812 bytes; SHA256 0C0E7BE2BCDD260C01AA2CD9ADDF516D071E9C32E9CA20BDAD456E8E2AA94885. Both match exactly.
+- Six encrypted occurrences were found: contextual/system artifacts in the deployment repository, desktop repository, and downloaded deployment ZIP. They collapse to two distinct encrypted hashes. Every occurrence matches the published local database checksum manifest.
+- Contextual encrypted SHA256: BBAFED0A77FDCDCE914ED09F9C22D73B34D696A6C8774E70684F65B630DC0FC6.
+- System encrypted SHA256: 9B60E316E72BF2878A1FB283D8E8DF39A0E12A8B9F99AC2A750B6FC8024952B7.
+- Original source size/hash also match VM133-MARIADB-BACKUP.md. The supplied published commit is d12e901d60263d947108823048e6a071c15d5522. A remote Git commit object was not independently fetched; commit attribution is the supplied record, not a claim of remote verification.
+
+## Complete structural inspection
+
+The lexer processes the entire dump with quote escaping, doubled quotes, comments, custom DELIMITER directives and multiline INSERT handling. It identifies CREATE DATABASE ignition_config, USE ignition_config, one CREATE TABLE alarm_event_data, 57 INSERT starts (56 terminated and one pending), and zero standalone routine/trigger/event definitions. The last INSERT begins at line 1333906, spans 994866 text characters, and ends at EOF with a comma (character code 44), requiring another VALUES tuple. Quotes and parentheses are balanced at EOF, so this is a missing continuation, not a quote-parser failure. The completion marker and closing session restoration/unlock statements are absent.
+
+Absence of a semicolon or completion comment alone would not establish a defective export: clients can accept some final statements at EOF, and comments can be disabled. Here the dangling comma plus the independent database-engine failure are decisive.
+
+## Isolated MariaDB 10.11 validation
+
+The installed 10.11.11 binaries initialized a disposable restricted datadir. This did not install/reinstall software or register a service. The test server used a unique authenticated named pipe, skip_networking=1, event_scheduler=OFF, disabled replication startup/binlogging and local infile, and a restricted file directory. No TCP listener or destination database was used.
+
+The unchanged original SQL was streamed as binary client stdin. The client returned exit code 1, **ERROR 1064 / SQLSTATE 42000 at line 1333906**. No confidential error excerpt or records were logged. Partial-test inventory: one table alarm_event_data, 1,333,799 successfully inserted rows, zero routines, zero triggers and zero events. These are disposable partial-import counts, not recovered destination data or a full source count. The disposable server was stopped. Both existing Windows services remained running and untouched.
+
+## Parser corrections and restoration safeguards
+
+Analyze-Staging.ps1 now uses SqlStructure.cs instead of line regex for SQL object/statement classification. Regression fixtures cover large/multiline INSERT structure, escaped and doubled quotes, semicolons inside values, custom routine delimiters, EOF comments, incomplete rows, unclosed quotes and embedded routine SQL inside a stored data record.
+
+The earlier system-dump regex could count names/SQL inside mysql.proc/mysql.event INSERT records as standalone CREATE routines/events. Corrected counts are 31 CREATE TABLE statements and zero standalone CREATE PROCEDURE/FUNCTION/EVENT statements. Stored system-table records still require careful selective review. The global mysql dump is not a safe replacement for a complete contextual export. Existing live-restore safety gates remain in force; missing records were not invented and the partial import was not promoted.
+
+## Source recovery and authorization
+
+A reviewed acquisition script and recovery procedure are prepared: Capture-SourceContext.ps1 and Source-Recovery-Procedure.md. They require source identity verification, approved isolation of every source NIC before boot, one expressly authorized VM133 startup on morrison, real dump-process exit checking, native --result-file output, asynchronous guest-exec polling, bounded transfer with truncation/length checks, public-recipient age encryption and end-to-end plaintext/encrypted hashes. They do not blindly restore mysql privileges. No source VM command was executed.
+
+Current source access limitation: morrison does not resolve in destination DNS, and no configured SSH identity/host record was found. No hostname/security configuration was changed. Starting or modifying the source VM still requires authorization; no request to supply another backup is needed until this source-recovery path is considered.
+
+## Restricted temporary data
+
+Automatic command approval review rejected the bundled cleanup command. The disposable server is stopped, but temporary decrypted copies, disposable credentials and datadir remain protected under C:\TBMC\Secure\artifact-investigation-20261105-014616. No weaker cleanup method or physical-erasure claim was substituted. Original encrypted artifacts and destination data remain preserved.
+
+Evidence: TBMC-MariaDB-Artifact-Investigation.json. Captured source records used here are local package records plus the original size/hash supplied by the user.
