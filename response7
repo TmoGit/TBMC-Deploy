@@ -1,0 +1,18 @@
+**The existing package does not contain sufficient InfluxDB configuration to migrate. No particular archive name is required.**
+
+I traced the original code:
+
+- `database\Install-Database.ps1` installs InfluxDB software and registers its service; it does **not** initialize or import InfluxDB configuration.
+- Its optional `Restore-TimeSeriesMetadata.ps1` hook consumes only `questdb-schema.json.age` and validates 11 QuestDB definitions.
+- `Restore-Database.ps1` restores MariaDB only.
+- `config\deployment.example.json` supplies installation settings, without InfluxDB organizations, buckets, retention rules or resource exports.
+
+Using the package’s working age identity, I decrypted the applicable Ignition artifacts in memory. They contain **client connection settings** for `TBMC` / `TBMC-Sensor-Data`, an embedded encrypted token, and an empty legacy retention field—not authoritative InfluxDB server configuration.
+
+Missing information includes exact v2 bucket retention rules, source resource IDs, authorization permissions, task definitions/states, and other resource definitions or confirmation of their absence. Initializing now would require inventing settings.
+
+The service remains **Running, healthy, and uninitialized**. No reinstall, restart, initialization or historical-data import occurred.
+
+[Full installer/artifact trace](C:/Users/tpignclouduser/Desktop/TBMC/TBMC-Deploy-main/database/INFLUX-INSTALLER-ARTIFACT-TRACE.md)
+
+Automatic approval review blocked an additional QuestDB-decryption inspection command. The applicable Ignition artifact inspection and separate launcher inspection completed successfully.
