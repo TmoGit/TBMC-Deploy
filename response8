@@ -1,0 +1,35 @@
+Finish the existing InfluxDB deployment now. Change the approach from configuration migration to a fresh production configuration. The package has been conclusively inspected; do not repeat artifact discovery or request source-config.zip.
+
+I authorize these settings:
+- Existing InfluxDB 2.8.0 installation and `TBMCInfluxDB` service.
+- Organization: `TBMC`.
+- Production bucket: `TBMC-Sensor-Data`.
+- Retention: unlimited, explicitly selected for this new deployment.
+- Fresh administrator credentials and fresh API tokens, stored securely.
+- No historical data import.
+- No recreation of unknown source tasks, dashboards, users, or other resources. Document them as not migrated.
+
+Execute the following:
+
+1. Read the existing deployment script and current report. Preserve the working service, LocalService identity, storage paths, startup behavior, recovery settings, and version-validation fix.
+
+2. Confirm the destination remains uninitialized, then initialize it using the settings above. If it has become initialized, inspect and reconcile existing resources without resetting or deleting anything.
+
+3. Generate strong administrator credentials and separate bucket-scoped tokens:
+   - An Ignition writer token with the permissions required by the actual integration.
+   - A read-only application/reporting token.
+   Keep administrative credentials separate. Save secrets in an ACL-restricted directory accessible only to the intended administrators and service identities. Do not print secrets or embed them in scripts, reports, or Git.
+
+4. Validate authenticated organization/bucket access and unlimited retention. Perform a write/query test in a temporary validation bucket, then remove that bucket. Verify the production bucket remains free of synthetic test data. Restart the service and verify persistence and health.
+
+5. Finish network configuration using actual machine settings and existing deployment documentation. Inspect available private/VPN interfaces, certificates, reverse-proxy configuration, and documented Ignition source addresses. Implement the supported connection path when those details are available, with appropriately restricted firewall access. Do not leave an unrestricted public port or transmit production tokens over public plaintext HTTP.
+
+6. Prepare the exact Ignition connection values: destination URL, organization, bucket, and protected writer-token file location. Do not reuse the old encrypted token. Do not claim end-to-end ingestion is verified until tested from the on-premises Ignition server.
+
+7. Configure scheduled backups if an established backup destination and policy are available. Otherwise document the precise outstanding backup decision without blocking database initialization and validation.
+
+8. Update the reusable deployment script and runbook to reproduce this fresh configuration safely. Record clearly that this is a fresh setup, not a source configuration migration.
+
+Continue through all authorized work. If external connectivity requires information unavailable on this machine, complete initialization, credentials, local validation, and the connection handoff first. Then ask one concise question containing only the missing network details.
+
+Report completed work and remaining external dependencies separately. Do not reinstall, repeat source-export requests, or stop because unknown source configuration is unavailable.
