@@ -1,0 +1,23 @@
+**Installation is complete; configuration migration remains pending.** The healthy service was left unchanged.
+
+Discovery found:
+
+- A working age identity in the package.
+- Encrypted Ignition configuration confirming the recorded organization, bucket, and historical endpoint.
+- An encrypted embedded token, but no usable plaintext API token or authoritative InfluxDB retention/resource export.
+- Referenced `C:\TBMC`, `C:\TBMC-Deploy`, and `C:\Secure` paths absent.
+- The destination secrets directory inaccessible—not confirmed empty.
+
+[Discovery report with every checked location](C:/Users/tpignclouduser/Desktop/TBMC/TBMC-Deploy-main/database/INFLUX-MIGRATION-DISCOVERY.md)
+
+**Required input:** place a configuration-only export from the confirmed source, including exact retention settings, in:
+
+```text
+C:\Users\tpignclouduser\AppData\Local\TBMC\InfluxMigration\source-config.zip
+```
+
+That directory is restricted to your Windows user, SYSTEM, and Administrators. Alternatively, supply `source.json` containing the confirmed endpoint and `source.token` there. Don’t paste credentials here.
+
+A fresh configuration requires explicit approval of missing settings and would not be migration.
+
+Automatic approval review rejected temporary-file cleanup with “blocked by policy.” Restricted plaintext inspection files remain at `C:\Users\tpignclouduser\AppData\Local\Temp\2\ti-e3d8a4f2`; an administrator should remove that exact directory.
