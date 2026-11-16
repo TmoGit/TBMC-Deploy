@@ -1,0 +1,20 @@
+The remaining blocker is **access to the source configuration**, especially its exact retention settings. The encrypted Ignition token hasn’t been shown to be usable for that export.
+
+The next step belongs on the **original InfluxDB host**. Give Codex there this commission:
+
+Create a configuration-only export of this source InfluxDB instance for migration to the new Windows production server.
+
+Inspect the local installation and securely available credentials. Confirm the source identity, organization, and buckets. Previously recorded values are organization `TBMC` and bucket `TBMC-Sensor-Data`; verify them.
+
+Use supported, read-only export methods. Include exact bucket retention rules and all accessible configuration resources: organizations, buckets, tasks, dashboards, variables, labels, DBRP mappings, and authorization permission definitions. Record dependencies and resource IDs. Document anything that cannot be exported or will require recreation, including credentials.
+
+Do not export historical measurements or copy engine/WAL/shard directories. Do not change, restart, or stop the source. Keep tokens and passwords out of logs and the report.
+
+Produce `source-config.zip` with a sanitized manifest identifying the source, version, export time, included resources, exact retention settings, and omissions. Validate the archive and report its path and SHA-256 hash.
+
+The destination expects this archive at:
+`C:\Users\tpignclouduser\AppData\Local\TBMC\InfluxMigration\source-config.zip`
+
+If source access is unavailable, identify the exact missing permission or credential rather than substituting defaults.
+
+Separately, automatic approval review rejected temporary-file cleanup as “blocked by policy.” The reported restricted plaintext files remain at `C:\Users\tpignclouduser\AppData\Local\Temp\2\ti-e3d8a4f2\`; remove that exact directory manually as administrator.
