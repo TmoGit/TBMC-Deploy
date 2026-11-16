@@ -1,0 +1,157 @@
+Paste this into Codex on the Windows cloud server:
+
+Complete the production InfluxDB deployment on this Windows cloud database server. Inspect the existing deployment package, obtain missing installers, migrate configuration without historical data, start the service, and validate the result.
+
+You are authorized to perform the installation and configuration on this destination server. Continue through execution and verification; do not stop after producing a plan or script. Ask only for essential information or credentials that cannot be found securely in the supplied package or existing local configuration.
+
+Scope and known context
+
+- On-premises Ignition is already deployed.
+- This server will host production InfluxDB.
+- The existing package is on the Desktop at `TBMC\TBMC-Deploy-main`.
+- Migrate configuration only. Do not migrate historical time-series data.
+- Do not install or modify Ignition, MariaDB, or QuestDB.
+- Do not modify or stop the source database.
+- Previously verified values were InfluxDB OSS 2.8.0, organization `TBMC`, and bucket `TBMC-Sensor-Data`. Verify these against the package before using them.
+- The previously documented cloud endpoint was `http://4.246.231.26:8086`. Treat this as historical context, not an instruction to connect to or overwrite that host.
+
+1. Locate and inspect the package
+
+Resolve the actual Windows Desktop location, including OneDrive redirection if applicable. Start with:
+
+`$HOME\Desktop\TBMC\TBMC-Deploy-main`
+
+Also check the Windows known Desktop folder. If the package is found, use its files directly and continue with setup. Do not request an upload or clone a replacement unnecessarily.
+
+Read applicable `AGENTS.md` files, deployment documentation, manifests, scripts, configuration examples, and exported configuration. Inspect these locations if present:
+
+- `database\Install-Database.ps1`
+- `config\client.json`
+- `config\deployment.example.json`
+- InfluxDB export, backup, manifest, or encrypted configuration folders
+- Installer manifests and service-wrapper configuration
+
+Determine exactly what the package contains and which steps have already been completed. Check existing InfluxDB services, processes, listening ports, binaries, configuration, and data directories. Do not print secrets while inspecting files.
+
+2. Establish the configuration migration method
+
+Inventory the configuration to migrate, including:
+
+- Organizations and buckets
+- Retention settings
+- Users and authorization permissions
+- Tasks and their enabled/disabled states
+- Labels, dashboards, variables, and other exported resources
+- DBRP mappings or compatibility settings if present
+- TLS and runtime settings applicable to this destination
+
+Use the package’s supported configuration-only import method where available. Verify the method against official documentation for the selected InfluxDB version.
+
+Do not perform a full restore containing historical data. Do not copy source engine, WAL, or shard directories. Treat server configuration files, database metadata, and time-series data as distinct items; determine what each supplied artifact actually contains.
+
+If the package lacks required configuration, use an explicitly identified source and available authorized credentials to export it read-only. Do not assume the historical IP is the source. If source identification or credentials are missing, complete independent preparation and request only the missing information.
+
+Do not assume resource IDs or tokens survive migration. Maintain an old-to-new ID mapping and update imported resource references where required. Preserve retention settings exactly; do not silently use defaults.
+
+If existing tokens or password hashes cannot be migrated through supported mechanisms, recreate the required identities and least-privilege authorizations where possible. Save new credentials securely on this server and report any client credential updates required without displaying the credentials.
+
+3. Create a dedicated deployment entry point
+
+Create an InfluxDB-only PowerShell deployment script in the package, such as:
+
+`database\Deploy-TBMC-InfluxDB-Production.ps1`
+
+Reuse appropriate existing functions and safeguards. Do not invoke the combined database installer blindly if it would install QuestDB or other components.
+
+The script must:
+
+- Check administrator privileges and supported PowerShell/runtime prerequisites.
+- Support a genuine read-only preflight mode.
+- Use explicit installation, configuration, data, log, and protected-secret paths.
+- Be safe to rerun: discover existing resources and avoid duplicate creation.
+- Refuse to overwrite an unrelated installation or reset an initialized database.
+- Preserve an existing destination installation before any necessary modification.
+- Record deployment progress and actionable errors without logging secrets.
+- Resume safely after partial completion.
+- Fail clearly if required configuration cannot be imported.
+- Avoid marking deployment successful merely because a process started.
+
+Do not silently upgrade an existing installation. Use the version pinned by the package; if none is pinned, use the previously verified 2.8.0 after confirming compatibility and official installer availability. Do not substitute InfluxDB 3 or an unpinned latest version.
+
+4. Obtain required installers
+
+Reuse valid existing installers. Download missing InfluxDB binaries, CLI, and any required Windows service wrapper from their official publishers.
+
+- Confirm exact versions and supported command options using official documentation.
+- Download into the package’s installer cache or established installer directory.
+- Verify publisher-provided checksums or signatures where available.
+- Record source URLs, versions, and verification results.
+- If an old pinned release cannot be obtained or verified, report the issue rather than silently selecting another release.
+- Keep server and CLI version compatibility in mind; they are separately versioned components.
+
+5. Install and configure InfluxDB
+
+Run preflight, resolve routine problems, and proceed with deployment.
+
+- Install InfluxDB as an automatically starting Windows service using a compatible service mechanism.
+- Configure service recovery, persistent storage, logs, and appropriate filesystem permissions.
+- Use a dedicated service identity where supported by the package and environment.
+- Keep setup credentials and administrative tokens in protected local storage with restrictive ACLs.
+- Initialize only a confirmed fresh destination.
+- Import configuration without importing historical measurements.
+- Preserve source files and configuration exports.
+- Stage imported tasks disabled until their dependencies, destination references, and potential external effects have been reviewed. Restore intended enabled states only when validated for this destination.
+
+Configure connectivity using the established deployment design. Inspect existing TLS, network, firewall, and reverse-proxy settings first. Do not invent a DNS name, certificate, or broad public-access requirement.
+
+If creating a Windows firewall rule, restrict it to documented client networks or source addresses. Do not create an unrestricted Internet-facing rule for port 8086. If the necessary network details are missing, complete local deployment and report external connectivity as pending.
+
+Do not modify cloud security groups, DNS, the existing on-premises Ignition configuration, or other client systems without explicit authorization.
+
+6. Validate the deployment
+
+Perform meaningful checks and fix failures within scope:
+
+- PowerShell syntax and preflight validation
+- Installed server and CLI versions
+- Service startup and recovery configuration
+- Expected listening address and port
+- InfluxDB health and readiness
+- Authenticated access to the intended organization and buckets
+- Source-to-destination comparison of migrated resources and retention settings
+- Authorization scopes and resource-ID references
+- Task definitions, dependencies, and intended enabled states
+- Service restart and configuration persistence
+- TLS verification if TLS is configured
+- Network access from an authorized client where available
+
+Use a temporary validation bucket with short retention for a uniquely identifiable write/query test, then remove the temporary bucket. Do not write synthetic data into the production bucket.
+
+Document separately whether the on-premises Ignition connection and real production ingestion have been verified. Local API tests alone do not prove end-to-end connectivity. Do not claim production readiness if required configuration, backups, external connectivity, or client credential updates remain unresolved.
+
+7. Deliver and report
+
+Leave these files in the deployment package:
+
+- The reusable InfluxDB-only deployment script
+- A sanitized configuration example containing no credentials
+- A configuration migration inventory and resource-ID mapping
+- A concise deployment and validation report
+- Exact rerun/resume instructions
+- Backup and recovery instructions appropriate to the installed version
+
+If an approved backup destination and policy already exist, configure them and verify a backup can be produced. Do not invent a retention policy or claim disaster recovery is established from an untested local backup.
+
+Finish with a concise report stating:
+
+- What was installed and where
+- Versions and installer verification
+- Windows service name and status
+- Destination endpoint and security configuration
+- Configuration migrated and anything omitted
+- Confirmation that historical data was not migrated
+- Validation results
+- Protected credential-file locations, without secret values
+- Any remaining action needed for on-premises Ignition connectivity or production readiness
+
+Proceed autonomously through discovery, downloads, script creation, installation, configuration migration, and verification wherever the supplied files and available permissions allow.
