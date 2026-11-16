@@ -1,0 +1,36 @@
+**Installation is complete; configuration migration is the remaining blocker.** Keep the healthy service as it is. Send Codex this:
+
+Resume the TBMC production InfluxDB deployment.
+
+Current verified state:
+- Service `TBMCInfluxDB` is running with Automatic startup.
+- InfluxDB 2.8.0 health and readiness pass.
+- API version is `v2.8.0`; preserve the validation fix.
+- LocalService identity and restart recovery are configured.
+- Endpoint is `http://127.0.0.1:8086`.
+- The destination is uninitialized.
+- No configuration or historical data has been migrated.
+
+Do not reinstall or repeat service staging.
+
+Work from:
+`C:\Users\tpignclouduser\Desktop\TBMC\TBMC-Deploy-main`
+
+Before asking again for source credentials, inspect the package and its referenced local deployment paths for:
+- Configuration-only exports and manifests
+- Encrypted configuration archives
+- Source connection settings
+- Protected token files
+- References to an age identity such as `C:\TBMC\Secure\deploy.key`
+
+Inspect securely without displaying credentials. Use existing artifacts and keys if present. Report exactly which relevant locations were checked and whether the package actually contains sufficient configuration to migrate.
+
+If usable configuration exists, continue with initialization and configuration-only migration using the existing script. Preserve exported organization, bucket, retention, and other supported settings. Do not import historical data, invent missing retention settings, or modify the source.
+
+If configuration is absent, distinguish these two paths clearly:
+1. Migration requires a confirmed source endpoint and an authorized protected token file or configuration export.
+2. A fresh configuration would require explicit approval of the missing settings and must not be described as migration.
+
+Previously recorded values were organization `TBMC` and bucket `TBMC-Sensor-Data`; these alone do not establish the complete source configuration. The historical endpoint `http://4.246.231.26:8086` is unconfirmed for this migration.
+
+Complete every unblocked step. If blocked after discovery, provide one precise request identifying the missing input and how to supply it securely on the machine. Update the deployment report with installation complete and configuration migration pending.
