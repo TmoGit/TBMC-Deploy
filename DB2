@@ -1,0 +1,15 @@
+Open **Start → Windows PowerShell → Run as administrator**, accept UAC, then run:
+
+```powershell
+Set-Location 'C:\Users\tpignclouduser\Desktop\TBMC\TBMC-Deploy-main'
+.\database\Deploy-TBMC-InfluxDB-Production.ps1 -Mode Preflight
+.\database\Deploy-TBMC-InfluxDB-Production.ps1 -Mode StageService
+```
+
+`StageService` stages an **uninitialized, local-only service**. It intentionally ends with “NOT PRODUCTION READY” because source configuration is missing.
+
+Installers are cached and the script passes syntax checks. **Nothing is installed yet; no historical data was migrated.**
+
+To complete migration, provide the confirmed source endpoint and a protected local token-file path, or a configuration-only export. Don’t paste credentials here.
+
+[Deployment report](C:/Users/tpignclouduser/Desktop/TBMC/TBMC-Deploy-main/database/INFLUX-PRODUCTION-REPORT.md) · [Resume and recovery instructions](C:/Users/tpignclouduser/Desktop/TBMC/TBMC-Deploy-main/database/INFLUX-PRODUCTION-RUNBOOK.md)
