@@ -1,0 +1,12 @@
+The service is installed and healthy. I fixed the validation bug: the API returns `v2.8.0`, including the `v`.
+
+Verified directly:
+
+- `TBMCInfluxDB`: **Running**, Automatic startup.
+- Version **2.8.0**, health and readiness passing.
+- LocalService identity and restart recovery configured.
+- Listening only at `http://127.0.0.1:8086`.
+
+No reinstall is needed. The database remains **uninitialized**; no configuration or historical data was migrated.
+
+To continue, I still need the configuration-only export or the confirmed source endpoint and protected token-file path.
