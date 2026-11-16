@@ -1,0 +1,9 @@
+Do not require an archive named source-config.zip. Use the existing TBMC-Deploy-main package directly.
+
+Inspect the database installer and trace the exact configuration artifacts it was designed to consume, including encrypted files, manifests, and configuration templates. Use the working age identity to decrypt applicable artifacts securely.
+
+Distinguish an actual InfluxDB configuration export from Ignition’s InfluxDB connection settings. If sufficient InfluxDB configuration exists, adapt the migration script to consume it directly and complete migration without historical data.
+
+If it does not exist, identify the specific missing settings and the relevant package files you inspected. Explain whether the original database installer ever included configuration migration or only software installation. Do not repeat a request for source-config.zip without establishing this.
+
+Leave the installed, healthy service intact. Do not invent retention values or describe a fresh configuration as a migration.
