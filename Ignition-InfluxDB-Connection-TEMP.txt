@@ -1,25 +1,41 @@
-TBMC Ignition / InfluxDB temporary credential handoff
-STATUS: PRIVATE ENDPOINT PREPARED; TP-IGN01 API/HISTORIAN VALIDATION PENDING
+TBMC IGNITION / INFLUXDB - CORRECTED KYMERA CREDENTIAL HANDOFF
+Created/updated UTC: 2026-11-17T15:20:17.7898843Z
+STATUS: DB-SIDE METADATA CORRECTION VERIFIED; GATEWAY VALIDATION REQUIRED
 Destination hostname: tp-cloud-ign02-
 Private IP: 10.1.0.132
-Current connection URL: http://10.1.0.132:8086 (PRIVATE NETWORK ONLY; also used for local administration)
-Current protocol/port: HTTP / TCP 8086
-Remote Ignition connection URL: http://10.1.0.132:8086; server health verified; actual remote TCP/API validation pending.
-Confirmed gateway: TP-IGN01, Embedded NIC 1, 172.16.81.201/24, DB route via 172.16.81.254. Server observed source 172.16.81.201 on established RDP connection. Inbound allow rule scopes TCP 8086 to that source, local IP 10.1.0.132 and influxd.exe. Remote TCP/API/historian validation pending.
-TLS trust/certificate requirements: private HTTP is configured; no HTTPS endpoint/certificate configured. Use only the private routed path. Never send this token over public plaintext HTTP. If HTTPS is required, establish an approved identity/trust chain; never bypass validation.
+Connection URL: http://10.1.0.132:8086/
+Protocol/port: PRIVATE HTTP / TCP 8086
+Allowed gateway source: TP-IGN01, 172.16.81.201
 InfluxDB version: v2.8.0
 Organization: TBMC
 Organization ID: 0d928763db22136b
+Token-owning user ID: 11a58fc791889000
+TLS: No HTTPS certificate configured. Use only the private routed path. Never send credentials over public plaintext HTTP or bypass certificate verification.
+
+PRODUCTION - use ONLY for intended existing historian named InfluxDB
 Bucket: TBMC-Sensor-Data
 Bucket ID: 7dac3900b1b2323d
-Retention: unlimited; everySeconds=0
-Authorization ID: 11a58fc7e4c89000
-Authorization description: TBMC Ignition historian bucket read-write
-Permissions: read and write ONLY on buckets resource 7dac3900b1b2323d in organization 0d928763db22136b.
-Dedicated Ignition token: PBdzu8d5rBPgI9g0uhARGC52cbnqkDWaZc-oC9T-O0PtEEnun5ZZnPkK5SC5B72J4Py113WCkqmCiSu3xQcKXQ==
-Authoritative protected copy: C:\Users\tpignclouduser\AppData\Local\TBMC\InfluxProduction\clients\ignition-writer.token
-Temporary copy creation UTC: 2026-11-17T07:31:28.8094084Z
-Validation: exact production token permissions verified; nonmutating production query passed; disposable-bucket write/read passed and temporary resources removed. No production synthetic writes.
-Required final verification: configure actual Ignition/Kymera connection with matching installed-version documentation, then verify gateway-originated ingestion and historical queries.
-Handling: do not email, upload, log, or commit this file. Transfer securely. Delete this TEMP file only after secure transfer and successful actual Ignition validation; preserve the authoritative protected credential.
-Endpoint update UTC: 2026-11-17T14:12:57.4970225Z
+Retention: unlimited, everySeconds=0
+Authorization ID: 11a6853a21d08000
+Permissions: bucket read/write ONLY for 7dac3900b1b2323d in TBMC; read user 11a58fc791889000; read organization 0d928763db22136b. No user/org writes, bucket creation or authorization-management privileges.
+Dedicated Ignition token: x0kGsnEqdUepC_p4nqw2kpnxB_JiWMqR2FxhjHTl_tr__p__pLlprvwG9KkXN-C3AJ_J6GhpbWX4ZSggK5XIig==
+Authoritative protected token: C:\Users\tpignclouduser\AppData\Local\TBMC\InfluxProduction\clients\ignition-kymera-production.token
+Replaces previous bucket-only credential for Kymera. Old authorization preserved until gateway acceptance.
+
+DISPOSABLE COMMISSIONING - use ONLY for a separate isolated test historian
+Bucket: TBMC-Commission-Kymera-20261117
+Bucket ID: ecedb062071ec18b
+Retention: 24 hours, everySeconds=86400
+Authorization ID: 11a6853a38108000
+Permissions: bucket read/write ONLY for ecedb062071ec18b in TBMC; same narrowly scoped read-only user/org metadata permissions. This token is DENIED access to the production bucket.
+Dedicated disposable test token: LljVBzITZtTXpIqMbE-RTAJT-7sqzbP5rrAJML0KwnNESRQWrqle5bvorgr1jnn5cBsC2cXPRh0md2GpwcOXDg==
+Authoritative protected token: C:\Users\tpignclouduser\AppData\Local\TBMC\InfluxProduction\clients\ignition-kymera-commissioning.token
+DB-side probe exists only in this test bucket under measurement db_commission_probe. No synthetic production points written.
+
+Verification: Both credentials GET /api/v2/me, TBMC org metadata and their own bucket metadata = HTTP 200. Production read-only Flux = HTTP 200. Test bucket write = HTTP 204 and readback passed. Cross-bucket metadata access denied HTTP 401 in both directions.
+
+NEXT ON TP-IGN01
+Securely replace the previously transferred handoff with this corrected copy; do not reuse the old bucket-only token. Verify metadata checks with corrected credential, update the existing InfluxDB historian through supported configuration with a Gateway-encrypted production credential, re-enable it, and inspect actual status. Preserve unrelated mappings/settings and queues. Validate historian write/query through a separate test historian and isolated memory tags pointed at the disposable bucket. No synthetic production writes.
+
+CLEANUP
+After actual historian write/query validation, remove owned test historian/tags/project, then revoke ONLY disposable authorization 11a6853a38108000 and delete ONLY bucket ecedb062071ec18b. Retention expiry does not delete bucket/token. Keep old production authorization until replacement acceptance; retire only after explicit verified migration. Delete TEMP handoff copies after secure transfer and successful validation; preserve authoritative production token. Do not email, upload, log, render or commit this file. Administrator credentials are not included.
