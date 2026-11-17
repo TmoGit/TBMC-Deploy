@@ -1,0 +1,19 @@
+Create and run a development-session helper that checks and resets the **Ignition and Kymera trial timers every 1 hour 45 minutes** while I work.
+
+Requirements:
+
+- Inspect the installed Ignition 8.3.4 and Kymera module’s supported trial-reset controls.
+- Use the normal authenticated gateway trial-reset mechanism. Determine whether the gateway reset also resets Kymera; perform a separate reset only if the installed module supports and requires it.
+- Prefer a documented API. If none exists, use authenticated browser automation of the normal Reset Trial control. Do not invent endpoints.
+- Verify the resulting timer and module status after every reset; do not report success from a click alone.
+- Use existing protected administrator credentials or an authenticated session. Never embed passwords, tokens or session cookies in the script or logs.
+- Provide `Start-DevTrialHelper.ps1` and `Stop-DevTrialHelper.ps1`, with simple Desktop shortcuts.
+- Run immediately when started, then every 105 minutes. Prevent duplicate helper instances.
+- Limit each session to eight hours by default, with a configurable duration. Stop must terminate only this helper.
+- Log timestamp, reset outcome, next scheduled attempt and module status without secrets. If authentication expires, notify me and request sign-in rather than looping failed logins.
+- Do not restart Ignition, reinstall modules, modify license files, change the system clock, or alter paid license activation.
+- If supported unattended reset is unavailable, implement a 105-minute reminder that opens the gateway reset page and clearly report that manual action is required.
+
+Test one reset now, confirm both trials are operational, start the helper, and report its status, next run time, stop time and file locations.
+
+This is temporary development assistance. Do not configure it as a permanent production service.
