@@ -1,0 +1,88 @@
+{
+  "Summary": [
+    {
+      "Item": "Commission outcome",
+      "Result": "BLOCKED: production database listener inaccessible; no protected DB handoff; expired trial/unlicensed gateway. Assessment completed."
+    },
+    {
+      "Item": "Origin",
+      "Result": "TP-IGN01, 172.16.81.201/24, Embedded NIC 1; equipment on-link; DB via 172.16.81.254; 2026-11-17T14:06:36.1946421+08:00"
+    },
+    {
+      "Item": "Workbook baseline",
+      "Result": "31 rows, 22 populated IPs, 9 blanks; no baseline difference; 1 visible worksheet, all rows read including hidden (none hidden). No duplicate populated workbook IPs."
+    },
+    {
+      "Item": "Unique equipment endpoints",
+      "Result": "28 tested: 6 responding, 22 nonresponding (6 timed out; 16 explicit unreachable); no intermittent responses or test errors."
+    },
+    {
+      "Item": "Workbook equipment results",
+      "Result": "6 responding, 22 nonresponding at matched/reference-candidate endpoints, 3 not conclusively testable because identity/address unresolved. Candidate results retained for all ambiguous rows."
+    },
+    {
+      "Item": "Reference-only inventory",
+      "Result": "4 unresolved records (BRX200-20, BRX5, AVA200, AVA600); BRX5 may overlap workbook equipment 3. 35 register records are not 35 confirmed physical devices."
+    },
+    {
+      "Item": "Responding equipment IPs",
+      "Result": "172.16.81.10, 172.16.81.13, 172.16.81.14, 172.16.81.20, 172.16.81.37, 172.16.81.68"
+    },
+    {
+      "Item": "Database",
+      "Result": "10.1.0.132: 0/8 ICMP replies; TCP 8086 timed out; direct HTTP health/ready/setup requests timed out. Version, TLS mapping, initialization, organization, bucket, retention and permissions NOT VERIFIED."
+    },
+    {
+      "Item": "Actual Ignition evidence",
+      "Result": "8.3.4 (b2026030309); administrator authenticated with native read/write access; Kymera InfluxDB Module 2.83.2 (b2), ACTIVE, Trial. InfluxDB v1/v2 historian exists, enabled=false, DISABLED. Previous URL http://4.246.231.26:8086/; org TBMC, bucket TBMC-Sensor-Data."
+    },
+    {
+      "Item": "Write/readback",
+      "Result": "NOT PERFORMED: database inaccessible and handoff unavailable. No isolated bucket/provider created; no synthetic production history, trial reset, gateway/config change or internal database edit."
+    },
+    {
+      "Item": "Backup status",
+      "Result": "No configuration mutation attempted; no new gateway backup needed for read-only assessment. A protected native gateway backup is mandatory before resuming configuration changes; historical backup does not replace current prechange backup."
+    },
+    {
+      "Item": "Application endpoints",
+      "Result": "No equipment-specific OPC listener URL/port supplied or configured. Current OPC connection is disabled loopback only. Generic DDS firewall TCP 62541 is not proof of a listener on every device; no port guesses/scans."
+    },
+    {
+      "Item": "Source comparison limits",
+      "Result": "Responsibility matrix not found. DDS revisions parsed in accepted view in memory; original raw table extraction retained separately. Architecture page 1 visually reviewed by room/label. Original files preserved."
+    },
+    {
+      "Item": "Ownership",
+      "Result": "TBMC: site network/routing/VPN/NAT/firewall, cabling, equipment/vendor readiness and identity corrections. Acropolis: Ignition historian configuration, module/licensing remediation and isolated read/write validation. DB administrator/operator ownership not supplied; confirm assignment."
+    }
+  ],
+  "Blockers": [
+    {
+      "Dependency": "DB private path/listener",
+      "Owner": "TBMC + DB operator (DB ownership unconfirmed)",
+      "Required Action": "Run commission 02 on 10.1.0.132; preserve existing installation/data; inspect listener, private route/VPN, firewall and health. Observed Ignition egress is 172.16.81.201 via 172.16.81.254. DB-side observed NAT/VPN source is unknown and must be confirmed before firewall scoping. No remote administration session/access supplied."
+    },
+    {
+      "Dependency": "Protected connection handoff",
+      "Owner": "DB operator (unconfirmed); Acropolis consumes",
+      "Required Action": "Supply approved private URL/protocol/port/TLS trust, actual version, TBMC organization ID, TBMC-Sensor-Data bucket ID/retention, and dedicated bucket read/write token in protected nonsynchronized local file. No chat secrets; existing embedded historical credential is not verified for new DB."
+    },
+    {
+      "Dependency": "Ignition/module entitlements",
+      "Owner": "Acropolis; commercial license owner unconfirmed",
+      "Required Action": "Gateway shows 0/33 licensed and Trial Expired. Use supported Platform > System > Licensing activation for the required Ignition and Kymera historian entitlements; confirm module ACTIVE and licensed. No silent module upgrade/reinstall; installed module is present."
+    },
+    {
+      "Dependency": "Equipment identity and site connectivity",
+      "Owner": "TBMC/vendor",
+      "Required Action": "Resolve workbook equipment 3 (second 801 5L), 22 (815 Plasmid), 27 (816 Gene Therapy); approve twin sharing and blank-cell candidates, confirm missing/placeholder reference inventory and nonresponding site endpoints. Provide actual vendor OPC/MFCS URLs where applicable. NanoScaler is CSV ONLY."
+    },
+    {
+      "Dependency": "Resume actual historian commissioning",
+      "Owner": "Acropolis",
+      "Required Action": "After prerequisites, obtain current native protected gateway backup; update intended Kymera historian using supported UI to verified private DB and protected token. Preserve unrelated resources and production tag mappings. Validate module connection, then isolated temporary bucket/tag gateway-originated writes and historical readback; capture and remove only owned temporary resources. Production handoff remains false until those pass."
+    }
+  ],
+  "ProductionReady": false
+}

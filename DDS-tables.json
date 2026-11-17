@@ -1,0 +1,1232 @@
+[
+  [
+    [
+      "Role 角色",
+      "Responsibilities 職責"
+    ],
+    [
+      "Computer System Validation 電腦系統驗證 (CSV)IT",
+      "Authors Configuration Specification. 作者配置規範。XXX"
+    ],
+    [
+      "System Owner 系統擁有者 (SO)",
+      "Provides technical subject matter expertise on the system configuration. 提供系統配置的技術專業知識。 | Reviews and approves Configuration Specification. 審查並核准配置規範。 | Ensures the system meets technical, security, and regulatory requirements through continuous evaluation of the system. 透過持續評估系統，確保系統符合技術、安全及法規要求。 | Provides technical support to assure continued functionality and security of the system. 提供技術支援，確保系統持續運作與安全。"
+    ]
+  ],
+  [
+    [
+      "Term 術語",
+      "Definition 定義 (as used within this document)"
+    ],
+    [
+      "BOD",
+      "Basis of Design"
+    ],
+    [
+      "CPP",
+      "Critical Process Parameters"
+    ],
+    [
+      "ER",
+      "Electronic Records"
+    ],
+    [
+      "FAT",
+      "Factory Acceptance Testing"
+    ],
+    [
+      "FC",
+      "Field Controller"
+    ],
+    [
+      "GAMP",
+      "Good Automated Manufacturing Practice"
+    ],
+    [
+      "MFCS",
+      "Manufacturing and Control System"
+    ],
+    [
+      "MQTT",
+      "Message Queuing Telemetry Transport"
+    ],
+    [
+      "OPC",
+      "Open Platform Communication"
+    ],
+    [
+      "PV",
+      "Process Variable"
+    ],
+    [
+      "SAT",
+      "Site Acceptance Testing"
+    ],
+    [
+      "SCADA",
+      "Supervisory Control and Data Acquisition"
+    ],
+    [
+      "SDS",
+      "Software Design Specification"
+    ],
+    [
+      "SQL",
+      "Structured Query Language"
+    ],
+    [
+      "TBMC",
+      "Taiwan Bio-Manufacturing Corporation"
+    ],
+    [
+      "Key CPP’s",
+      "Three process parameters determined by the client, which are displayed on the level 2 screens and trended in reports that contain the device"
+    ],
+    [
+      "batch_uid",
+      "Unique persistent identifier for a saved batch setup record. The same saved batch setup may be loaded multiple times using the same batch_uid."
+    ],
+    [
+      "batch_run_uid",
+      "Unique identifier for a specific loaded/runtime batch instance. A new batch_run_uid shall be generated each time a saved batch setup is loaded."
+    ],
+    [
+      "Displayed Run Instance ID",
+      "Human-readable runtime identifier displayed to users in the UI, audit trail, report selection table, and Batch Report. The Displayed Run Instance ID shall allow users to distinguish multiple executions of the same saved batch name."
+    ],
+    [
+      "Runtime Batch Instance / Runtime Batch Card",
+      "The active batch workflow instance created when a saved batch setup is loaded. The runtime instance/card tracks selected equipment, current batch status, timestamps, user actions, equipment claims, audit records, and reporting context."
+    ],
+    [
+      "Equipment Claim State",
+      "A runtime workflow status used to identify whether a selected equipment item is loaded, officially claimed, or released for batch workflow/reporting purposes."
+    ],
+    [
+      "LOADED",
+      "Equipment claim state indicating that the equipment was selected for a loaded runtime batch instance/card. LOADED means the equipment is associated with the loaded batch, but it has not yet been officially acquired by a started batch."
+    ],
+    [
+      "CLAIMED",
+      "Equipment claim state indicating that the equipment has been officially acquired by the first runtime batch instance to start. CLAIMED equipment shall be treated as unavailable to other runtime batch instances until released."
+    ],
+    [
+      "RELEASED",
+      "Equipment claim state indicating that equipment is available for use by another runtime batch instance. Equipment shall transition to RELEASED on Complete, Abort, or Archive, as defined by the batch workflow."
+    ]
+  ],
+  [
+    [
+      "DS ID",
+      "Ethernet Device",
+      "IP Address",
+      "Subnet Mask",
+      "Room Number"
+    ],
+    [
+      "",
+      "Sartorius BioPAT MFCS",
+      "172.16.81.10",
+      "TBMC to Provide",
+      "801 - Biologics"
+    ],
+    [
+      "",
+      "Sartorius DCU-TWIN 5L ",
+      "172.16.81.12",
+      "TBMC to Provide",
+      "801 -Biologics"
+    ],
+    [
+      "",
+      "Sartorius 50L BIOSTATSTR3 ",
+      "172.16.81.13",
+      "TBMC to Provide",
+      "801 -Biologics"
+    ],
+    [
+      "",
+      "Sartorius 200L BIOSTATSTR3 ",
+      "172.16.81.14",
+      "TBMC to Provide",
+      "801 -Biologics"
+    ],
+    [
+      "",
+      "Sartorius 200L BRX200-20 – Need Info.",
+      "TBMC to Provide",
+      "TBMC to Provide",
+      "801 -Biologics"
+    ],
+    [
+      "",
+      "Sartorius BRX5 – Need Info.",
+      "TBMC to Provide",
+      "TBMC to Provide",
+      "801 -Biologics"
+    ],
+    [
+      "",
+      "Cytiva AVA200 – Need Info.",
+      "TBMC to Provide",
+      "TBMC to Provide",
+      "801 -Biologics"
+    ],
+    [
+      "",
+      "Cytiva AVA600 – Need Info.",
+      "TBMC to Provide",
+      "TBMC to Provide",
+      "801 -Biologics"
+    ],
+    [
+      "",
+      "Cytiva  Äkta Avant 150",
+      "172.16.81.15",
+      "TBMC to Provide",
+      "801 -Biologics"
+    ],
+    [
+      "",
+      "Cytiva  Äkta Avant 25",
+      "172.16.81.18",
+      "TBMC to Provide",
+      "801 -Biologics"
+    ],
+    [
+      "",
+      "Cytiva  Äkta Avant 25",
+      "172.16.81.19",
+      "TBMC to Provide",
+      "801 -Biologics"
+    ],
+    [
+      "",
+      "Cytiva  Äkta Avant Pure  - Does it still exist?",
+      "172.16.81.20",
+      "TBMC to ProvideTBMC to Provide",
+      "801 -Biologics"
+    ],
+    [
+      "",
+      "Cytiva  Äkta Avant Pilot ",
+      "TBMC to Provide172.16.81.XX",
+      "TBMC to Provide",
+      "801 -Biologics"
+    ],
+    [
+      "",
+      "REBEL 908 REBELCell Culture Media Analyzer",
+      "172.16.81.16",
+      "TBMC to Provide",
+      "801 -Biologics"
+    ],
+    [
+      "",
+      "Nova Flex2 Biomedical BioProfile Flex2",
+      "172.16.81.21",
+      "TBMC to Provide",
+      "801 -Biologics"
+    ],
+    [
+      "",
+      "Tornado Spectral - Hudson 785 Raman Probe",
+      "172.16.81.17",
+      "TBMC to Provide",
+      "801 -Biologics"
+    ],
+    [
+      "",
+      "Cytiva Äkta Avant 150",
+      "172.16.81.37",
+      "TBMC to Provide",
+      "805 -Nucleic Acid"
+    ],
+    [
+      "",
+      "Cytiva Äkta Avant 25Tornado Hudson 785 Raman Probe",
+      "TBMC to Provide 172.16.81.17",
+      "TBMC to ProvideTBMC to Provide",
+      "805 -Nucleic Acid801 -Biologics"
+    ],
+    [
+      "",
+      "Repligen Krosflo KR2i TFFCytiva Äkta Avant 150",
+      "172.16.81.38172.16.81.37",
+      "TBMC to ProvideTBMC to Provide",
+      "805 -Nucleic Acid805 -Nucleic Acid"
+    ],
+    [
+      "",
+      "Repligen Krosflo KR2i TFFCytiva Äkta Avant XXX",
+      "172.16.81.41172.16.81.XX",
+      "TBMC to ProvideTBMC to Provide",
+      "805 -Nucleic Acid805 -Nucleic Acid"
+    ],
+    [
+      "",
+      "Repligen Krosflo KR2i TFFRepligen Krosflo KR2i TFF",
+      "172.16.81.42172.16.81.38",
+      "TBMC to ProvideTBMC to Provide",
+      "805 -Nucleic Acid805 -Nucleic Acid"
+    ],
+    [
+      "",
+      "Sartorius RM 20LRepligen Krosflo KR2i TFF",
+      "172.16.81.39172.16.81.41",
+      "TBMC to ProvideTBMC to Provide",
+      "805 -Nucleic Acid805 -Nucleic Acid"
+    ],
+    [
+      "",
+      "KNAUER  IJM NanoScalerRepligen Krosflo KR2i TFF",
+      "172.16.81.40172.16.81.42",
+      "TBMC to ProvideTBMC to Provide",
+      "805 -Nucleic Acid805 -Nucleic Acid"
+    ],
+    [
+      "",
+      "Sartorius DCU-TWIN 5LSatorius RM 20L",
+      "172.16.81.50172.16.81.39",
+      "TBMC to ProvideTBMC to Provide",
+      "814 - Plasmid805 -Nucleic Acid"
+    ],
+    [
+      "",
+      "Cytiva Äkta Avant 25",
+      "TBMC to Provide",
+      "TBMC to Provide",
+      "814 - Plasmid"
+    ],
+    [
+      "",
+      "Cytiva Äkta Avant 150",
+      "TBMC to Provide",
+      "TBMC to Provide",
+      "814 - Plasmid"
+    ],
+    [
+      "",
+      "Sartorius BioPAT MFCSKNAUER  IJM NanoScaler",
+      "172.16.81.65172.16.81.40",
+      "TBMC to ProvideTBMC to Provide",
+      "815 - Gene Therapy805 -Nucleic Acid"
+    ],
+    [
+      "",
+      "Sartorius DCU-TWIN 5LSatorius DCU-TWIN 5L",
+      "172.16.81.66172.16.81.50",
+      "TBMC to ProvideTBMC to Provide",
+      "815 - Gene Therapy814 -Nucleic Plasmid"
+    ],
+    [
+      "",
+      "Sartorius 50L BIOSTATSTR3Satorius BioPAT MFCS",
+      "172.16.81.67172.16.81.65",
+      "TBMC to ProvideTBMC to Provide",
+      "815 - Gene Therapy815 - Gene Therapy"
+    ],
+    [
+      "",
+      "Cytiva Äkta Avant 150Satorius DCU-TWIN 5L",
+      "172.16.81.68172.16.81.66",
+      "TBMC to ProvideTBMC to Provide",
+      "815 - Gene Therapy815 - Gene Therapy"
+    ],
+    [
+      "",
+      "Cytiva Äkta Avant 25Satorius 50L BIOSTATSTR3",
+      "172.16.81.69172.16.81.67",
+      "TBMC to ProvideTBMC to Provide",
+      "815 - Gene Therapy815 - Gene Therapy"
+    ],
+    [
+      "",
+      "Repligen Krosflo KR2i TFFCytiva Äkta Avant 150",
+      "172.16.81.70172.16.81.68",
+      "TBMC to ProvideTBMC to Provide",
+      "815 - Gene Therapy815 - Gene Therapy"
+    ],
+    [
+      "",
+      "Cytiva Äkta Avant 25",
+      "172.16.81.69",
+      "TBMC to Provide",
+      "815 - Gene Therapy"
+    ],
+    [
+      "",
+      "Repligen Krosflo KR2i TFF",
+      "172.16.81.70",
+      "TBMC to Provide",
+      "815 - Gene Therapy"
+    ]
+  ],
+  [
+    [
+      "DS ID",
+      "Parameter 參數",
+      "Value 數值"
+    ],
+    [
+      "SER-01",
+      "Server Name 伺服器名稱",
+      "TBD"
+    ],
+    [
+      "SER-02",
+      "Domain 領域",
+      "TBMC"
+    ],
+    [
+      "SER-03",
+      "Processor 處理器",
+      "Intel Xeon"
+    ],
+    [
+      "SER-04",
+      "CPU Speed 中央處理器速度",
+      "2.5+Ghz "
+    ],
+    [
+      "SER-05",
+      "Processors 處理器 (Number of Cores 核心數)",
+      "4"
+    ],
+    [
+      "SER-06",
+      "Memory 記憶體 (RAM)",
+      "8GB"
+    ],
+    [
+      "SER-07",
+      "Drive Size 磁碟容量 (<partition label 分割區標籤>)",
+      "2x 256GB (SSD)"
+    ],
+    [
+      "SER-08",
+      "IP Address IP 位址",
+      "TBD"
+    ],
+    [
+      "SER-09",
+      "Subnet Masks(s) 子網遮罩",
+      "TBD"
+    ],
+    [
+      "SER-010",
+      "Operating System 作業系統",
+      "Windows Server 2026"
+    ],
+    [
+      "SER-011",
+      "Software Dependencies 軟體相依關係",
+      "MS Entra ID"
+    ]
+  ],
+  [
+    [
+      "DS ID",
+      "Parameter 參數",
+      "Value 數值"
+    ],
+    [
+      "CR-01",
+      "Resource: Azure VM"
+    ],
+    [
+      "CR-01",
+      "CIDR Block",
+      "TBD"
+    ],
+    [
+      "CR-02",
+      "Resource: Internet Gateway 資源：網際網路閘道"
+    ],
+    [
+      "CR-02",
+      "VPC ID",
+      "TBD"
+    ]
+  ],
+  [
+    [
+      "DS ID",
+      "Parameter 參數",
+      "Value 數值"
+    ],
+    [
+      "CL-01",
+      "Client Name 客戶名稱",
+      "TBMC"
+    ],
+    [
+      "CL-02",
+      "Domain 領域",
+      "TBMC"
+    ],
+    [
+      "CL-03",
+      "Processor 處理器",
+      "Intel Xeon"
+    ],
+    [
+      "CL-04",
+      "CPU Speed 中央處理器速度 | ",
+      "2.5+Ghz"
+    ],
+    [
+      "CL-05",
+      "Processors 處理器 (Number of Cores 核心數)",
+      "4 vCPU’s"
+    ],
+    [
+      "CL-06",
+      "Memory 記憶體 (RAM)",
+      "8GB"
+    ],
+    [
+      "CL-07",
+      "Drive Size 磁碟容量 (<partition label 分割區標籤>)",
+      "1TB / 2TB / 4TB"
+    ],
+    [
+      "CL-08",
+      "IP Address IP 位址",
+      "TBD"
+    ],
+    [
+      "CL-09",
+      "Subnet Masks(s) 子網遮罩",
+      "TBD"
+    ],
+    [
+      "CL-010",
+      "Operating System 作業系統",
+      "Linux"
+    ],
+    [
+      "CL-011",
+      "Software Dependencies 軟體相依關係",
+      ""
+    ]
+  ],
+  [
+    [
+      "Database Name 資料庫名稱:"
+    ],
+    [
+      "Parameter 參數",
+      "Value 數值"
+    ],
+    [
+      "Database IP Address/Port 資料庫 IP 位址/埠口",
+      "4.246.231.26:8086"
+    ],
+    [
+      "Database Version 資料庫版本",
+      "InfluxDB V2"
+    ]
+  ],
+  [
+    [
+      "Table Name",
+      "Purpose",
+      "Minimum Required Data Elements"
+    ],
+    [
+      "batch_setup",
+      "Stores reusable saved batch setup records.",
+      "batch_uid, batch_name, suite, batch age, batch age unit, report configuration, created by, created timestamp, updated by, updated timestamp, active flag"
+    ],
+    [
+      "batch_equipment",
+      "Stores equipment selected for a saved batch setup.",
+      "batch_uid, equipment path, equipment name, suite, area, room label, enabled flag, display order"
+    ],
+    [
+      "batch_equipment_claims",
+      "Stores runtime equipment availability and claim records for loaded batch instances.",
+      "claim ID, batch_uid, batch_run_uid, Run Instance ID, equipment path, equipment name, claim state, claimed by, claimed timestamp, released by, released timestamp"
+    ],
+    [
+      "batch_control_audit",
+      "Stores auditable batch workflow control actions performed by users or the system.",
+      "audit ID, event timestamp, user ID, session ID, action name, action value, batch path, batch_uid, batch name, batch_run_uid, Run Instance ID, previous control state, new control state, write result, notes"
+    ],
+    [
+      "cache_batch_reporting_json",
+      "Stores cached batch reporting data or report payload JSON associated with a specific runtime batch instance.",
+      "cache ID, batch_uid, batch_run_uid, Run Instance ID, report JSON, generated by, generated timestamp, report status"
+    ]
+  ],
+  [
+    [
+      "DS ID",
+      "Software",
+      "Revision",
+      "License"
+    ],
+    [
+      "",
+      "Ignition by Inductive Automation, LLC",
+      "8.3.4",
+      "To Be Purchased"
+    ],
+    [
+      "",
+      "IA: OPC-UA Module",
+      "10.3.4",
+      "To Be Purchased"
+    ],
+    [
+      "",
+      "IA: Perspective Module",
+      "3.3.4",
+      "To Be Purchased"
+    ],
+    [
+      "",
+      "IA: Reporting Module",
+      "7.3.4",
+      "To Be Purchased"
+    ],
+    [
+      "",
+      "IA: Historian Core",
+      "1.3.4",
+      "To Be Purchased"
+    ],
+    [
+      "",
+      "IA: SQL Historian",
+      "1.3.4",
+      "To Be Purchased"
+    ],
+    [
+      "",
+      "Kymera InfluxDB Module",
+      "2.83.2 (b2)",
+      "To Be Purchased"
+    ],
+    [
+      "",
+      "SQL Bridge",
+      "11.3.4",
+      "To Be Purchased"
+    ],
+    [
+      "",
+      "MariaDB JDBC Driver",
+      "1.3.4",
+      "To Be Purchased"
+    ],
+    [
+      "",
+      "Symbol Factory",
+      "8.3.4",
+      "To Be Purchased"
+    ]
+  ],
+  [
+    [
+      "DS ID",
+      "Display 顯示",
+      "Description 說明"
+    ],
+    [
+      "UI-01UI-01",
+      "Main Overview Screen 主畫面總覽畫面Main Overview Screen 主畫面總覽畫面 | ",
+      "The Main Overview Screen allows users to navigate to Charts, Alarms, Reports, Batch Setup / Batch Report Setup, Level 2 Screens, and Level 3 Screens after login. Where runtime batch functionality is enabled, the Main Overview Screen may display active runtime batch cards. Runtime batch card behavior is defined in Section 10.The main overview screen allows the users to gain access to the system. Users can gain access to the following areas once logged in: Charts, Alarms, Reports, Batch Report Setup, Level 2 Screens, Level 3 Screens. "
+    ],
+    [
+      "UI-02UI-02",
+      "Batch Setup / Batch Report SetupBatch Report Setup",
+      "This screen allows authorized users to configure batch/report setup records and create runtime batch instances from saved setups. Users may enter or select batch name, batch suite, equipment selections, batch age or report duration, and reporting configuration. The screen supports Save and Load actions. Save stores or updates a batch setup record. Load creates a runtime batch instance/card. Detailed runtime behavior is defined in Section 10.1.This screen allows users to configure the data to be included in the Batch Report by selecting which devices should be included in the report, as well as the batch age. Accessed by clicking “Setup” on any screen’s batch controls."
+    ],
+    [
+      "UI-03UI-03",
+      "ChartsCharts",
+      "This screen shows a dynamic trend chart that can be populated with available system data points. Both historical and real-time data are available. Accessed by clicking “Charts.”This screen shows a dynamic trend chart which can be populated with any data points in the system - both historical and real-time data is available. Accessed by clicking “Charts”."
+    ],
+    [
+      "UI-04UI-04 | ",
+      "AlarmsAlarms",
+      "This screen shows system alarms based on configured filters. Alarms can be filtered by status, including Active, Inactive, Acknowledged, and Unacknowledged. Alarm actions such as acknowledge, shelve, un-shelve, and clear shall be available according to configured security permissions. Accessed by clicking “Alarms.”This screen shows all system alarms based on the configured filters. Alarms can be filtered between any combination of status’s - Active, Inactive, Acknowledged, & Unacknowledged. Alarms can be cleared, acknowledged, shelved, or un-shelved from this screen. Accessed by clicking “Alarms”."
+    ],
+    [
+      "UI-05UI-05 | ",
+      "ReportsReports",
+      "This screen displays modular Batch Reports with alarms, events, and data trends containing Key CPPs for devices configured in the report. The Reports screen shall allow users to select reports by Batch Name and Run Instance and/or Displayed Run Instance ID. Reports can be exported in PDF format by clicking the cloud icon in the lower right corner. Detailed runtime reporting requirements are defined in Section 10.4.This screen displays a modular batch report with alarms, events, and data trends containing key CPP’s for any devices configured in the report. Reports can be exported in .PDF format by clicking the cloud icon in the lower right corner. Accessed by clicking “Reports”."
+    ],
+    [
+      "UI-06UI-06 | ",
+      "Level 2 ScreensLevel 2 Screens",
+      "These screens display enabled equipment dynamically from the Ignition tag browser structure. Equipment shall be organized by suite, room, and functional area. Functional areas shall include UPSTREAM, DOWNSTREAM, and ANALYTICS, or equivalent approved project folder names. Key CPPs are displayed under each device. A chart icon appears next to each Key CPP; clicking the icon opens a pop-up window with a live trend of the data point. Equipment source and inventory requirements are defined in Section 10.5.These screens display the devices in each of the separate labs, separated by room number and modality – Upstream, Downstream, & Analytical. Key CPP’s critical process parameters which are determined by the customer are displayed under each device (commonly referred to as “Key CPP’s”). A chart icon appears next to each Key CPP – clicking the icon will open a pop-up window with a live trend of the data point. Accessed by clicking the corresponding room title."
+    ],
+    [
+      "UI-07UI-07 | ",
+      "Level 3 ScreenLevel 3 Screen",
+      "This screen displays critical process parameters for a selected device. A chart icon appears next to each CPP; clicking the icon opens a pop-up window with a live trend of the data point. This screen is accessed by clicking a device image on the overview screen or Level 2 screens.This screen displays all critical process parameters for a given device. A chart icon appears next to each CPP – clicking the icon will open a pop-up window with a live trend of the data point. | This screen is accessed by clicking on any device image on the overview screen or level 2 screens."
+    ],
+    [
+      "UI-08",
+      "Equipment Tag Browser",
+      "The Equipment Tag Browser allows authenticated users to view equipment process-tag configuration from the live Ignition tag structure under [default]TBMC-SCADA/TW-LAB01. Authorized Supervisor users may stage and save approved configuration changes, including CPP assignment, OPC source path, historization, engineering limits, alarm enablement, and alarm delay. Saved changes write to live Ignition tag configuration after confirmation and are recorded through the Ignition audit system."
+    ]
+  ],
+  [
+    [
+      "Report Selection Field",
+      "Requirement"
+    ],
+    [
+      "Batch Name",
+      "Displays the saved batch name associated with the report."
+    ],
+    [
+      "Run Instance",
+      "Displays the selected runtime batch instance associated with the saved batch setup."
+    ],
+    [
+      "Displayed Run Instance ID",
+      "Displays the human-readable runtime identifier used to distinguish one execution from another."
+    ],
+    [
+      "batch_uid",
+      "Identifies the saved batch setup record, where displayed or used internally."
+    ],
+    [
+      "batch_run_uid",
+      "Identifies the specific loaded/runtime batch instance, where displayed or used internally."
+    ],
+    [
+      "Batch Status",
+      "Displays the current or final workflow status of the runtime batch instance, such as Loaded, Running, Hold, Complete, Abort, or Archived, as applicable."
+    ]
+  ],
+  [
+    [
+      "Claim State",
+      "Definition",
+      "Expected Behavior"
+    ],
+    [
+      "LOADED",
+      "Equipment was selected for a loaded runtime batch instance/card.",
+      "The equipment is associated with the loaded batch but has not yet been officially acquired by a started batch. The equipment shall be visually indicated as associated with the loaded runtime batch instance."
+    ],
+    [
+      "CLAIMED",
+      "Equipment has been officially acquired by the first runtime batch instance to start.",
+      "CLAIMED equipment shall be treated as unavailable to other runtime batch instances. A runtime batch instance shall not be allowed to start with equipment that is already CLAIMED by another active runtime batch instance."
+    ],
+    [
+      "RELEASED",
+      "Equipment has been released from the runtime batch instance.",
+      "Equipment shall transition to RELEASED on Complete, Abort, or Archive. RELEASED equipment shall be available for future selection, loading, or claiming, subject to equipment enabled status and approved workflow rules."
+    ]
+  ],
+  [
+    [
+      "Field",
+      "Requirement"
+    ],
+    [
+      "Batch Name",
+      "Displays the saved batch name associated with the runtime batch instance."
+    ],
+    [
+      "Run Instance",
+      "Displays the runtime instance associated with the selected batch."
+    ],
+    [
+      "Displayed Run Instance ID",
+      "Displays the human-readable identifier used to distinguish repeated executions of the same batch name."
+    ],
+    [
+      "Batch Status",
+      "Displays the current or final workflow status associated with the runtime batch instance."
+    ],
+    [
+      "Start Timestamp",
+      "Displays the runtime batch start timestamp, where available."
+    ],
+    [
+      "Complete Timestamp",
+      "Displays the runtime batch completion timestamp, where available."
+    ],
+    [
+      "Archive Status",
+      "Indicates whether the runtime batch instance has been archived, where applicable."
+    ]
+  ],
+  [
+    [
+      "Level",
+      "Role",
+      "Description"
+    ],
+    [
+      "1",
+      "Public View Only",
+      "Access to login and Main Overview screen view rights only."
+    ],
+    [
+      "2",
+      "User",
+      "Authorized SCADA user access. User may perform approved workflow and monitoring functions but shall not modify alarm setpoints unless specifically approved."
+    ],
+    [
+      "3",
+      "Supervisor",
+      "Highest application access level. Supervisor may perform restricted functions, including alarm setpoint changes and other approved administrative or controlled workflow actions."
+    ]
+  ],
+  [
+    [
+      "1",
+      "Public View Only (access to login, Main overview screen view rights only )"
+    ],
+    [
+      "2",
+      "User (Manipulate SCADA, no alarm adjustments)"
+    ],
+    [
+      "3",
+      "Supervisor (Highest – Adjust Alarm Setpoints)"
+    ]
+  ],
+  [
+    [
+      "Screen / Function AreaScreen",
+      "Item"
+    ],
+    [
+      "",
+      "",
+      "Security group |  (S) Supervisor, (U) User, (P) Public"
+    ],
+    [
+      "",
+      "",
+      "S",
+      "U",
+      "P"
+    ],
+    [
+      "Main Overview Screen",
+      "Screen Access",
+      "√",
+      "√",
+      "√"
+    ],
+    [
+      "",
+      "Login / Logout ",
+      "√",
+      "√",
+      "√"
+    ],
+    [
+      "",
+      "Level 3 Parameters Pop-Up ",
+      "√",
+      "√",
+      ""
+    ],
+    [
+      "Batch Setup / Batch Report Setup",
+      "Screen Access",
+      "√",
+      "√",
+      ""
+    ],
+    [
+      "",
+      "Save Setup",
+      "√",
+      "√",
+      ""
+    ],
+    [
+      "",
+      "Load Batch",
+      "√",
+      "√",
+      ""
+    ],
+    [
+      "Runtime Batch Card / Batch Controls",
+      "Start",
+      "√",
+      "√",
+      ""
+    ],
+    [
+      "",
+      "Hold",
+      "√",
+      "√",
+      ""
+    ],
+    [
+      "",
+      "Abort",
+      "√",
+      "√",
+      ""
+    ],
+    [
+      "",
+      "Complete",
+      "√",
+      "√",
+      ""
+    ],
+    [
+      "",
+      "Archive",
+      "√",
+      "√",
+      ""
+    ],
+    [
+      "Level 2 Detail Screen",
+      "Screen Access",
+      "√",
+      "√",
+      ""
+    ],
+    [
+      "",
+      "Level 3 Parameters Pop-Up",
+      "√",
+      "√",
+      ""
+    ],
+    [
+      "Level 3 Detail Screen",
+      "Screen Access",
+      "√",
+      "√",
+      ""
+    ],
+    [
+      "",
+      "Modify Alarm Setpoints ",
+      "√",
+      "",
+      ""
+    ],
+    [
+      "Charts Screen",
+      "Screen Access",
+      "√",
+      "√",
+      ""
+    ],
+    [
+      "",
+      "Create Trends ",
+      "√",
+      "√",
+      ""
+    ],
+    [
+      "",
+      "Modify Timeframe",
+      "√",
+      "√",
+      ""
+    ],
+    [
+      "",
+      "Select Tags",
+      "√",
+      "√",
+      ""
+    ],
+    [
+      "Alarms Screen",
+      "Screen Access",
+      "√",
+      "√",
+      ""
+    ],
+    [
+      "",
+      "Select Alarm Filters",
+      "√",
+      "√",
+      ""
+    ],
+    [
+      "",
+      "Acknowledge Alarms",
+      "√",
+      "√",
+      ""
+    ],
+    [
+      "",
+      "Modify Display Columns",
+      "√",
+      "√",
+      ""
+    ],
+    [
+      "",
+      "Shelve Alarms",
+      "√",
+      "√",
+      ""
+    ],
+    [
+      "",
+      "Clear Alarms",
+      "√",
+      "√",
+      ""
+    ],
+    [
+      "Reports Screen",
+      "Screen Access",
+      "√",
+      "√",
+      ""
+    ],
+    [
+      "",
+      "Report Selection",
+      "√",
+      "√",
+      ""
+    ],
+    [
+      "",
+      "Report Export",
+      "√",
+      "√",
+      ""
+    ],
+    [
+      "Audit Trail",
+      "Audit Trail Access",
+      "√",
+      "Site Decision / Read Only",
+      ""
+    ],
+    [
+      "",
+      "Batch control - Audit Review",
+      "√",
+      "Site Decision / Read Only",
+      ""
+    ],
+    [
+      "Equipment Tag Browser",
+      "Screen Access",
+      "√",
+      "√",
+      ""
+    ],
+    [
+      "",
+      "View Tag Configuration",
+      "√",
+      "√",
+      ""
+    ],
+    [
+      "",
+      "Refresh Tag Configuration",
+      "√",
+      "√",
+      ""
+    ],
+    [
+      "",
+      "Export All/Export Filtered",
+      "√",
+      "√",
+      ""
+    ],
+    [
+      "",
+      "Stage Configuration Changes",
+      "√",
+      "",
+      ""
+    ],
+    [
+      "",
+      "Save Live Tag Configuration Changes",
+      "√",
+      "",
+      ""
+    ],
+    [
+      "",
+      "",
+      "",
+      "",
+      ""
+    ],
+    [
+      "",
+      "",
+      "",
+      "",
+      ""
+    ]
+  ],
+  [
+    [
+      "Audit Field",
+      "Requirement"
+    ],
+    [
+      "User",
+      "Authenticated user identity associated with the action."
+    ],
+    [
+      "Session",
+      "Ignition Perspective session identifier or equivalent session/context identifier."
+    ],
+    [
+      "Action Name",
+      "Name of the action performed, such as Save Setup, Load Batch, Start, Hold, Abort, Complete, Archive, equipment claim transition, alarm setpoint change, report export, or rejected workflow action."
+    ],
+    [
+      "Action Value",
+      "Submitted value, command, selected control, status transition, report export option, alarm setpoint value, or other action-specific value."
+    ],
+    [
+      "Batch Path",
+      "Ignition project/tag path or logical batch path associated with the action, where applicable."
+    ],
+    [
+      "Batch ID / Batch Name",
+      "Saved batch identifier and displayed batch name associated with the action."
+    ],
+    [
+      "Run Instance / Hash",
+      "Runtime batch identifier, including batch_run_uid, Displayed Run Instance ID, run hash, or equivalent approved runtime identifier."
+    ],
+    [
+      "Previous Control State",
+      "Control state, batch status, equipment claim state, alarm setpoint value, or other relevant value before the action."
+    ],
+    [
+      "New Control State",
+      "Control state, batch status, equipment claim state, alarm setpoint value, or other relevant value after the action."
+    ],
+    [
+      "Write Result",
+      "Result of the applicable Ignition tag write, SQL write, report export request, or rejected/failed action."
+    ],
+    [
+      "Notes",
+      "Operator-entered notes, system messages, rejection reasons, exception details, or other action-specific context where applicable."
+    ],
+    [
+      "Timestamp",
+      "Date/time when the action occurred or was attempted."
+    ]
+  ],
+  [
+    [
+      "Policy",
+      "Protocol",
+      "Source",
+      "Destination",
+      "Port",
+      "Comment "
+    ],
+    [
+      "Allow",
+      "TCP",
+      "ANY",
+      "INBOUND",
+      "80",
+      "Web server"
+    ],
+    [
+      "Allow",
+      "TCP",
+      "ANY",
+      "INBOUND",
+      "443",
+      "HTTPS Traffic"
+    ],
+    [
+      "Allow",
+      "TCP",
+      "ANY",
+      "INBOUND",
+      "8043",
+      "HTTPS Traffic"
+    ],
+    [
+      "Allow",
+      "TCP",
+      "ANY",
+      "INBOUND",
+      "8088",
+      "HTTP Traffic"
+    ],
+    [
+      "Allow",
+      "TCP",
+      "ANY",
+      "INBOUND",
+      "62541",
+      "OPC UA Traffic"
+    ],
+    [
+      "Allow",
+      "TCP",
+      "ANY",
+      "OUTBOUND",
+      "3306",
+      "SQL DB Traffic"
+    ]
+  ],
+  [
+    [
+      "Document No. | 文件編號",
+      "Document Title | 文件名稱"
+    ],
+    [
+      "T-000376",
+      "TBMC Passphrase Standard"
+    ],
+    [
+      "T-000382",
+      "Domain Control and Password Management"
+    ]
+  ],
+  [
+    [
+      "Version No. 版本編號Version No. | 版本編號",
+      "Description of Change 變更內容Description of Change | 變更內容",
+      "Reason for Change 變更原因Reason for Change | 變更原因"
+    ],
+    [
+      "1.01.0",
+      "New Document.New Document.",
+      "N/AN/A"
+    ],
+    [
+      "2.1 / Final Controlled Revision TBD",
+      "Updated the Equipment Tag Browser functionality, Design Specification to add Batch Runtime Workflow functionality, including monitoring plus batch workflow/status management, Batch Setup / Batch Report Setup Save and Load behavior, dynamic runtime batch cards, runtime UDT/tag instances, unique runtime batch identifiers, equipment filtering, enabled-equipment display logic, equipment claims, GMP-retentive archive behavior, run-instance reporting, expanded security permissions, and expanded audit trail requirements.",
+      "Change order to add Ignition batch workflow/status management functionality while maintaining the boundary that the application does not directly command physical process equipment unless formally added to scope."
+    ],
+    [
+      "2.0",
+      "Add Chinese translation.",
+      "Bilingual document request and meet actual practices."
+    ]
+  ]
+]

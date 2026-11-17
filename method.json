@@ -1,0 +1,10 @@
+{
+    "ResponsibilityMatrix":  "Not found in project, actual Desktop, C:\\TBMC\\Incoming or deployment package",
+    "AGENTS":  "None found in applicable ancestors or supplied project",
+    "Extraction":  "DOCX OpenXML accepted revisions (w:del/w:moveFrom removed in memory only); XLSX all worksheets and hidden rows; PDF text plus visual review",
+    "GatewayConfigurationModified":  false,
+    "SourceOriginalsModified":  false,
+    "openpyxl":  "3.1.5",
+    "PyMuPDF":  "1.24.14",
+    "Python":  "3.12.8 (isolated C:\\TBMC\\Tools\\commission-python)"
+}

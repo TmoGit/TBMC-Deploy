@@ -1,0 +1,170 @@
+Ignition-TP-IGN01
+Ignition standard 8.3.4 (b2026030309)
+?
+tbmc_admin
+Home
+Platform
+Connections
+Network
+Services
+Diagnostics
+Platform
+Overview
+System
+Gateway Settings
+Projects
+Modules
+Licensing
+Redundancy
+Modes
+Store & Forward
+Ignition Exchange
+Backup & Restore
+Security
+General Settings
+User Sources
+Identity Providers
+Secret Providers
+Audit Profiles
+Levels
+Zones
+API Keys
+OAuth2 Clients
+
+Platform Overview
+
+Last Scanned 12 ¤Ñ«e
+Scan File System
+Configured Items
+View
+AllErrors
+ITEM
+LAST UPDATED
+ENABLED
+STATUS
+Alarm Journal Settings
+2
+Configure
+Alarm Notification Profiles
+Configure
+API Token
+Configure
+Audit Profiles
+2
+Configure
+Call Script
+5
+Database Connection
+2
+Configure
+Database Translator
+6
+Configure
+Devices
+1
+Configure
+Email Profile Settings
+Configure
+Fonts
+3
+Historian
+3
+3 ERRORS
+Holiday
+Configure
+Icons
+6
+Identity Provider
+1
+Configure
+Incoming Connection Settings
+Configure
+JDBC Driver
+6
+2 ERRORS
+Configure
+Keyboard Layouts
+4
+Licenses
+Configure
+Local Devices
+Configure
+Metrics Dashboard
+Modules
+33
+Configure
+MQTT Engine Certificate File
+MQTT Engine Custom Namespace Convert Settings
+MQTT Engine Custom Namespace Settings
+MQTT Engine Default Namespace Convert Settings
+MQTT Engine Namespace Settings
+2
+MQTT Engine Server Set Settings
+1
+MQTT Engine Server Settings
+1
+MQTT Engine Topic Token Filter Settings
+MQTT Transmission Certificate File Settings
+MQTT Transmission File Settings
+MQTT Transmission History Store Settings
+2
+MQTT Transmission Record Settings
+MQTT Transmission Server Set Settings
+1
+MQTT Transmission Server Settings
+1
+MQTT Transmission Transmitter Settings
+1
+MQTT Transmission UNS Transmitter Settings
+Namespace Server Set Settings
+2
+OAuth2 Client
+Configure
+OPC Connections
+1
+1 ERROR
+Configure
+Outgoing Connection Settings
+Configure
+Projects
+5
+Configure
+Rosters
+Configure
+Schedule
+2
+Configure
+Secret Provider
+Configure
+Security Zones
+1
+Configure
+Service Connectors
+Store and Forward Engine
+7
+Configure
+Tag Providers
+5
+1 ERROR
+Configure
+Themes
+6
+User Sources
+1
+Configure
+Trial Expired
+0:00:00
+2 hours went by already? Not to worry, just click reset for 2 more.
+Reset Trial
+Activate Ignition
+Browser Not Supported
+
+To access the Gateway, please use one of the following supported, modern browsers.
+
+Google Chrome
+
+Mozilla Firefox
+
+Microsoft Edge
+
+Apple Safari

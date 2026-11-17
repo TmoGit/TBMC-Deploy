@@ -1,0 +1,1677 @@
+
+PURPOSE 目的
+The purpose of this Design Specification (DS) is to provide the technical details on how (the Ignition Equipment Monitoring System) will be designed.
+
+SCOPE 範圍
+
+This document pertains to the software design for the SCADA-based Ignition Equipment Monitoring System, including centralized equipment monitoring, batch workflow/status management, data historization, reporting, security, and audit trail functionality.
+The system scope includes the following functionality:
+SCADA software platform configuration, including Ignition gateway architecture.
+Data acquisition from in-scope laboratory equipment via OPC DA/UA and vendor-provided interfaces.
+Centralized data historization and time-series data storage.
+Relational SQL data storage for batch setup, runtime batch status, equipment selection, equipment claims, batch control audit records, and reporting support data.
+User interface design principles and navigation structure.
+Data visualization, trending, and batch-level reporting framework.
+Batch setup functionality for saving and updating reusable batch/report configurations.
+Runtime batch workflow functionality for loading saved batch setups into uniquely identifiable batch run instances/cards.
+Batch status management, including statuses and actions such as Loaded, Start, Hold, Abort, Complete, and Archive, as defined by approved workflow requirements.
+Equipment availability and equipment claim management for selected batch equipment.
+Report selection and report generation that distinguish between multiple executions of the same saved batch name.
+System security, authentication, authorization, and audit trail functionality.
+Integration with on-premises IT infrastructure and cloud-based data services.
+Support for alarm handling, event logging, and system monitoring as defined by project scope.
+The Ignition application may write to Ignition batch/status/reporting tags and relational SQL records required to manage batch workflow state, equipment claims, audit trail records, and reporting data.
+The system does not directly command, start, stop, manipulate, or otherwise control physical process equipment. No closed-loop control or direct manipulation of process equipment is included unless explicitly defined, approved, and implemented under a future formal scope change.
+This SDS is developed based on and aligned with the approved Basis of Design (BOD), approved User Requirements, Functional Requirements, and formally authorized change orders. Items not explicitly described herein are considered out of scope unless covered by referenced documents or approved through formal change management.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ GENERAL DESCRIPTION
+The Equipment Monitoring System is a SCADA-based platform designed to provide centralized visibility of laboratory equipment performance, process parameters, and batch-related data across multiple laboratory suites within the TBMC facility. The system is intended to improve data accessibility, reduce manual data handling, and establish a scalable and robust foundation for future advanced analytics and batch process integration.
+
+SYSTEM OVERVIEW
+The system architecture consists of an on?premises SCADA environment integrated with a secure cloud-based historian and reporting infrastructure. Process and equipment data are collected from vendor-provided equipment controllers and analyzers, aggregated through an Ignition gateway, and transmitted for storage and long-term analysis.
+Key system objectives include:
+Real-time monitoring of critical process parameters (CPPs)
+Centralized data historization and time-series storage
+Generation of batch-level and equipment-level reports
+Secure access to data through role-based authentication
+Scalable and modular architecture to support future expansion
+
+ In-Scope Equipment And Areas
+The system monitors lab-scale equipment located in multiple rooms and functional groups, including but not limited to:
+Bioreactors and fermentation systems
+Chromatography systems
+Tangential flow filtration (TFF) systems
+Process analyzers and sensors
+
+Equipment connectivity and data availability vary by vendor and system type and are addressed using industry-standard communication protocols where available.
+
+Software And Data Architecture
+The SCADA platform is based on the Ignition software ecosystem and includes:
+An on-premises Ignition gateway for data acquisition, visualization, and operator access
+OPC UA communications to vendor equipment and controllers
+
+A cloud-hosted time-series database for high-performance data storage and analytics
+Web-based client access using browser-based interfaces
+
+Data integrity, availability, and traceability are foundational design principles of the system. Where applicable, system functions are designed to support audit trails, controlled access, and retention of electronic records consistent with regulatory expectations.
+
+This SDS reflects a detailed design stage following approval of the BOD and defines how the proposed system will be implemented from a software perspective. Further refinements, detailed tag definitions, alarm configurations, and report content will be finalized during implementation in accordance with approved change control procedures. 
+
+The system will reside within a self-contained rack mounted server located on the premises of TBMC.
+
+Data will be collected via serial gateways and hardwired digital and analog signals to the Sartorius MFCS servers. Data will be fed to the Ignition Gateway Server via OPC UA protocol.
+
+
+
+RESPONSIBILITIES 權責
+
+Role 角色
+Responsibilities 職責
+IT
+XXX
+System Owner 系統擁有者 (SO)
+Provides technical subject matter expertise on the system configuration. 提供系統配置的技術專業知識。
+Reviews and approves Configuration Specification. 審查並核准配置規範。
+Ensures the system meets technical, security, and regulatory requirements through continuous evaluation of the system. 透過持續評估系統，確保系統符合技術、安全及法規要求。
+Provides technical support to assure continued functionality and security of the system. 提供技術支援，確保系統持續運作與安全。
+
+
+
+DEFINITIONS 定義
+
+Term 術語
+Definition 定義 (as used within this document)
+BOD
+Basis of Design
+CPP
+Critical Process Parameters
+ER
+Electronic Records
+FAT
+Factory Acceptance Testing
+FC
+Field Controller
+GAMP
+Good Automated Manufacturing Practice
+MFCS
+Manufacturing and Control System
+MQTT
+Message Queuing Telemetry Transport
+OPC
+Open Platform Communication
+PV
+Process Variable
+SAT
+Site Acceptance Testing
+SCADA
+Supervisory Control and Data Acquisition
+SDS
+Software Design Specification
+SQL
+Structured Query Language
+TBMC
+Taiwan Bio-Manufacturing Corporation
+Key CPP’s
+Three process parameters determined by the client, which are displayed on the level 2 screens and trended in reports that contain the device
+batch_uid
+Unique persistent identifier for a saved batch setup record. The same saved batch setup may be loaded multiple times using the same batch_uid.
+batch_run_uid
+Unique identifier for a specific loaded/runtime batch instance. A new batch_run_uid shall be generated each time a saved batch setup is loaded.
+Displayed Run Instance ID
+Human-readable runtime identifier displayed to users in the UI, audit trail, report selection table, and Batch Report. The Displayed Run Instance ID shall allow users to distinguish multiple executions of the same saved batch name.
+Runtime Batch Instance / Runtime Batch Card
+The active batch workflow instance created when a saved batch setup is loaded. The runtime instance/card tracks selected equipment, current batch status, timestamps, user actions, equipment claims, audit records, and reporting context.
+Equipment Claim State
+A runtime workflow status used to identify whether a selected equipment item is loaded, officially claimed, or released for batch workflow/reporting purposes.
+LOADED
+Equipment claim state indicating that the equipment was selected for a loaded runtime batch instance/card. LOADED means the equipment is associated with the loaded batch, but it has not yet been officially acquired by a started batch.
+CLAIMED
+Equipment claim state indicating that the equipment has been officially acquired by the first runtime batch instance to start. CLAIMED equipment shall be treated as unavailable to other runtime batch instances until released.
+RELEASED
+Equipment claim state indicating that equipment is available for use by another runtime batch instance. Equipment shall transition to RELEASED on Complete, Abort, or Archive, as defined by the batch workflow.
+
+
+
+
+
+
+
+INFRASTRUCTURE 基礎設施
+
+Network Architecture Diagram 
+Refer to external attachment: TBMC Network Architecture
+
+
+
+
+
+
+
+
+
+
+
+
+
+Pd Lab Equipment
+The PD Lab Equipment inventory shall align with the approved Ignition tag browser structure and associated equipment configuration. Equipment names, suite names, room labels, functional area assignments, equipment paths, enabled status, and related metadata shall be maintained consistently between the Design Specification, Level 2 screens, Batch Setup / Batch Report Setup screen, runtime batch cards, equipment claim records, audit trail records, and Batch Reports.
+The equipment inventory shall be reconciled against the approved Ignition tag browser export and associated UDT/equipment configuration records prior to final approval or documented as an open reconciliation item according to project document-control practices.
+Only equipment enabled in the applicable tag/configuration records shall appear as active equipment on Level 2 screens or as selectable equipment in Batch Setup / Batch Report Setup.
+
+
+DS ID
+Ethernet Device
+IP Address
+Subnet Mask
+Room Number
+
+Sartorius BioPAT MFCS
+172.16.81.10
+TBMC to Provide
+801 - Biologics
+
+Sartorius DCU-TWIN 5L 
+172.16.81.12
+TBMC to Provide
+801 -Biologics
+
+Sartorius 50L BIOSTATSTR3 
+172.16.81.13
+TBMC to Provide
+801 -Biologics
+
+Sartorius 200L BIOSTATSTR3 
+172.16.81.14
+TBMC to Provide
+801 -Biologics
+
+Sartorius 200L BRX200-20 – Need Info.
+TBMC to Provide
+TBMC to Provide
+801 -Biologics
+
+Sartorius BRX5 – Need Info.
+TBMC to Provide
+TBMC to Provide
+801 -Biologics
+
+Cytiva AVA200 – Need Info.
+TBMC to Provide
+TBMC to Provide
+801 -Biologics
+
+Cytiva AVA600 – Need Info.
+TBMC to Provide
+TBMC to Provide
+801 -Biologics
+
+Cytiva  Akta Avant 150
+172.16.81.15
+TBMC to Provide
+801 -Biologics
+
+Cytiva  Akta Avant 25
+172.16.81.18
+TBMC to Provide
+801 -Biologics
+
+Cytiva  Akta Avant 25
+172.16.81.19
+TBMC to Provide
+801 -Biologics
+
+Cytiva  Akta Avant Pure  - Does it still exist?
+172.16.81.20
+TBMC to Provide
+801 -Biologics
+
+Cytiva  Akta Avant Pilot 
+TBMC to Provide
+TBMC to Provide
+801 -Biologics
+
+REBEL 908 Cell Culture Media Analyzer
+172.16.81.16
+TBMC to Provide
+801 -Biologics
+
+Nova Flex2 Biomedical BioProfile 
+172.16.81.21
+TBMC to Provide
+801 -Biologics
+
+Tornado Spectral - Hudson 785 Raman Probe
+172.16.81.17
+TBMC to Provide
+801 -Biologics
+
+Cytiva Akta Avant 150
+172.16.81.37
+TBMC to Provide
+805 -Nucleic Acid
+
+Cytiva Akta Avant 25
+TBMC to Provide 
+TBMC to Provide
+805 -Nucleic Acid
+
+Repligen Krosflo KR2i TFF
+172.16.81.38
+TBMC to Provide
+805 -Nucleic Acid
+
+Repligen Krosflo KR2i TFF
+172.16.81.41
+TBMC to Provide
+805 -Nucleic Acid
+
+Repligen Krosflo KR2i TFF
+172.16.81.42
+TBMC to Provide
+805 -Nucleic Acid
+
+Sartorius RM 20L
+172.16.81.39
+TBMC to Provide
+805 -Nucleic Acid
+
+KNAUER  IJM NanoScaler
+172.16.81.40
+TBMC to Provide
+805 -Nucleic Acid
+
+Sartorius DCU-TWIN 5L
+172.16.81.50
+TBMC to Provide
+814 - Plasmid
+
+Cytiva Akta Avant 25
+TBMC to Provide
+TBMC to Provide
+814 - Plasmid
+
+Cytiva Akta Avant 150
+TBMC to Provide
+TBMC to Provide
+814 - Plasmid
+
+Sartorius BioPAT MFCS
+172.16.81.65
+TBMC to Provide
+815 - Gene Therapy
+
+Sartorius DCU-TWIN 5L
+172.16.81.66
+TBMC to Provide
+815 - Gene Therapy
+
+Sartorius 50L BIOSTATSTR3
+172.16.81.67
+TBMC to Provide
+815 - Gene Therapy
+
+Cytiva Akta Avant 150
+172.16.81.68
+TBMC to Provide
+815 - Gene Therapy
+
+Cytiva Akta Avant 25
+172.16.81.69
+TBMC to Provide
+815 - Gene Therapy
+
+Repligen Krosflo KR2i TFF
+172.16.81.70
+TBMC to Provide
+815 - Gene Therapy
+
+
+
+
+
+
+
+
+
+
+
+Equipment Inventory Reconciliation Requirements
+The equipment inventory shall be reconciled using the latest approved Ignition tag browser export and associated UDT/equipment configuration records. At minimum, the reconciliation shall verify the equipment name, equipment path, suite name, room label, functional area, enabled status, network information, and traceability to the configured Ignition tag path.
+Only equipment enabled in the applicable tag/configuration records shall appear as active equipment on Level 2 screens or as selectable equipment in Batch Setup / Batch Report Setup.
+If equipment information in the Design Specification conflicts with the approved Ignition tag browser export, the discrepancy shall be resolved before final approval or documented as an open reconciliation item according to project document-control practices.
+
+
+Servers 伺服器 
+
+
+DS ID
+Parameter 參數
+Value 數值
+SER-01
+Server Name 伺服器名稱
+TBD
+SER-02
+Domain 領域
+TBMC
+SER-03
+Processor 處理器
+Intel Xeon
+SER-04
+CPU Speed 中央處理器速度
+2.5+Ghz 
+SER-05
+Processors 處理器 (Number of Cores 核心數)
+4
+SER-06
+Memory 記憶體 (RAM)
+8GB
+SER-07
+Drive Size 磁碟容量 (<partition label 分割區標籤>)
+2x 256GB (SSD)
+SER-08
+IP Address IP 位址
+TBD
+SER-09
+Subnet Masks(s) 子網遮罩
+TBD
+SER-010
+Operating System 作業系統
+Windows Server 2026
+SER-011
+Software Dependencies 軟體相依關係
+MS Entra ID
+
+
+Cloud Resources雲端資源
+
+
+DS ID
+Parameter 參數
+Value 數值
+CR-01
+Resource: Azure VM
+CR-01
+CIDR Block
+TBD
+CR-02
+Resource: Internet Gateway 資源：網際網路閘道
+CR-02
+VPC ID
+TBD
+
+
+
+Virtual Machine
+
+DS ID
+Parameter 參數
+Value 數值
+CL-01
+Client Name 客戶名稱
+TBMC
+CL-02
+Domain 領域
+TBMC
+CL-03
+Processor 處理器
+Intel Xeon
+CL-04
+CPU Speed 中央處理器速度
+
+2.5+Ghz
+CL-05
+Processors 處理器 (Number of Cores 核心數)
+4 vCPU’s
+CL-06
+Memory 記憶體 (RAM)
+8GB
+CL-07
+Drive Size 磁碟容量 (<partition label 分割區標籤>)
+1TB / 2TB / 4TB
+CL-08
+IP Address IP 位址
+TBD
+CL-09
+Subnet Masks(s) 子網遮罩
+TBD
+CL-010
+Operating System 作業系統
+Linux
+CL-011
+Software Dependencies 軟體相依關係
+
+
+Database 資料庫
+
+The system shall use database storage to support process data historization, batch workflow records, reporting data, and auditability.
+
+
+Time-Series Historian — InfluxDB
+The existing InfluxDB database shall be used for time-series process data historization, including monitored process values, equipment data, trends, and historian data used for visualization and reporting.
+
+
+
+Parameter 參數
+Value 數值
+Database IP Address/Port 資料庫 IP 位址/埠口
+4.246.231.26:8086
+Database Version 資料庫版本
+InfluxDB V2
+
+Relational SQL Database — Batch Workflow and Reporting Records
+A relational SQL database shall be used alongside InfluxDB to support batch setup records, runtime batch workflow records, equipment selection, equipment availability/claims, batch control audit records, and cached batch reporting data.
+InfluxDB shall remain the time-series historian for process and equipment data. The relational SQL database shall store structured workflow, configuration, audit, equipment claim, and reporting metadata that references saved batch setups and runtime batch instances.
+At minimum, the relational SQL database shall include the following logical tables or equivalent approved schema objects:
+
+Table Name
+Purpose
+Minimum Required Data Elements
+batch_setup
+Stores reusable saved batch setup records.
+batch_uid, batch_name, suite, batch age, batch age unit, report configuration, created by, created timestamp, updated by, updated timestamp, active flag
+batch_equipment
+Stores equipment selected for a saved batch setup.
+batch_uid, equipment path, equipment name, suite, area, room label, enabled flag, display order
+batch_equipment_claims
+Stores runtime equipment availability and claim records for loaded batch instances.
+claim ID, batch_uid, batch_run_uid, Run Instance ID, equipment path, equipment name, claim state, claimed by, claimed timestamp, released by, released timestamp
+batch_control_audit
+Stores auditable batch workflow control actions performed by users or the system.
+audit ID, event timestamp, user ID, session ID, action name, action value, batch path, batch_uid, batch name, batch_run_uid, Run Instance ID, previous control state, new control state, write result, notes
+cache_batch_reporting_json
+Stores cached batch reporting data or report payload JSON associated with a specific runtime batch instance.
+cache ID, batch_uid, batch_run_uid, Run Instance ID, report JSON, generated by, generated timestamp, report status
+
+The relational SQL database shall maintain the relationship between saved batch setup records and runtime batch instances. The batch_uid shall identify the saved batch setup, while the batch_run_uid and/or Displayed Run Instance ID shall identify each individual loaded/runtime batch instance.
+
+Batch reports shall not rely on batch name alone for report selection or report identification. Where multiple executions of the same saved batch name exist, the report selection table and Batch Report first page shall include the Run Instance and/or Displayed Run Instance ID.
+
+
+
+
+
+
+
+
+
+
+
+
+SOFTWARE DESIGN 軟體設計
+The following software packages are used to develop the Ignition Gateway Server:
+
+DS ID
+Software
+Revision
+License
+
+Ignition by Inductive Automation, LLC
+8.3.4
+To Be Purchased
+
+IA: OPC-UA Module
+10.3.4
+To Be Purchased
+
+IA: Perspective Module
+3.3.4
+To Be Purchased
+
+IA: Reporting Module
+7.3.4
+To Be Purchased
+
+IA: Historian Core
+1.3.4
+To Be Purchased
+
+IA: SQL Historian
+1.3.4
+To Be Purchased
+
+Kymera InfluxDB Module
+2.83.2 (b2)
+To Be Purchased
+
+SQL Bridge
+11.3.4
+To Be Purchased
+
+MariaDB JDBC Driver
+1.3.4
+To Be Purchased
+
+Symbol Factory
+8.3.4
+To Be Purchased
+
+
+
+SCADA System Tag Hierarchy
+Refer to Attachment 2: UDT Definition List for details.
+Level 2 equipment shall be sourced dynamically from the Ignition tag browser hierarchy. The tag browser structure shall define the suite, room, functional area, equipment path, enabled status, and associated equipment metadata used by Level 2 screens and Batch Setup / Batch Report Setup equipment selection.
+The displayed equipment list shall remain consistent with the approved Ignition tag browser export and associated UDT definitions.
+
+
+
+The Equipment Tag Browser shall read equipment process-tag configuration directly from the live Ignition tag structure under [default]TBMC-SCADA/TW-LAB01. The browser shall include applicable process tags and shall exclude internal configuration tags that are managed indirectly by the application, including batch runtime folders, alarm metric folders, equipment status folders, Key CPP reference tags, Key CPP name tags, and other approved internal configuration tags.
+
+
+
+
+USER INTERFACE 使用者介面
+User Interfaces 使用者介面
+The Ignition application shall provide browser-based user interfaces for system navigation, equipment monitoring, charting, alarms, batch setup, batch reporting, and detailed equipment views. User interface access and available actions shall be controlled by the security permissions defined in Section 11. 
+
+DS ID
+Display 顯示
+Description 說明
+UI-01
+Main Overview Screen 主畫面總覽畫面
+
+The Main Overview Screen allows users to navigate to Charts, Alarms, Reports, Batch Setup / Batch Report Setup, Level 2 Screens, and Level 3 Screens after login. Where runtime batch functionality is enabled, the Main Overview Screen may display active runtime batch cards. Runtime batch card behavior is defined in Section 10.
+UI-02
+Batch Setup / Batch Report Setup
+This screen allows authorized users to configure batch/report setup records and create runtime batch instances from saved setups. Users may enter or select batch name, batch suite, equipment selections, batch age or report duration, and reporting configuration. The screen supports Save and Load actions. Save stores or updates a batch setup record. Load creates a runtime batch instance/card. Detailed runtime behavior is defined in Section 10.1.
+UI-03
+Charts
+This screen shows a dynamic trend chart that can be populated with available system data points. Both historical and real-time data are available. Accessed by clicking “Charts.”
+UI-04
+
+Alarms
+This screen shows system alarms based on configured filters. Alarms can be filtered by status, including Active, Inactive, Acknowledged, and Unacknowledged. Alarm actions such as acknowledge, shelve, un-shelve, and clear shall be available according to configured security permissions. Accessed by clicking “Alarms.”
+UI-05
+
+Reports
+This screen displays modular Batch Reports with alarms, events, and data trends containing Key CPPs for devices configured in the report. The Reports screen shall allow users to select reports by Batch Name and Run Instance and/or Displayed Run Instance ID. Reports can be exported in PDF format by clicking the cloud icon in the lower right corner. Detailed runtime reporting requirements are defined in Section 10.4.
+UI-06
+
+Level 2 Screens
+These screens display enabled equipment dynamically from the Ignition tag browser structure. Equipment shall be organized by suite, room, and functional area. Functional areas shall include UPSTREAM, DOWNSTREAM, and ANALYTICS, or equivalent approved project folder names. Key CPPs are displayed under each device. A chart icon appears next to each Key CPP; clicking the icon opens a pop-up window with a live trend of the data point. Equipment source and inventory requirements are defined in Section 10.5.
+UI-07
+
+Level 3 Screen
+This screen displays critical process parameters for a selected device. A chart icon appears next to each CPP; clicking the icon opens a pop-up window with a live trend of the data point. This screen is accessed by clicking a device image on the overview screen or Level 2 screens.
+
+UI-08
+Equipment Tag Browser
+The Equipment Tag Browser allows authenticated users to view equipment process-tag configuration from the live Ignition tag structure under [default]TBMC-SCADA/TW-LAB01. Authorized Supervisor users may stage and save approved configuration changes, including CPP assignment, OPC source path, historization, engineering limits, alarm enablement, and alarm delay. Saved changes write to live Ignition tag configuration after confirmation and are recorded through the Ignition audit system.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Main Overview Screen
+The Main Overview Screen provides the primary navigation path for users after login. Users may access Charts, Alarms, Reports, Batch Setup / Batch Report Setup, Level 2 Screens, and Level 3 Screens according to their assigned security permissions. 
+Where batch runtime functionality is enabled, the Main Overview Screen may display active runtime batch cards. Runtime batch card creation, status behavior, equipment claim behavior, archive behavior, and audit requirements are governed by Section 10. 
+
+
+
+
+Charts Screen
+The Charts screen shall allow authorized users to view real-time and historical trends for available system data points. Chart access, tag selection, and timeframe modification shall be controlled by configured security permissions. 
+
+
+
+
+
+
+
+
+
+Alarms Screen
+The Alarms screen shall display system alarms according to configured filters and user permissions. Alarm records may be filtered by status, including Active, Inactive, Acknowledged, and Unacknowledged. 
+Key CPPs may have alarm setpoints configured by users with Supervisor credentials. Alarm setpoint change permissions and audit requirements are defined in Section 11. 
+
+
+
+
+Reports Screen
+The Reports screen shall allow authorized users to select and export Batch Reports. Reports shall be selectable by Batch Name and Run Instance and/or Displayed Run Instance ID so that users can distinguish multiple executions of the same saved batch name. 
+Detailed reporting requirements, including runtime report identification, report first-page identification, and cached report traceability, are defined in Section 10.4. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Level 2 Screen
+Level 2 equipment displays shall be generated dynamically from the Ignition tag browser structure. Equipment shall only appear when enabled in the associated tag configuration. 
+Level 2 screens shall organize equipment by suite, room, and functional area. Functional areas shall include UPSTREAM, DOWNSTREAM, and ANALYTICS, or equivalent approved project folder names. Detailed equipment source, enabled-equipment filtering, and inventory reconciliation requirements are defined in Section 10.5. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Level 3 Screen
+
+The Level 3 screen shall display critical process parameters for a selected device. A chart icon shall be available next to each CPP to open a live trend of the selected data point. 
+
+Where units are displayed, units shall be presented as fixed text next to the CPP description, and the displayed process value shall not repeat the unit. 
+
+
+
+
+Batch Setup / Batch Report Setup Screen
+
+The Batch Setup / Batch Report Setup screen allows authorized users to configure batch/report setup records and create runtime batch instances from saved setups. 
+
+The screen shall include, at minimum:
+
+Enter or select batch name.
+Select batch suite.
+Select equipment to include in the batch/report setup.
+Enter batch age or report duration.
+Select unit for batch age or report duration.
+Save batch setup.
+Load saved batch setup as a new runtime batch instance/card.
+When opened from a runtime batch card, the Batch Setup / Batch Report Setup popup shall display values associated with the selected runtime batch instance, not merely the newest saved setup record for the suite.
+
+The popup shall prepopulate available runtime values including batch name, room, target batch age, batch age units, acquired equipment, and batch notes. Where a legacy runtime UDT does not include a notes tag, saved setup notes may be used as a fallback.
+
+Batch Name options shall be filtered according to the selected Batch Suite. When the selected Batch Suite changes, the actual Batch Name value shall be cleared to prevent a saved batch from the previous suite from remaining associated with the new suite.
+
+When available, the first batch returned by the selected-suite filter may be displayed as Batch Name placeholder text. The placeholder shall be visually distinct from an actual selected value and shall not be treated as a selected batch. The system shall not load batch details solely because the placeholder text changed.
+Equipment selections shall reset when Batch Suite changes because equipment membership is suite-specific.
+
+
+
+
+Save and Load behavior is governed by Section 10.1. Equipment availability and claim behavior is governed by Section 10.2. Security permissions for Save and Load are defined in Section 11. 
+
+
+
+Batch Report
+Batch Reports shall identify the specific runtime batch instance used to generate the report. The Batch Report selection table and Batch Report first page shall include Batch Name and Run Instance and/or Displayed Run Instance ID so users can distinguish multiple executions of the same saved batch name. 
+Detailed reporting and runtime identification requirements are defined in Section 10.4. Report export permissions and audit requirements are defined in Section 11.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+The Batch Report first page shall include the Batch Name, Run Instance and/or Displayed Run Instance ID, and sufficient runtime-identification information to distinguish the selected report from other executions of the same saved batch name.
+Where multiple executions of the same saved batch name exist, the report selection table and Batch Report first page shall clearly identify which runtime batch instance was selected.
+Generated Batch Reports shall remain traceable to the associated batch_uid, batch_run_uid, Displayed Run Instance ID, selected equipment, equipment claim records, audit trail records, and cached reporting data where applicable.
+
+
+
+
+
+
+
+
+
+
+    9.10      Equipment Tag Browser
+The Equipment Tag Browser provides a desktop Perspective interface for viewing and managing equipment process-tag configuration under:
+The Equipment Tag Browser reads directly from the live Ignition tag structure. The displayed equipment process tags shall not depend on UDT definitions to assemble the browser table.
+All authenticated users may view the Equipment Tag Browser. Only users with Supervisor security level may stage or save configuration changes. Saved changes are written directly to live Ignition tag configuration only after user confirmation.
+The Equipment Tag Browser shall support, at minimum:
+automatic loading of the current tag structure when the view opens;
+manual refresh of displayed tag configuration;
+global and column-specific filtering;
+sorting, resizing, and column reordering;
+selection of an individual equipment process tag;
+real-time Live Value display for the selected tag;
+historical trend access for historized selected tags;
+staging of tag configuration changes before live write;
+confirmation before applying live tag configuration changes;
+CSV export of all displayed tags or filtered tag results.
+The browser shall display process-tag configuration information including suite, area, group, equipment, tag name, data type, quality, CPP assignment, source type, OPC item path, historization state, engineering limits, alarm state, alarm delay, and configured alarm names.
+The table shall display configuration as a point-in-time snapshot. The selected tag Live Value shall update in real time.
+
+
+Configuration changes shall use a staged workflow. Staged changes shall not be written to live tag configuration until the user selects Save Changes, enters the required confirmation text, and applies the live changes. A successful save shall display a confirmation popup and shall be recorded through the Ignition audit system.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+BATCH RUNTIME WORKFLOW 
+
+The Batch Runtime Workflow requirements shall be maintained as the governing specification section for runtime batch behavior. User-facing screen descriptions are provided in Section 9. Security permissions and audit trail requirements are provided in Section 11.
+
+This section defines the runtime behavior for saved batch setup records, runtime batch instances/cards, equipment availability and claims, archive behavior, reporting by Run Instance, and equipment source consistency.
+
+
+
+
+
+Saved Batch Setup vs. Runtime Batch Instance
+
+A saved batch setup represents a reusable batch/report configuration stored in SQL. A saved batch setup shall be identified by a unique batch_uid.
+
+A saved batch setup may include, at minimum:
+Batch name
+Batch suite
+Selected equipment
+Batch age or report duration
+Report configuration
+Related setup metadata
+Loading a saved batch setup shall create a new runtime batch instance/card. Each Load action shall generate a unique batch_run_uid and a Displayed Run Instance ID.
+
+The same saved batch setup may be loaded multiple times. Each loaded/runtime batch instance shall remain uniquely identifiable in the Ignition user interface, audit trail, relational SQL records, and generated Batch Reports.
+
+When the Setup popup is opened from a runtime batch card, the system shall use the selected runtime batch UDT path to identify and read the applicable runtime batch instance values. Runtime values shall take precedence over saved setup records where runtime tags are available. Saved setup records may be used as fallback data only where approved runtime tags are not available.
+
+
+
+
+
+Reports and audit records shall not rely on batch name alone to identify a batch execution. Where multiple executions of the same saved batch name exist, the Run Instance and/or Displayed Run Instance ID shall distinguish one execution from another.
+Equipment Availability / Claims Workflow
+The Batch Runtime Workflow shall include equipment availability and equipment claim management to identify and prevent conflicting use of the same equipment by multiple runtime batch instances.
+Equipment selected for a saved batch setup or loaded runtime batch instance shall be tracked using relational SQL records, including the batch_equipment_claims table or an equivalent approved schema object.
+Equipment availability shall be evaluated during batch Load and Start actions. The workflow shall distinguish between equipment that has been selected for a loaded batch and equipment that has been officially acquired by a started batch.
+Equipment availability and equipment claim records shall reference equipment sourced from the approved Ignition tag browser structure, including the configured equipment path, equipment name, suite, room, area, and enabled status where applicable.
+The user interface shall visually indicate equipment that is already associated with a loaded, running, or otherwise active runtime batch instance. Equipment that has been selected, used, or claimed by a runtime batch instance shall be highlighted in green on the batch card or equipment selection display, or by an equivalent approved display treatment.
+
+ Equipment Claim States
+
+Claim State
+Definition
+Expected Behavior
+LOADED
+Equipment was selected for a loaded runtime batch instance/card.
+The equipment is associated with the loaded batch but has not yet been officially acquired by a started batch. The equipment shall be visually indicated as associated with the loaded runtime batch instance.
+CLAIMED
+Equipment has been officially acquired by the first runtime batch instance to start.
+CLAIMED equipment shall be treated as unavailable to other runtime batch instances. A runtime batch instance shall not be allowed to start with equipment that is already CLAIMED by another active runtime batch instance.
+RELEASED
+Equipment has been released from the runtime batch instance.
+Equipment shall transition to RELEASED on Complete, Abort, or Archive. RELEASED equipment shall be available for future selection, loading, or claiming, subject to equipment enabled status and approved workflow rules.
+
+
+Load and Start Behavior
+
+When a user loads a saved batch setup, the system shall create a new runtime batch instance/card and evaluate the selected equipment against current equipment availability records.
+
+Equipment selected for the loaded runtime batch instance shall be written to the equipment claim workflow as LOADED unless the equipment is unavailable according to approved workflow rules.
+
+When a user starts a runtime batch instance, the system shall attempt to officially acquire the selected equipment for that batch.
+
+The first runtime batch instance to successfully Start with available selected equipment shall transition the applicable equipment claim records to CLAIMED.
+
+If required equipment is already CLAIMED by another active runtime batch instance, the Start control shall be disabled or the Start action shall be rejected unless an approved exception workflow is defined.
+
+The system shall not silently overwrite, replace, or release equipment claims assigned to another runtime batch instance.
+
+Release Behavior
+Equipment claims shall be released when the associated runtime batch instance reaches a terminal or inactive workflow state.
+Equipment shall transition to RELEASED when one of the following actions occurs:
+Complete
+Abort
+Archive
+On Complete, Abort, or Archive, the system shall update the applicable equipment claim records to RELEASED.
+
+The release event shall be recorded in the batch control audit trail in accordance with Section 11. 
+Archive-related equipment release shall follow the requirements defined in Section 10.3.
+
+
+       10.2.4Locked Batch Behavior
+When a runtime batch instance is locked due to equipment conflict or equipment ownership by another active runtime batch instance, the system shall prevent actions that would create or modify an invalid runtime control state.
+For locked runtime batch instances:
+START shall be disabled, blocked, or rejected.
+HOLD shall be disabled, blocked, or rejected.
+ABORT shall be disabled, blocked, or rejected.
+COMPLETE shall remain available when allowed by approved workflow logic.
+ARCHIVE shall be available only after the locked runtime batch has reached Complete status.
+The system shall not change START, HOLD, or ABORT control-state tags for locked runtime batch instances. Equipment-conflict protection for START shall remain enforced. Completing or archiving a locked batch shall not overwrite, release, or otherwise affect equipment claims owned by another active runtime batch instance.
+
+Archive Behavior
+Archive shall be implemented as a GMP-retentive workflow action.
+Archive shall not delete, overwrite, purge, or otherwise remove:
+Saved batch setup records
+Runtime batch records
+Equipment claim history
+Audit trail records
+Historian data
+Report records
+Cached reporting data
+Archive shall be available only for runtime batch instances that have reached Complete status. Runtime batch instances that are Loaded, Running, Held, or Aborted shall not be eligible for Archive unless an approved exception workflow is formally defined.
+When a completed runtime batch instance is archived, the system shall hide the associated runtime batch card from the active batch overview. Archiving shall remove the card from the active operating view only; it shall not remove the underlying batch data or GMP-relevant records.
+Archive shall release any active equipment claims associated with the archived runtime batch instance. Equipment associated with the archived runtime batch instance shall transition to RELEASED unless the equipment remains associated with another active runtime batch instance under approved workflow logic.
+Released equipment shall become available for display and selection according to equipment enabled status and approved tag browser configuration.
+Archive shall create an audit trail record in accordance with Section 11.
+Archived runtime batch instances shall remain available for audit trail review and reporting according to applicable retention and access requirements. Reports shall continue to distinguish archived runtime batch instances using batch name, Run Instance, batch_run_uid, and/or Displayed Run Instance ID.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Reporting and Run Instance Identification
+Batch reporting shall be based on the selected runtime batch instance, not solely on the saved batch name.
+The same saved batch setup may be loaded and executed multiple times. Each loaded/runtime batch instance shall have a unique batch_run_uid and Displayed Run Instance ID. Reporting functions shall use these runtime identifiers to distinguish one execution from another.
+The Reports screen shall provide sufficient runtime-identification information for users to select the correct report. At minimum, the report selection table shall include:
+Batch Name
+Run Instance and/or Displayed Run Instance ID
+Batch Status
+Applicable runtime timestamps, where available
+The Batch Report first page shall display the selected runtime batch instance. At minimum, the first page shall include:
+Batch Name
+Run Instance and/or Displayed Run Instance ID
+Where applicable, the Batch Report first page may also include:
+Selected suite
+Selected equipment
+Start timestamp
+Complete timestamp
+Archive timestamp or archive status
+Report generation timestamp
+Cached reporting data stored in cache_batch_reporting_json or an equivalent approved schema object shall be associated with the specific runtime batch instance using batch_run_uid and/or Displayed Run Instance ID.
+Report export permissions and report export audit requirements are defined in Section 11.
+
+10.4.1 Report Selection Filtering
+The Reports screen shall suppress report selection rows that do not represent a valid completed runtime batch interval.
+At minimum, report selection shall exclude:
+Records without a Batch End Time.
+Records where Batch End Time equals Batch Start Time.
+Records where Batch End Time is earlier than Batch Start Time.
+Only records with batch_end_time > batch_start_time shall be displayed in the report selection table.
+The visible Run Instance ID column shall be displayed as the final visible column in the report selection table, while preserving the underlying report-selection bindings required to generate the selected Batch Report.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Level 2 Equipment Source and Equipment Inventory
+Equipment available for batch setup, runtime batch cards, equipment claims, audit trail records, reports, and Level 2 displays shall be sourced from the approved Ignition tag browser structure and reconciled equipment inventory.
+The system shall use the tag browser hierarchy to identify equipment by:
+Suite
+Room
+Functional area
+Equipment path
+Equipment name
+Enabled status
+Equipment shall only be displayed or made available for selection when the equipment is enabled in the associated tag configuration.
+Where runtime batch UDT paths are used to open setup or filtering functions, the system shall normalize the selected runtime path back to the applicable suite folder so that suite-specific Batch Name filtering and suite-specific equipment filtering are applied correctly.
+
+
+
+The same equipment source logic shall be used consistently across:
+Level 2 displays
+Batch Setup / Batch Report Setup equipment selection
+Runtime batch cards
+Equipment claim records
+Audit trail records
+Batch Reports
+Runtime batch cards, equipment claim records, and Batch Reports shall use equipment names and equipment paths that are consistent with the reconciled equipment inventory.
+If equipment information in the Design Specification conflicts with the approved Ignition tag browser export, the discrepancy shall be resolved before final approval or documented as an open reconciliation item according to project document-control practices.
+
+Security and Audit Cross-Reference
+Batch workflow actions shall be controlled by configured Ignition security levels and associated Identity Provider roles.
+Security permissions shall be defined in Section 11 and shall include, at minimum:
+Save Setup
+Load Batch
+Start
+Hold
+Abort
+Complete
+Archive
+Report Export
+Alarm Setpoint Changes
+Audit Trail Access
+The system shall prevent unauthorized users from performing restricted workflow actions by disabling, hiding, or rejecting the applicable control based on approved security configuration.
+Batch workflow actions shall generate audit trail records in accordance with Section 11. Audit trail requirements shall include user, session, action name, action value, batch ID/name, runtime identifier, previous/new control state, write result, timestamp, and notes or system message where applicable.
+
+SECURITY  安全性 
+
+Security within the SCADA application is controlled by configured security levels. If a user has access to a security area, the user may perform functions assigned to that level. Security levels for screens and controls shall be configured within the Ignition application and associated Identity Provider roles.
+There shall be a minimum of three security access levels corresponding to roles defined in Microsoft Entra ID or the approved Identity Provider:
+Level
+Role
+Description
+1
+Public View Only
+Access to login and Main Overview screen view rights only.
+2
+User
+Authorized SCADA user access. User may perform approved workflow and monitoring functions but shall not modify alarm setpoints unless specifically approved.
+3
+Supervisor
+Highest application access level. Supervisor may perform restricted functions, including alarm setpoint changes and other approved administrative or controlled workflow actions.
+New users must first be added to the site SSO / Microsoft Entra ID before defining roles in the         SCADA gateway server. Users shall then be synchronized and assigned to specific user groups.
+SCADA groups and security levels shall be configured in the Ignition gateway. For this system, security is integrated into the customer domain, and security groups and users are managed through Microsoft Entra ID.
+Users can log off from the SCADA application by selecting the Login/Logout icon from the navigation header. After a period of inactivity on the client, the current user is automatically logged out, the application reverts to Public access, and the login screen is displayed. Password age requirements shall be controlled through the central domain controller.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Security Matrix
+
+The following table identifies items requiring security access.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Screen / Function Area
+Item
+
+
+Security group
+ (S) Supervisor, (U) User, (P) Public
+
+
+S
+U
+P
+Main Overview Screen
+Screen Access
+√
+√
+√
+
+Login / Logout 
+√
+√
+√
+
+Level 3 Parameters Pop-Up 
+√
+√
+
+Batch Setup / Batch Report Setup
+Screen Access
+√
+√
+
+
+Save Setup
+√
+√
+
+
+Load Batch
+√
+√
+
+Runtime Batch Card / Batch Controls
+Start
+√
+√
+
+
+Hold
+√
+√
+
+
+Abort
+√
+√
+
+
+Complete
+√
+√
+
+
+Archive
+√
+√
+
+Level 2 Detail Screen
+Screen Access
+√
+√
+
+
+Level 3 Parameters Pop-Up
+√
+√
+
+Level 3 Detail Screen
+Screen Access
+√
+√
+
+
+Modify Alarm Setpoints 
+√
+
+
+Charts Screen
+Screen Access
+√
+√
+
+
+Create Trends 
+√
+√
+
+
+Modify Timeframe
+√
+√
+
+
+Select Tags
+√
+√
+
+Alarms Screen
+Screen Access
+√
+√
+
+
+Select Alarm Filters
+√
+√
+
+
+Acknowledge Alarms
+√
+√
+
+
+Modify Display Columns
+√
+√
+
+
+Shelve Alarms
+√
+√
+
+
+Clear Alarms
+√
+√
+
+Reports Screen
+Screen Access
+√
+√
+
+
+Report Selection
+√
+√
+
+
+Report Export
+√
+√
+
+Audit Trail
+Audit Trail Access
+√
+
+
+
+Batch control - Audit Review
+√
+
+
+Equipment Tag Browser
+Screen Access
+√
+√
+
+
+View Tag Configuration
+√
+√
+
+
+Refresh Tag Configuration
+√
+√
+
+
+Export All/Export Filtered
+√
+√
+
+
+Stage Configuration Changes
+√
+
+
+
+Save Live Tag Configuration Changes
+√
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Save Setup stores a new batch setup or updates an existing batch setup in SQL. Load Batch creates a new runtime batch instance/card from a saved batch setup. Both actions shall be controlled by security permissions and shall generate audit records.
+Start, Hold, Abort, Complete, and Archive shall be secured runtime batch actions. Abort and Archive User-level permissions shall be confirmed by site policy. Archive shall be available only for completed batches, and Supervisor-only access is recommended unless otherwise approved.
+Alarm setpoint changes shall remain restricted to Supervisor-level users. Report export shall be available only to authorized users and shall identify the selected runtime batch instance. Audit trail access shall be restricted to authorized users, with User or QA read-only access defined only if approved by site policy.
+Equipment Tag Browser save functions shall be restricted to Supervisor users. Saving configuration changes shall require confirmation before changes are written to live Ignition tag configuration.
+
+Audit Trail Requirements
+Batch workflow actions shall generate audit trail records sufficient to reconstruct:
+
+who performed the action;
+what action was performed;
+what runtime batch instance was affected;
+what value or state changed;
+whether the write succeeded; and
+any applicable notes or system messages.
+Audit trail records shall be generated for GMP-relevant batch setup, batch runtime workflow, equipment claim, archive, alarm setpoint, report export, and security-relevant actions.
+At minimum, batch action audit records shall include the following data elements:
+Audit Field
+Requirement
+User
+Authenticated user identity associated with the action.
+Session
+Ignition Perspective session identifier or equivalent session/context identifier.
+Action Name
+Name of the action performed, such as Save Setup, Load Batch, Start, Hold, Abort, Complete, Archive, equipment claim transition, alarm setpoint change, report export, or rejected workflow action.
+Action Value
+Submitted value, command, selected control, status transition, report export option, alarm setpoint value, or other action-specific value.
+Batch Path
+Ignition project/tag path or logical batch path associated with the action, where applicable.
+Batch ID / Batch Name
+Saved batch identifier and displayed batch name associated with the action.
+Run Instance / Hash
+Runtime batch identifier, including batch_run_uid, Displayed Run Instance ID, run hash, or equivalent approved runtime identifier.
+Previous Control State
+Control state, batch status, equipment claim state, alarm setpoint value, or other relevant value before the action.
+New Control State
+Control state, batch status, equipment claim state, alarm setpoint value, or other relevant value after the action.
+Write Result
+Result of the applicable Ignition tag write, SQL write, report export request, or rejected/failed action.
+Notes
+Operator-entered notes, system messages, rejection reasons, exception details, or other action-specific context where applicable.
+Timestamp
+Date/time when the action occurred or was attempted.
+
+The following actions shall be auditable at minimum:
+Save Setup
+Load Batch
+Start
+Hold
+Abort
+Complete
+Archive
+Equipment marked LOADED
+Equipment transitioned to CLAIMED
+Equipment transitioned to RELEASED
+Rejected or blocked Load attempts
+Rejected or blocked Start attempts
+Report export
+Alarm setpoint changes
+Audit trail access, where required by approved audit policy
+Action-specific audit records shall include applicable runtime identifiers and state-change information. Start audit records shall include equipment claim acquisition results. Complete, Abort, and Archive audit records shall include equipment claim release results where equipment transitions to RELEASED. Report export audit records shall identify the selected runtime batch instance and shall not rely on batch name alone. Alarm setpoint audit records shall include equipment path or tag path, previous alarm setpoint value, new alarm setpoint value, write result, user, session, timestamp, and notes where applicable.
+
+Equipment Tag Browser configuration changes shall be auditable. Audit records for saved tag configuration changes shall include, where applicable, user, session, action name, tag path, equipment name, property changed, previous value, new value, write result, timestamp, and notes or system message.
+Auditable Equipment Tag Browser actions shall include, at minimum:
+saved CPP assignment changes;
+saved OPC item path changes;
+saved historization changes;
+saved engineering limit changes;
+saved alarm enablement changes;
+saved alarm delay changes;
+failed or rejected save attempts.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Firewall Rules 防火牆規則
+
+Policy
+Protocol
+Source
+Destination
+Port
+Comment 
+Allow
+TCP
+ANY
+INBOUND
+80
+Web server
+Allow
+TCP
+ANY
+INBOUND
+443
+HTTPS Traffic
+Allow
+TCP
+ANY
+INBOUND
+8043
+HTTPS Traffic
+Allow
+TCP
+ANY
+INBOUND
+8088
+HTTP Traffic
+Allow
+TCP
+ANY
+INBOUND
+62541
+OPC UA Traffic
+Allow
+TCP
+ANY
+OUTBOUND
+3306
+SQL DB Traffic
+
+
+
+REFERENCES 參考文件
+
+Document No.
+文件編號
+Document Title
+文件名稱
+T-000376
+TBMC Passphrase Standard
+T-000382
+Domain Control and Password Management
+
+REVISION HISTORY 修訂紀錄
+
+
+
+Version No. 版本編號
+
+Description of Change 變更內容
+
+Reason for Change 變更原因
+
+1.0
+New Document.
+N/A
+2.1 / Final Controlled Revision 
+Updated the Equipment Tag Browser functionality, Design Specification to add Batch Runtime Workflow functionality, including monitoring plus batch workflow/status management, Batch Setup / Batch Report Setup Save and Load behavior, dynamic runtime batch cards, runtime UDT/tag instances, unique runtime batch identifiers, equipment filtering, enabled-equipment display logic, equipment claims, GMP-retentive archive behavior, run-instance reporting, expanded security permissions, and expanded audit trail requirements.
+Change order to add Ignition batch workflow/status management functionality while maintaining the boundary that the application does not directly command physical process equipment unless formally added to scope.
+
+
+
+
+
+END OF DOCUMENT 終
+

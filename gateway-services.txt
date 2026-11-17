@@ -1,0 +1,71 @@
+Ignition-TP-IGN01
+Ignition standard 8.3.4 (b2026030309)
+?
+tbmc_admin
+Home
+Platform
+Connections
+Network
+Services
+Diagnostics
+Services
+Overview
+Historians
+Historians
+Tags
+Alarming
+Settings
+Pipelines
+Journals
+Notification
+Rosters
+Manage Scripts
+Scheduling
+Reports
+Transaction Groups
+Event Streams
+
+Services Overview
+
+Tag Providers
+View Tag Providers
+4/5
+Active Resources
+922
+Total Tag Count
+Reports
+view
+0
+Currently Executing
+0
+Upcoming Scheduled
+Transaction Groups
+view
+0/0
+Healthy Transaction Groups
+0
+Errored
+0
+Fatally Errored
+0
+Running
+Alarm Pipelines
+view
+0
+Active Count
+Trial Expired
+0:00:00
+2 hours went by already? Not to worry, just click reset for 2 more.
+Reset Trial
+Activate Ignition
+Browser Not Supported
+
+To access the Gateway, please use one of the following supported, modern browsers.
+
+Google Chrome
+
+Mozilla Firefox
+
+Microsoft Edge
+
+Apple Safari

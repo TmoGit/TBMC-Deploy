@@ -1,0 +1,247 @@
+[
+  [
+    "DS ID",
+    "Ethernet Device",
+    "IP Address",
+    "Subnet Mask",
+    "Room Number"
+  ],
+  [
+    "",
+    "Sartorius BioPAT MFCS",
+    "172.16.81.10",
+    "TBMC to Provide",
+    "801 - Biologics"
+  ],
+  [
+    "",
+    "Sartorius DCU-TWIN 5L ",
+    "172.16.81.12",
+    "TBMC to Provide",
+    "801 -Biologics"
+  ],
+  [
+    "",
+    "Sartorius 50L BIOSTATSTR3 ",
+    "172.16.81.13",
+    "TBMC to Provide",
+    "801 -Biologics"
+  ],
+  [
+    "",
+    "Sartorius 200L BIOSTATSTR3 ",
+    "172.16.81.14",
+    "TBMC to Provide",
+    "801 -Biologics"
+  ],
+  [
+    "",
+    "Sartorius 200L BRX200-20 – Need Info.",
+    "TBMC to Provide",
+    "TBMC to Provide",
+    "801 -Biologics"
+  ],
+  [
+    "",
+    "Sartorius BRX5 – Need Info.",
+    "TBMC to Provide",
+    "TBMC to Provide",
+    "801 -Biologics"
+  ],
+  [
+    "",
+    "Cytiva AVA200 – Need Info.",
+    "TBMC to Provide",
+    "TBMC to Provide",
+    "801 -Biologics"
+  ],
+  [
+    "",
+    "Cytiva AVA600 – Need Info.",
+    "TBMC to Provide",
+    "TBMC to Provide",
+    "801 -Biologics"
+  ],
+  [
+    "",
+    "Cytiva  Äkta Avant 150",
+    "172.16.81.15",
+    "TBMC to Provide",
+    "801 -Biologics"
+  ],
+  [
+    "",
+    "Cytiva  Äkta Avant 25",
+    "172.16.81.18",
+    "TBMC to Provide",
+    "801 -Biologics"
+  ],
+  [
+    "",
+    "Cytiva  Äkta Avant 25",
+    "172.16.81.19",
+    "TBMC to Provide",
+    "801 -Biologics"
+  ],
+  [
+    "",
+    "Cytiva  Äkta Avant Pure  - Does it still exist?",
+    "172.16.81.20",
+    "TBMC to Provide",
+    "801 -Biologics"
+  ],
+  [
+    "",
+    "Cytiva  Äkta Avant Pilot ",
+    "TBMC to Provide",
+    "TBMC to Provide",
+    "801 -Biologics"
+  ],
+  [
+    "",
+    "REBEL 908 Cell Culture Media Analyzer",
+    "172.16.81.16",
+    "TBMC to Provide",
+    "801 -Biologics"
+  ],
+  [
+    "",
+    "Nova Flex2 Biomedical BioProfile ",
+    "172.16.81.21",
+    "TBMC to Provide",
+    "801 -Biologics"
+  ],
+  [
+    "",
+    "Tornado Spectral - Hudson 785 Raman Probe",
+    "172.16.81.17",
+    "TBMC to Provide",
+    "801 -Biologics"
+  ],
+  [
+    "",
+    "Cytiva Äkta Avant 150",
+    "172.16.81.37",
+    "TBMC to Provide",
+    "805 -Nucleic Acid"
+  ],
+  [
+    "",
+    "Cytiva Äkta Avant 25",
+    "TBMC to Provide ",
+    "TBMC to Provide",
+    "805 -Nucleic Acid"
+  ],
+  [
+    "",
+    "Repligen Krosflo KR2i TFF",
+    "172.16.81.38",
+    "TBMC to Provide",
+    "805 -Nucleic Acid"
+  ],
+  [
+    "",
+    "Repligen Krosflo KR2i TFF",
+    "172.16.81.41",
+    "TBMC to Provide",
+    "805 -Nucleic Acid"
+  ],
+  [
+    "",
+    "Repligen Krosflo KR2i TFF",
+    "172.16.81.42",
+    "TBMC to Provide",
+    "805 -Nucleic Acid"
+  ],
+  [
+    "",
+    "Sartorius RM 20L",
+    "172.16.81.39",
+    "TBMC to Provide",
+    "805 -Nucleic Acid"
+  ],
+  [
+    "",
+    "KNAUER  IJM NanoScaler",
+    "172.16.81.40",
+    "TBMC to Provide",
+    "805 -Nucleic Acid"
+  ],
+  [
+    "",
+    "Sartorius DCU-TWIN 5L",
+    "172.16.81.50",
+    "TBMC to Provide",
+    "814 - Plasmid"
+  ],
+  [
+    "",
+    "Cytiva Äkta Avant 25",
+    "TBMC to Provide",
+    "TBMC to Provide",
+    "814 - Plasmid"
+  ],
+  [
+    "",
+    "Cytiva Äkta Avant 150",
+    "TBMC to Provide",
+    "TBMC to Provide",
+    "814 - Plasmid"
+  ],
+  [
+    "",
+    "Sartorius BioPAT MFCS",
+    "172.16.81.65",
+    "TBMC to Provide",
+    "815 - Gene Therapy"
+  ],
+  [
+    "",
+    "Sartorius DCU-TWIN 5L",
+    "172.16.81.66",
+    "TBMC to Provide",
+    "815 - Gene Therapy"
+  ],
+  [
+    "",
+    "Sartorius 50L BIOSTATSTR3",
+    "172.16.81.67",
+    "TBMC to Provide",
+    "815 - Gene Therapy"
+  ],
+  [
+    "",
+    "Cytiva Äkta Avant 150",
+    "172.16.81.68",
+    "TBMC to Provide",
+    "815 - Gene Therapy"
+  ],
+  [
+    "",
+    "Cytiva Äkta Avant 25",
+    "172.16.81.69",
+    "TBMC to Provide",
+    "815 - Gene Therapy"
+  ],
+  [
+    "",
+    "Repligen Krosflo KR2i TFF",
+    "172.16.81.70",
+    "TBMC to Provide",
+    "815 - Gene Therapy"
+  ],
+  [
+    "",
+    "",
+    "",
+    "",
+    ""
+  ],
+  [
+    "",
+    "",
+    "",
+    "",
+    ""
+  ]
+]

@@ -1,0 +1,26 @@
+﻿[
+    {
+        "Test":  "TCP 10.1.0.132:8086",
+        "Timestamp":  "2026-11-17T14:13:09.6829407+08:00",
+        "Status":  "Failed",
+        "Detail":  "TimeoutException: Connection deadline exceeded"
+    },
+    {
+        "Test":  "/health",
+        "Timestamp":  "2026-11-17T14:13:18.7314544+08:00",
+        "Status":  "Failed",
+        "Detail":  "MethodInvocationException: 以 \"0\" 引數呼叫 \"GetResult\" 時發生例外狀況: \"工作已取消。\""
+    },
+    {
+        "Test":  "/ready",
+        "Timestamp":  "2026-11-17T14:13:23.7442055+08:00",
+        "Status":  "Failed",
+        "Detail":  "MethodInvocationException: 以 \"0\" 引數呼叫 \"GetResult\" 時發生例外狀況: \"工作已取消。\""
+    },
+    {
+        "Test":  "/api/v2/setup",
+        "Timestamp":  "2026-11-17T14:13:28.7453039+08:00",
+        "Status":  "Failed",
+        "Detail":  "MethodInvocationException: 以 \"0\" 引數呼叫 \"GetResult\" 時發生例外狀況: \"工作已取消。\""
+    }
+]

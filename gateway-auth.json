@@ -1,0 +1,92 @@
+﻿{
+    "Started":  "2026-11-17T14:07:28.5289132+08:00",
+    "Status":  "PASS",
+    "PasswordRecoveryRequired":  false,
+    "PasswordResetPerformed":  false,
+    "ExistingCredentialUsed":  true,
+    "TemporaryRecoveryResourcesCreated":  false,
+    "Challenges":  [
+                       "username",
+                       "password"
+                   ],
+    "FinalPath":  "/app/status",
+    "Permissions":  {
+                        "access":  true,
+                        "read":  true,
+                        "write":  true
+                    },
+    "AuthenticatedNavigation":  {
+                                    "value":  [
+                                                  {
+                                                      "text":  "Home",
+                                                      "path":  "/app/home"
+                                                  },
+                                                  {
+                                                      "text":  "Platform",
+                                                      "path":  "/app/platform/overview"
+                                                  },
+                                                  {
+                                                      "text":  "Connections",
+                                                      "path":  "/app/connections/overview"
+                                                  },
+                                                  {
+                                                      "text":  "Network",
+                                                      "path":  "/app/network/overview"
+                                                  },
+                                                  {
+                                                      "text":  "Services",
+                                                      "path":  "/app/services/overview"
+                                                  },
+                                                  {
+                                                      "text":  "Diagnostics",
+                                                      "path":  "/app/diagnostics/overview"
+                                                  },
+                                                  {
+                                                      "text":  "Welcome",
+                                                      "path":  "/app/home"
+                                                  },
+                                                  {
+                                                      "text":  "Download",
+                                                      "path":  "/app/home/designer/download"
+                                                  },
+                                                  {
+                                                      "text":  "Connections",
+                                                      "path":  "/app/home/designer/connections"
+                                                  },
+                                                  {
+                                                      "text":  "Launch",
+                                                      "path":  "/app/home/perspective/session-launcher"
+                                                  },
+                                                  {
+                                                      "text":  "Download",
+                                                      "path":  "/app/home/perspective/download"
+                                                  },
+                                                  {
+                                                      "text":  "Sessions",
+                                                      "path":  "/app/home/perspective/sessions"
+                                                  },
+                                                  {
+                                                      "text":  "Brand Settings",
+                                                      "path":  "/app/home/perspective/branding"
+                                                  },
+                                                  {
+                                                      "text":  "Launch",
+                                                      "path":  "/app/home/vision/client-launcher"
+                                                  },
+                                                  {
+                                                      "text":  "Download",
+                                                      "path":  "/app/home/vision/download"
+                                                  },
+                                                  {
+                                                      "text":  "Clients",
+                                                      "path":  "/app/home/vision/clients"
+                                                  },
+                                                  {
+                                                      "text":  "Return to Home",
+                                                      "path":  "/app/home"
+                                                  }
+                                              ],
+                                    "Count":  17
+                                },
+    "Finished":  "2026-11-17T14:07:32.6666120+08:00"
+}

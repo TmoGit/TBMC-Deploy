@@ -1,0 +1,12 @@
+{
+  "ExcelReadback": "PASS",
+  "WorkbookRows": 31,
+  "RegisterRecords": 35,
+  "UniqueEquipmentEndpoints": 28,
+  "DatabaseEndpoints": 1,
+  "RawICMPRequests": 208,
+  "Baseline": "31 / 22 populated / 9 blank: PASS",
+  "KnownGatewayPasswordsAbsent": "PASS",
+  "OwnedDebugListenersRemaining": 0,
+  "ProductionReady": false
+}

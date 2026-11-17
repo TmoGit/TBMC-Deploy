@@ -1,0 +1,26 @@
+[
+    {
+        "Test":  "TCP 8086",
+        "Timestamp":  "2026-11-17T14:08:47.4551221+08:00",
+        "Status":  "Failed",
+        "Detail":  "TCP connection timed out"
+    },
+    {
+        "Test":  "/health",
+        "Timestamp":  "2026-11-17T14:08:56.5056263+08:00",
+        "Status":  "Failed",
+        "Detail":  "作業已逾時。"
+    },
+    {
+        "Test":  "/ready",
+        "Timestamp":  "2026-11-17T14:09:01.5102130+08:00",
+        "Status":  "Failed",
+        "Detail":  "作業已逾時。"
+    },
+    {
+        "Test":  "/api/v2/setup",
+        "Timestamp":  "2026-11-17T14:09:06.5115227+08:00",
+        "Status":  "Failed",
+        "Detail":  "作業已逾時。"
+    }
+]

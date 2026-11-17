@@ -1,0 +1,52 @@
+Ignition-TP-IGN01
+Ignition standard 8.3.4 (b2026030309)
+?
+tbmc_admin
+Home
+Platform
+Connections
+Network
+Services
+Diagnostics
+Platform
+Overview
+System
+Gateway Settings
+Projects
+Modules
+Licensing
+Redundancy
+Modes
+Store & Forward
+Ignition Exchange
+Backup & Restore
+Security
+General Settings
+User Sources
+Identity Providers
+Secret Providers
+Audit Profiles
+Levels
+Zones
+API Keys
+OAuth2 Clients
+No Licenses Activated
+You may use the trial version of Ignition as long as you'd like to get a feel for our product. When you purchase Ignition, you'll receive a license key, which you can activate here.
+Learn More
+Activate a License
+Trial Expired
+0:00:00
+2 hours went by already? Not to worry, just click reset for 2 more.
+Reset Trial
+Activate Ignition
+Browser Not Supported
+
+To access the Gateway, please use one of the following supported, modern browsers.
+
+Google Chrome
+
+Mozilla Firefox
+
+Microsoft Edge
+
+Apple Safari

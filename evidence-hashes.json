@@ -1,0 +1,217 @@
+[
+  {
+    "File": "architecture-page-1.png",
+    "SHA256": "f79641f126a76e186ef32bb1bc94b56d131542d4054cb8db470712482b7a6fe5",
+    "Bytes": 606539
+  },
+  {
+    "File": "architecture-page-1.txt",
+    "SHA256": "78d215185b752f4ad97fae9d8beaa4f7a3ea11907d2f0bf4dee5cfaeba56592f",
+    "Bytes": 2589
+  },
+  {
+    "File": "Assess-Database.ps1",
+    "SHA256": "6c58e01fd39d3515c341fa8c0928e65895af0f954ad58894d0bdaf85ec4b9b98",
+    "Bytes": 1583
+  },
+  {
+    "File": "Assess-Equipment.ps1",
+    "SHA256": "051ee0b3ae962c00e44cd362085c9457fc192bde2f668060a2b16d97cdde5441",
+    "Bytes": 2406
+  },
+  {
+    "File": "build-commission-report.py",
+    "SHA256": "600d26d34f5f10fcc065f026011adf4db2032ad82e706f2d5ff5d35144445eb1",
+    "Bytes": 18304
+  },
+  {
+    "File": "cleanup.json",
+    "SHA256": "a275f0bc51c0f49b54cad09e88e83fd97daead5d812560b6ef7aeb973635e4f9",
+    "Bytes": 387
+  },
+  {
+    "File": "database-ignition-results.csv",
+    "SHA256": "f1bb0d18178dfc191a17e1fd968ffd786f38b9a6e135b1a15a59c01a792ebac4",
+    "Bytes": 3999
+  },
+  {
+    "File": "database-tests-direct.json",
+    "SHA256": "20de1bd0fb27344e52d1b365fe5acb1b00400f1ca0e8db266c305a0d73f619c4",
+    "Bytes": 1026
+  },
+  {
+    "File": "database-tests.json",
+    "SHA256": "a53d1ed7b74effcde3d33d67d853d37b6ce815517b66dc811b0f7dcdea5cec97",
+    "Bytes": 699
+  },
+  {
+    "File": "DDS-equipment-accepted.json",
+    "SHA256": "055b707a0cbaac5299f1b3d10327db14ce15e197837bf5396e1220902947ed67",
+    "Bytes": 4187
+  },
+  {
+    "File": "DDS-extracted.txt",
+    "SHA256": "8706bb8f0b5e4695f4e884188cff3a8c56bac9c945ac4773f345a0b0b5fb9cf5",
+    "Bytes": 53428
+  },
+  {
+    "File": "DDS-tables.json",
+    "SHA256": "36ffb300420cc629bb753c612b3792c948ed1218f6e02f0798389ca1ef6a46f6",
+    "Bytes": 33130
+  },
+  {
+    "File": "discrepancies.csv",
+    "SHA256": "c41f64b2a34a457c4d11ea201aad8354f52c5566982a3287066ff70d072b83b4",
+    "Bytes": 18885
+  },
+  {
+    "File": "endpoint-results.csv",
+    "SHA256": "8f830c52eaf385c41674e8eeecb8e60fd311a36e4e2a107ee3ef90fc3eee7270",
+    "Bytes": 2578
+  },
+  {
+    "File": "endpoints.json",
+    "SHA256": "7ca6fd0aa281710fa00aab6ffd6e1ed0a3ab06b7612c8f272fad518f87ac40d4",
+    "Bytes": 612
+  },
+  {
+    "File": "equipment-register.json",
+    "SHA256": "43d01bf1a159d54e6633ecaf0e88a0a69b16f42e655bc241a5dbb36bc2e05f56",
+    "Bytes": 55627
+  },
+  {
+    "File": "equipment-results.csv",
+    "SHA256": "a5b56dcd42757bb725a92033d89342ed9cbc89ed46db26cd701cdb2f174e08c5",
+    "Bytes": 27755
+  },
+  {
+    "File": "extract-commission.py",
+    "SHA256": "d2010271474a5ad57e2286775e66632ddf62c79b2d06c3550ab68d26fd9bbd9d",
+    "Bytes": 1492
+  },
+  {
+    "File": "extract-dds-accepted.py",
+    "SHA256": "8c6afd088b5c9dec5891fad03586af1a840b7647566863b7f01c27b7d79bf7e5",
+    "Bytes": 959
+  },
+  {
+    "File": "gateway-auth.json",
+    "SHA256": "a54ea04582d2e8c288b841a07b67ae024bea788931c7a095c702850b490fe592",
+    "Bytes": 5515
+  },
+  {
+    "File": "gateway-historians.png",
+    "SHA256": "3893c0f767f4550c5538fbbc4e6c6f2f188f4d1323c1cc2a06e32500fbe245de",
+    "Bytes": 56340
+  },
+  {
+    "File": "gateway-historians.txt",
+    "SHA256": "872339146a0174e939cb54ddf0521a0215b2747ae396e1220fc32fbd01bd29e6",
+    "Bytes": 828
+  },
+  {
+    "File": "gateway-influx-form.txt",
+    "SHA256": "3623851a65224e42b0b8044d572a20a619fe485cf06fddde53630d20feb918c9",
+    "Bytes": 8692
+  },
+  {
+    "File": "gateway-licensing.txt",
+    "SHA256": "259116a8e82dc1b56e7b183010556eaa6db4d8562f2cd0ad550e7ed9a0aef977",
+    "Bytes": 911
+  },
+  {
+    "File": "gateway-modules-page2.txt",
+    "SHA256": "19b3f1149666f31f35e76e5ca6d32b04af2245f50369afdd219759c718ae7db8",
+    "Bytes": 3658
+  },
+  {
+    "File": "gateway-modules.txt",
+    "SHA256": "ea46b49879566fdca9d7addfde5ca32133aa2a155b8bd61ad3024d8fd4d69792",
+    "Bytes": 2346
+  },
+  {
+    "File": "gateway-opc.txt",
+    "SHA256": "27f26235c6acf706ec979cea5aaa9d68ae3d38d9a60f5a5b26bcdd314d350ce8",
+    "Bytes": 1946
+  },
+  {
+    "File": "gateway-platform.txt",
+    "SHA256": "b6136c53d63d58f8d25ecf7a561bc58571315cdccebab7b1daa625538ee232b1",
+    "Bytes": 2287
+  },
+  {
+    "File": "gateway-services.txt",
+    "SHA256": "8fa346b96dd6f68f12dbdfd9798217afea3bf64de59ddd326d175cbd2b010aec",
+    "Bytes": 862
+  },
+  {
+    "File": "gateway-status.txt",
+    "SHA256": "d8ab72db624f070e3e4b29e5d0b2204a524fe97afea3f66f416659356430e6ff",
+    "Bytes": 479
+  },
+  {
+    "File": "historian-previous-sanitized.json",
+    "SHA256": "ae068a378c653d6febb1b987d86d1ce86ffb4e1c13ed6d0c62026a330a528a33",
+    "Bytes": 132
+  },
+  {
+    "File": "icmp-raw.csv",
+    "SHA256": "5ab40e65bee5a0bf60ef0be2739d7f719fb809389eab73a316162d91ad645f26",
+    "Bytes": 18682
+  },
+  {
+    "File": "method.json",
+    "SHA256": "bb111596d1d9fffe7a0edefb367210f9b76b0e5ace0f6c1d51872468608cfdbd",
+    "Bytes": 566
+  },
+  {
+    "File": "neighbors-after-tests.csv",
+    "SHA256": "02dfa696b86513c8435eff8d040b416e80a4321b2da0b577863535e30f28968d",
+    "Bytes": 1864
+  },
+  {
+    "File": "origin.json",
+    "SHA256": "6b2c3938b0f8fc927dc926f6a53346131466d7925d1d09020465bdbc3d0d14ea",
+    "Bytes": 8552
+  },
+  {
+    "File": "README-Resume.md",
+    "SHA256": "21d337e9ee03980b6641354d6970f96801a24e23830e8147cbd7e4c5f2c901dc",
+    "Bytes": 7085
+  },
+  {
+    "File": "source-hashes.csv",
+    "SHA256": "849fa6625ffa6253a8ef08a0dda54503371e48735a8906df8f88e6811462f565",
+    "Bytes": 809
+  },
+  {
+    "File": "summary.json",
+    "SHA256": "d5cafdd28c7d1e62fc3f4b5f325058819c098b7ca4772d1a81f46a23489c40b8",
+    "Bytes": 6025
+  },
+  {
+    "File": "TBMC-Commission-Report.html",
+    "SHA256": "e089a57ef652fe2e9d40f263ac003702b3ed628fa510beb7ed947237ac2d2acd",
+    "Bytes": 15909
+  },
+  {
+    "File": "TBMC-Commission-Results.xlsx",
+    "SHA256": "ddd5880ce2529ae86ba0e2f583728a8e7d8f0951ef1874fcf7bfe109dfccb6c7",
+    "Bytes": 24003
+  },
+  {
+    "File": "verification.json",
+    "SHA256": "9dd3b5713b6ce5e968e6ea32f175fbef34d28194320443b2e3e3335f1ae60fa0",
+    "Bytes": 330
+  },
+  {
+    "File": "Verify-Reports.py",
+    "SHA256": "6698298d16a2dc1e6bbef9770748986413532868ed36141648c531297887739b",
+    "Bytes": 2599
+  },
+  {
+    "File": "workbook-raw.json",
+    "SHA256": "8a0ca20d20964443002a75cdb75e1f7c0dca546de19f45b0ab8fadee6a1be9c9",
+    "Bytes": 7777
+  }
+]
