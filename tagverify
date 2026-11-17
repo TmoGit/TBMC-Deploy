@@ -1,0 +1,21 @@
+Investigate why equipment is missing or not populating in the deployed TBMC SCADA. Execute this on the on-premises Ignition server.
+
+Keep OPC integration and shop-floor troubleshooting deferred. This task is to verify the migrated application and tag structure.
+
+1. Confirm the browser session is opening the correct gateway, Perspective project and deployed project version. Record the actual URL and project name.
+
+2. Inspect all configured tag providers, their enabled states, UDT definitions, equipment instances and tag counts. Distinguish missing tags from disabled providers, bad-quality tags and unavailable OPC sources.
+
+3. Trace how the equipment overview and batch equipment lists are populated: tag browsing, UDT metadata, SQL equipment records, named queries, scripts, bindings, filters and user permissions. Check gateway/browser errors. Determine whether an offline or bad-quality filter is hiding existing equipment.
+
+4. Compare the deployed structure against the approved source gateway backup, tag exports and deployment package. Check whether the deployment actually imported tag providers and UDT instances or restored only project resources. Do not assume project deployment included tags.
+
+5. Reconcile the equipment workbook and approved inventory against deployed equipment instances and screen entries. Report each equipment item as present, missing, disabled, filtered out, incorrectly bound or unresolved. Preserve room/provider/path discrepancies.
+
+6. Back up the current gateway and export current tags before changes. If authoritative tag/UDT/equipment configuration is available, restore only the missing required configuration through supported Ignition tools. Review import collision behavior first; preserve existing configuration and credentials. Do not blindly restore an entire gateway backup.
+
+7. Correct evidenced provider names, tag paths, equipment metadata, SQL inventory or screen-binding defects. Do not invent equipment mappings, assign guessed OPC addresses, enable new equipment communications or substitute simulated data as live data.
+
+8. Verify the expected equipment appears in the SCADA and batch equipment lists. Where live sources remain unavailable, show the application’s intended unavailable/bad-quality state rather than falsely showing healthy values.
+
+Deliver a concise root-cause report, before/after equipment counts, itemized changes, screenshots and remaining missing-source artifacts. State explicitly whether tags were omitted during migration, exist but are not bound correctly, or are being hidden by application logic.
