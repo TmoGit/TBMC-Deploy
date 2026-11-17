@@ -1,0 +1,5 @@
+Check the actual Desktop for TBMC-InfluxDB-Handoff\Ignition-InfluxDB-Connection-TEMP.txt and any protected handoff paths recorded in the DB continuation report. Do not display its contents.
+
+If found locally, use it for authenticated testing and Ignition configuration.
+
+If it exists only on DB server 10.1.0.132, identify that clearly. I will securely copy it to this server. If it was never created, give me the exact remaining DB-side step to create it using the existing initialized database and protected administrative credentials. Do not reinstall, reinitialize, or repeat network discovery.
