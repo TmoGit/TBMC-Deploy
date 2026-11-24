@@ -1,0 +1,2 @@
+Test-NetConnection 172.16.81.50 -Port 4842
+Test-NetConnection 172.16.81.50 -Port 4840
