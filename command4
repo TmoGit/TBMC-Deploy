@@ -1,0 +1,9 @@
+Get-ChildItem "C:\ProgramData\Cytiva" `
+-Recurse -File -ErrorAction SilentlyContinue |
+Where-Object {
+    $_.Extension -in '.log','.txt' -and
+    $_.LastWriteTime -gt (Get-Date).AddHours(-2)
+} |
+Select-String -Pattern `
+'Ignition_User|AccessDenied|IdentityToken|Authentication failed' |
+Select-Object Path,LineNumber,Line
