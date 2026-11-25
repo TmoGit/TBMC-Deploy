@@ -1,0 +1,109 @@
+# Commission 06A.1 — Enable MFCS Live SCADA Pilot
+
+**Project:** TmoGit/TBMC-Deploy  
+**Equipment:** BRX5-02-01  
+**OPC Source:** MFCS_OPCUA — U01  
+**Execution:** Authorized controlled commissioning test
+
+## 1. Objective
+
+Restore and enable live process data for BRX5-02-01 so Acropolis can visually verify the existing SCADA overview and equipment detail graphics using actual MFCS measurements.
+
+Preserve the FAT-approved application structure and existing visualization logic.
+
+## 2. Execution Instructions
+
+1. Inspect the Commission 06A rollback guard status and determine whether the previous live configuration was reverted.
+2. Retire the temporary `TBMC_COM06A_PilotGuard_0224` rollback project. Retain the manual rollback package.
+3. Verify that the Ignition trial is active and MFCS_OPCUA is connected with valid data quality.
+4. Restore the previously approved Commission 06A live configuration for BRX5-02-01 using the verified U01 OPC addresses.
+5. Enable the 12 previously verified process measurement tags.
+6. Enable the existing KeyCPP1, KeyCPP2 and KeyCPP3 references.
+7. Inspect the existing `EquipIsEnabled` member and enable equipment monitoring using its intended configuration mechanism.
+8. Verify that the existing equipment availability logic recognizes the live OPC source.
+9. Open the existing Plasmid-814 SCADA overview and BRX5-02-01 equipment detail screen.
+10. Verify that actual live process values appear on both screens.
+
+## 3. Live Parameters
+
+Restore the previously verified mappings for:
+
+- TEMP
+- pH
+- pO2
+- AFOAMT
+- BASET
+- SUBS_A
+- SUBS_B
+- SUBS_C
+- VWEIGHT
+- JTEMP
+- AIROV
+- STIRR
+
+The existing overview shall display:
+
+| Reference | Parameter |
+|---|---|
+| KeyCPP1 | pH |
+| KeyCPP2 | pO2 |
+| KeyCPP3 | TEMP |
+
+Leave CO2SP, AIRSP, N2SP and O2SP unchanged pending parameter reconciliation.
+
+## 4. Equipment Enablement
+
+Trace the existing logic responsible for the Unavailable / disabled indication.
+
+Enable the equipment through the existing UDT enablement mechanism where it represents an administrative monitoring enable.
+
+Do not force equipment running, active, batch-associated or communication-health indications.
+
+The existing graphics should reflect actual equipment conditions through their original logic.
+
+## 5. Restrictions
+
+- Do not modify parent UDT definitions.
+- Do not modify SCADA graphics or bindings.
+- Do not modify equipment hierarchy.
+- Do not modify alarm definitions or thresholds.
+- Do not modify color or image selection logic.
+- Do not enable equipment control.
+- Do not perform OPC process writes.
+- Do not modify other equipment instances.
+- Do not deploy another automatic rollback guard.
+- Do not automatically revert live tags to simulation upon communication loss or trial expiration.
+
+## 6. Acceptance Criteria
+
+- BRX5-02-01 monitoring is enabled.
+- All 12 previously verified process parameters receive live OPC data.
+- pH, pO2 and TEMP are visible on the existing overview graphic.
+- Live measurements are visible on the existing equipment detail screen.
+- Displayed values match direct OPC readings within existing display precision.
+- Equipment colors and status indicators operate through existing logic.
+- FAT-approved application structure remains unchanged.
+- No equipment control writes occur.
+
+## 7. Final Disposition
+
+Leave BRX5-02-01 enabled and configured for live OPC acquisition for Acropolis review.
+
+Do not revert the configuration at commission completion.
+
+If the Ignition trial expires or OPC communication is interrupted, retain the live addressing and allow the existing quality and availability logic to reflect the interruption.
+
+## 8. Deliverables
+
+Provide:
+
+- Root cause of the previous disabled indication.
+- Rollback guard retirement confirmation.
+- Before-and-after configuration differences.
+- Live OPC and UDT value comparison.
+- SCADA overview screenshot.
+- Equipment detail screenshot.
+- Final equipment enablement and data quality status.
+- Confirmation that the FAT-approved structure remains unchanged.
+
+Proceed with execution using the existing authorized BRX5-02-01 pilot scope. Do not request additional confirmation unless an operation exceeds this scope.
