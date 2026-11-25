@@ -1,0 +1,2 @@
+nltest /dsgetdc:tbmc.local
+Test-NetConnection tbmc.local -Port 636
