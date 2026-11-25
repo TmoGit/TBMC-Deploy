@@ -1,0 +1,431 @@
+I would make this a **TBMC OPC UA Data Source Verification and Parameter Mapping Commission**, rather than another general troubleshooting commission.
+
+The objective is to establish a verified data acquisition baseline for the currently connected MFCS and UNICORN equipment, using the customer-provided parameter lists already in the `TBMC-Deploy` project.
+
+We are not trying to validate every instrument at TBMC yet. We are trying to prove the complete data path for the equipment we can currently access.
+
+The commission should answer four questions:
+
+- Are the customer-requested parameters exposed through OPC UA?
+- What are their exact OPC NodeIds and browse paths?
+- Can Ignition successfully read and subscribe to those parameters with valid data quality?
+- Are there any missing parameters, incorrect addresses, or additional initialization requirements?
+
+# **Codex Commission — TBMC OPC UA Data Source Verification**
+
+# TBMC — OPC UA Data Source Verification and Parameter Mapping
+
+**Commission ID:** TBMC-COM-OPC-VERIFY-01\
+**Project:** TmoGit/TBMC-Deploy\
+**Organization:** Acropolis Engineers\
+**Execution type:** Diagnostic, data verification and mapping\
+**Target environment:** TBMC on-premises Ignition Gateway
+
+## 1. Objective
+
+Verify the availability, addressing, accessibility and data quality of the customer-requested process parameters for the currently connected MFCS and UNICORN equipment.
+
+Use the existing customer-provided parameter lists, equipment inventories, project configuration files and previous commissioning results already present in the TBMC-Deploy repository.
+
+Establish a verified OPC UA parameter mapping that can be used for subsequent Ignition tag development, historian configuration and SAT execution.
+
+## 2. Known Environment
+
+| Component              | Configuration                                   |
+| ---------------------- | ----------------------------------------------- |
+| Ignition Gateway       | 172.16.81.201:8088                              |
+| Ignition version       | 8.3.4                                           |
+| MFCS OPC connection    | MFCS_OPCUA                                      |
+| UNICORN OPC connection | Unicorn-2                                       |
+| UNICORN workstation    | 172.16.81.70                                    |
+| UNICORN version        | 7.12.0.2797                                     |
+| UNICORN OPC Server     | 1.3.0.798                                       |
+| UNICORN instrument     | Avant3119961                                    |
+| UNICORN endpoint       | opc.tcp\://172.16.81.70:60409/OPC/DAAndAEServer |
+
+The MFCS and UNICORN OPC UA sessions have been successfully established.
+
+UNICORN authentication was successful using the existing Default account. Authentication using the dedicated Ignition_User account remains unresolved.
+
+Do not extract, expose or commit credentials.
+
+## 3. Scope
+
+Limit testing to:
+
+- Equipment currently accessible through MFCS_OPCUA.
+- Equipment currently accessible through Unicorn-2.
+- Customer-requested parameters associated with those connected instruments.
+- Supporting OPC nodes required to establish equipment status and data availability.
+
+Do not expand the scope to other instruments, disabled OPC connections or equipment that has not yet been connected.
+
+## 4. Operating Restrictions
+
+This commission is primarily read-only.
+
+- Do not modify equipment process settings.
+- Do not execute chromatography methods.
+- Do not execute manual equipment instructions.
+- Do not acknowledge alarms.
+- Do not acquire instrument control.
+- Do not change UNICORN global password policies.
+- Do not modify certificates, credentials, firewall settings or licenses.
+- Do not restart Windows services or the Ignition Gateway.
+- Do not interrupt the working MFCS connection.
+- Do not modify existing production Ignition tags.
+- Do not install additional software without authorization.
+
+Any operation required to initialize instrument monitoring that involves an OPC write or method call must be identified, documented and separately authorized before execution.
+
+## 5. Task A — Locate Customer Parameter Requirements
+
+Search the existing repository for:
+
+- Customer-provided parameter lists.
+- Equipment-specific parameter spreadsheets.
+- Existing OPC addressing information.
+- Ignition tag definitions.
+- Equipment inventory and accepted equipment lists.
+- Previous FAT and SAT results.
+- Existing data source configuration.
+- Historical database mapping files.
+
+Identify the authoritative source files and retain their filenames, revision information, worksheet names and applicable row references.
+
+Extract only the requirements associated with the currently connected MFCS and UNICORN equipment.
+
+Do not silently resolve conflicting requirements. Report discrepancies between source documents.
+
+## 6. Task B — Verify OPC Connectivity
+
+For each in-scope connection, capture:
+
+- Connection name.
+- Connection status.
+- Discovery URL.
+- Endpoint URL.
+- Security policy.
+- Security mode.
+- Authentication type, without credentials.
+- Connection uptime.
+- Available namespaces.
+- Discovered instrument identifiers.
+
+Record the current gateway trial or licensing state and identify whether it affects testing.
+
+## 7. Task C — Discover Available OPC Parameters
+
+Browse the relevant OPC UA address spaces through the existing Ignition connections.
+
+Use supported Ignition scripting interfaces or available authenticated diagnostic interfaces.
+
+For each relevant data-bearing node, capture:
+
+- OPC connection name.
+- Instrument identifier.
+- Display name.
+- Browse name.
+- Complete hierarchical browse path.
+- Exact OPC NodeId.
+- Namespace URI.
+- Namespace index.
+- Data type.
+- Access level.
+- Engineering units, if exposed.
+- Description, if exposed.
+- Current value.
+- OPC status code.
+- Source timestamp.
+- Server timestamp, if available.
+
+Prefer namespace URI-based addressing where supported to avoid dependencies on changing namespace indexes.
+
+Exclude unrelated methods, commands and configuration objects from the primary process parameter inventory.
+
+Retain relevant diagnostic and instrument status nodes in a separate inventory.
+
+## 8. Task D — UNICORN Instrument Initialization Assessment
+
+The UNICORN OPC UA session is established, and the address space is browsable.
+
+The following diagnostic values have been observed:
+
+| Parameter                  | Observed value |
+| -------------------------- | -------------- |
+| AssignState                | 2 — None       |
+| InstrumentStatus           | 2 — Unknown    |
+| InstrumentStatusConnection | 0 — Yes        |
+| RunState                   | No data        |
+| UserInControl              | No data        |
+| ConnectSystemTag           | 0 — Good       |
+
+Most instrument state tags currently report Good_NoData.
+
+Consult the UNICORN OPC Server 1.3 User Manual, document 29752660 AA:
+
+- Section 2.5 — OPC UA client connectivity.
+- Section 2.7.1, page 29 — ConnectSystem method.
+- Section 4.5.1, page 68 — AssignState.
+- Section 4.5.4, page 74 — InstrumentStatus.
+- Section 4.5.5, page 76 — InstrumentStatusConnection.
+
+Determine whether the OPC client requires an explicit instrument connection before process data becomes available.
+
+Discover and document:
+
+- ConnectSystem parent ObjectId.
+- ConnectSystem MethodId.
+- Method input and output arguments.
+- ConnectSystemTag NodeId.
+- ConnectSystemTag data type and access level.
+- AssignState NodeId.
+- Disconnect method and tag identifiers.
+- Available process data nodes.
+
+Verify the supported Ignition 8.3 mechanism for invoking the connection method.
+
+The required instrument assignment is View mode, represented by AssignState = 0.
+
+Do not set AssignState = 1.
+
+Do not assume the ConnectSystemTag trigger value.
+
+Do not execute initialization methods or writes without separate authorization. If initialization is required, produce an exact follow-on execution procedure that establishes View mode without taking control of the instrument.
+
+## 9. Task E — Customer Parameter Mapping
+
+Compare every in-scope customer-requested parameter against the discovered OPC address space.
+
+Evaluate mappings in the following order:
+
+1. Exact NodeId or customer-specified address match.
+2. Exact browse path match.
+3. Exact parameter name match within the correct instrument.
+4. Normalized parameter name match.
+5. Engineering unit, description and equipment context match.
+
+Do not treat a fuzzy name match as a verified mapping without supporting evidence.
+
+Classify each parameter as one of the following:
+
+- VERIFIED_LIVE
+- VERIFIED_ADDRESS_NO_DATA
+- ADDRESS_CORRECTION_REQUIRED
+- CANDIDATE_MATCH
+- AMBIGUOUS_MATCH
+- NOT_EXPOSED
+- ACCESS_DENIED
+- INITIALIZATION_REQUIRED
+- NOT_TESTED
+
+Preserve the original customer parameter naming and addressing alongside the discovered OPC information.
+
+## 10. Task F — Live Data Verification
+
+For all matched, readable parameters:
+
+- Perform an initial read.
+- Where practical, establish a temporary read-only subscription.
+- Observe the values and timestamps over a bounded monitoring period of approximately 60 to 120 seconds.
+- Record initial and final data quality.
+- Identify null values, stale values and unsupported data types.
+- Determine whether each parameter is available during the current instrument operating state.
+
+Distinguish between:
+
+- Valid data with Good quality.
+- Good_NoData.
+- Bad quality.
+- Uncertain quality.
+- Valid but unchanged process values.
+- Parameters available only during an active run.
+- Parameters dependent on instrument initialization.
+
+Do not classify a static process value as failed solely because it does not change during the observation period.
+
+Do not initiate a process run to generate test data.
+
+## 11. Task G — Existing Project Mapping Comparison
+
+Compare the verified OPC addresses against existing project tag definitions and data acquisition configurations.
+
+Identify:
+
+- Incorrect NodeIds.
+- Incorrect OPC connection references.
+- Incorrect equipment associations.
+- Missing customer parameters.
+- Duplicate mappings.
+- Incorrect or incompatible data types.
+- Engineering unit discrepancies.
+- Existing placeholder addresses.
+- Parameters mapped to unavailable equipment.
+
+Where available, trace each verified parameter through the existing project configuration to its intended historian measurement or field.
+
+Do not modify the existing configuration during this commission.
+
+Generate a proposed corrected mapping for review.
+
+## 12. Required Deliverables
+
+Create the following deliverables under:
+
+artifacts/opc-verification/
+
+### OPC_Verification_Report.md
+
+Include:
+
+- Executive summary.
+- Equipment tested.
+- Source documents reviewed.
+- Connectivity results.
+- Address space discovery results.
+- Parameter coverage.
+- Live data verification results.
+- UNICORN initialization assessment.
+- Outstanding deficiencies.
+- Recommended corrective actions.
+- SAT readiness assessment.
+
+### Customer_Parameter_Mapping.csv
+
+Include at minimum:
+
+- Equipment
+- OPC connection
+- Customer parameter name
+- Customer parameter ID
+- Customer-specified address
+- Customer engineering units
+- Discovered parameter name
+- Verified OPC NodeId
+- Verified OPC browse path
+- Namespace URI
+- OPC data type
+- OPC engineering units
+- Current value
+- Data quality
+- Source timestamp
+- Mapping classification
+- Match confidence
+- Existing project tag path
+- Recommended corrected address
+- Historian destination, if available
+- Required corrective action
+- Source document
+- Source worksheet and row
+- Notes
+
+### OPC_Discovered_Nodes.json
+
+Machine-readable inventory of the relevant discovered OPC nodes.
+
+### OPC_Live_Data_Evidence.csv
+
+Timestamped evidence of parameter reads and subscription results.
+
+### OPC_Mapping_Deficiencies.csv
+
+Include deficiency ID, equipment, parameter, expected behavior, actual behavior, recommended corrective action and SAT impact.
+
+### UNICORN_Initialization_Assessment.md
+
+Document the supported procedure for establishing instrument monitoring in View mode, including actual discovered NodeIds and any prerequisite Ignition configuration.
+
+Clearly distinguish verified behavior from assumptions.
+
+### Proposed_Ignition_Tag_Mapping.json
+
+Generate a proposed, non-deployed Ignition-compatible parameter mapping using verified addresses and data types.
+
+Mark unresolved mappings and exclude them from any import-ready production configuration.
+
+## 13. Completion Criteria
+
+The commission is complete when:
+
+- All customer parameters associated with currently connected equipment have been evaluated.
+- Exact OPC addressing is recorded for all verified matches.
+- Live data availability and quality are documented.
+- Existing project addressing is compared against discovered addressing.
+- Missing, ambiguous and unavailable parameters are explicitly identified.
+- UNICORN instrument initialization requirements are documented.
+- No equipment control or unauthorized configuration changes have occurred.
+
+Calculate parameter coverage separately for each instrument and connection.
+
+Report address coverage and live data coverage independently.
+
+If access limitations prevent full execution, preserve all completed results and explicitly identify the remaining blockers.
+
+## 14. Final Execution Summary
+
+Return the following:
+
+- Customer parameter source files identified.
+- Equipment tested.
+- Total customer-requested parameters.
+- Total OPC nodes discovered.
+- Verified parameter mappings.
+- Parameters returning valid live data.
+- Parameters returning Good_NoData.
+- Parameters requiring address correction.
+- Missing or ambiguous parameters.
+- UNICORN initialization requirements.
+- Files generated.
+- Recommended next commission.
+
+Do not report SAT readiness based solely on successful OPC connectivity or address space browsing.
+
+## **Expected data flow**
+
+**MFCS OPC UA**
+
+Connected equipment only
+
+**UNICORN OPC UA**
+
+Avant3119961
+
+**Ignition Gateway**
+
+Browse · Read · Subscribe · Capture quality
+
+**Customer parameter list**
+
+Expected data
+
+**Discovered OPC nodes**
+
+Actual data
+
+**Parameter reconciliation**
+
+Address · Data type · Units · Quality · Coverage
+
+**Verified Ignition tag mapping**
+
+Prepared for subsequent deployment and historian integration
+
+## **What I want to see in the results**
+
+The primary deliverable is the parameter reconciliation matrix, something like this:
+
+Illustrative results only — actual values will come from the commission.
+
+| Customer parameter | Source  | OPC address | Quality | Mapping                 |
+| ------------------ | ------- | ----------- | ------- | ----------------------- |
+| pH                 | MFCS    | Discovered  | Good    | Verified                |
+| Temperature        | MFCS    | Discovered  | Good    | Verified                |
+| Conductivity       | UNICORN | Discovered  | No data | Initialization required |
+| UV absorbance      | UNICORN | Discovered  | No data | Initialization required |
+| Flow rate          | UNICORN | Pending     | Pending | Unverified              |
+
+**I would run this commission directly on the TBMC commissioning workstation.** It deliberately discovers the actual customer parameter files from the repository instead of assuming their filenames or contents.
+
+I have also kept UNICORN initialization writes outside the authorized scope for now. Codex should discover the exact supported mechanism and report whether it is necessary.
+
+This will give us an authoritative data source inventory for the connected equipment and a foundation for the subsequent Ignition tag deployment, InfluxDB integration and SAT execution, without expanding the commissioning scope prematurely.
