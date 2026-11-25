@@ -1,0 +1,517 @@
+# TBMC — Commission 06B: Room 815 UNICORN Live OPC Integration
+
+**Project:** TmoGit/TBMC-Deploy  
+**Organization:** Acropolis Engineers  
+**Target area:** Gene Therapy — Room 815  
+**Target equipment:** AVA25 — existing ÄKTA avant 25 instance, subject to identity verification  
+**OPC connection:** Unicorn-2  
+**Predecessors:** Commission 06A, 06A.1 and 06A.2  
+**Design authority:** Existing FAT-approved Ignition application  
+**Final disposition:** Leave successfully integrated equipment enabled for live monitoring
+
+## 1. Objective
+
+Establish live process data acquisition from the connected UNICORN chromatography instrument in Room 815.
+
+Integrate verified OPC measurements into the existing deployed chromatography UDT using the same instance-level configuration methodology successfully demonstrated on both MFCS BIOSTAT Twin bioreactors.
+
+Demonstrate the complete data path:
+
+ÄKTA instrument → UNICORN OPC Server → Ignition → Existing AVANT_CHROM_SKID UDT → Existing SCADA graphics.
+
+Preserve the FAT-approved application structure.
+
+## 2. Known Environment
+
+| Component | Configuration |
+|---|---|
+| Ignition Gateway | 172.16.81.201:8088 |
+| Ignition version | 8.3.4 |
+| UNICORN workstation | 172.16.81.70 |
+| Workstation hostname | 815-AVANT25-01 |
+| UNICORN version | 7.12.0.2797 |
+| UNICORN OPC Server | 1.3.0.798 |
+| OPC connection | Unicorn-2 |
+| Instrument identifier | Avant3119961 |
+| Authentication context | Default |
+| OPC endpoint | opc.tcp://172.16.81.70:60409/OPC/DAAndAEServer |
+| Expected UDT definition | AVANT_CHROM_SKID |
+| Target process area | Gene Therapy — 815 |
+
+Expected existing equipment tag path:
+
+`[default]TBMC-SCADA/TW-LAB01/Gene_Therapy-815/DOWNSTREAM/CHROMATOGRAPHY/AVA25`
+
+Verify the exact deployed tag path before making changes.
+
+The workstation hostname provides supporting evidence for the Room 815 AVA25 association. Verify against the discovered instrument identity and available customer inventory.
+
+Do not modify either AVA25 or AVA150 in Plasmid-814.
+
+## 3. Reference Previous Results
+
+Locate and review:
+
+- Previous OPC verification commission results.
+- Customer_Parameter_Mapping.csv.
+- OPC_Discovered_Nodes.json.
+- OPC_Live_Data_Evidence.csv.
+- UNICORN_Initialization_Assessment.md.
+- Commission 06A UNICORN integration change plan.
+- Commission 06A.1 equipment enablement procedure.
+- Commission 06A.2 final configuration.
+- UNICORN OPC Server 1.3 User Manual, 29752660 AA.
+- UNICORN 7.12 Administration and Technical Manual, 29800665 AA.
+
+Use the existing repository artifacts rather than assuming filenames or configuration details that cannot be verified.
+
+## 4. FAT Baseline Preservation
+
+Preserve the existing:
+
+- Parent UDT definitions and inheritance.
+- Equipment hierarchy.
+- Equipment instance paths.
+- Process tag names and data types.
+- Alarm definitions and thresholds.
+- Equipment status expressions.
+- KeyCPP assignments.
+- Engineering units.
+- Equipment images and colors.
+- SCADA views, navigation and bindings.
+- Historical data configuration.
+- Security configuration.
+- Existing MFCS live integrations.
+
+Capture a fresh baseline before making changes.
+
+Export the existing Room 815 chromatography instance, including inherited properties and existing instance-level overrides.
+
+Prepare a targeted manual rollback package.
+
+Do not deploy new UDT definitions, additional equipment folders, new SCADA views or automatic rollback projects.
+
+## 5. Phase A — Verify Current UNICORN OPC Connectivity
+
+Confirm Unicorn-2 is authenticated and connected.
+
+Browse Avant3119961 and capture current values, exact quality codes and timestamps for:
+
+- AssignState.
+- InstrumentStatus.
+- InstrumentStatusConnection.
+- RunState.
+- UserInControl.
+- ConnectSystemTag.
+
+Previous observations:
+
+| Tag | Previous value | Interpretation |
+|---|---|---|
+| AssignState | 2 | None |
+| InstrumentStatus | 2 | Unknown |
+| InstrumentStatusConnection | 0 | Yes |
+| RunState | Empty | No valid data |
+| UserInControl | Empty | No valid data |
+| ConnectSystemTag | 0 | None |
+
+Most instrument state tags previously returned Good_NoData.
+
+Do not interpret these values as confirmed instrument operating conditions unless valid data quality is established.
+
+If the instrument is already assigned in View mode with valid data, do not repeat initialization unnecessarily.
+
+Do not modify the existing working authentication configuration.
+
+## 6. Phase B — Establish View-Only Instrument Monitoring
+
+The UNICORN OPC UA session has previously been established successfully, but instrument-level monitoring was not initialized.
+
+Review Section 2.7.1, page 29, of the UNICORN OPC Server 1.3 User Manual.
+
+The documented instrument connection method is ConnectSystem.
+
+Previous discovery identified the following candidate NodeIds:
+
+**ConnectSystem parent ObjectId:**
+
+`nsu=http://opcfoundation.org/OPC/DataAccess;s=1:Avant3119961?ConnectSystem?Default`
+
+**ConnectSystem MethodId:**
+
+`nsu=http://opcfoundation.org/OPC/DataAccess;s=1:Avant3119961?ConnectSystem?Default\ConnectSystem`
+
+**ConnectSystemTag:**
+
+`nsu=http://opcfoundation.org/OPC/DataAccess;s=1:Avant3119961?ConnectSystemTag?Default\ConnectSystemTag`
+
+Previous OPC metadata discovery identified the ConnectSystemTag enumeration:
+
+- 0 = None
+- 1 = ConnectSystem
+
+AssignState enumeration:
+
+- 0 = View
+- 1 = Control
+- 2 = None
+- 3 = Disconnected
+
+These are different enumerations and must not be confused.
+
+### Initialization requirements
+
+Before executing an instrument connection operation:
+
+1. Verify the actual method and argument metadata.
+2. Confirm the documented initial View-mode behavior.
+3. Confirm TBMC authorization for instrument monitoring.
+4. Confirm the operation will not interrupt an existing operator or acquire instrument control.
+5. Establish the supported disconnect or recovery procedure.
+6. Verify the existing Ignition read-only protections.
+
+Prefer the documented ConnectSystem method using the supported Ignition OPC UA method-call interface.
+
+Use the existing authenticated OPC session where supported.
+
+Resolve namespace indexes dynamically where required.
+
+If the current read-only connection prevents the initialization method, report the exact restriction and obtain approval for any narrowly scoped temporary change.
+
+Do not automatically enable unrestricted OPC writes.
+
+Do not automatically fall back to writing ConnectSystemTag.
+
+If the safe View-only initialization sequence cannot be established, stop before execution and report the blocker.
+
+### Post-initialization verification
+
+Following authorized initialization:
+
+- Verify AssignState = 0 with valid quality.
+- Verify actual instrument status.
+- Verify RunState.
+- Verify that instrument control was not acquired.
+- Verify that no process instruction was executed.
+- Verify that no process setting changed.
+
+Do not set AssignState to 1.
+
+Do not start or stop a method or manual run.
+
+## 7. Phase C — Discover and Verify Process Data
+
+Browse the instrument address space following successful View-mode initialization.
+
+Compare the current nodes against the previous discovery inventory.
+
+Evaluate the six existing chromatography process parameters:
+
+| Existing UDT Member | OPC Candidate |
+|---|---|
+| pH | RunData/pH |
+| Conductivity | RunData/Cond |
+| Flow Rate | RunData/System flow |
+| UV Absorbance | RunData/UV 1, UV 2 or UV 3 |
+| Pressure | RunData/System pressure |
+| Gradient | RunData/Conc B |
+
+The listed addresses are candidates and require verification.
+
+For each parameter, capture:
+
+- Exact NodeId.
+- Complete browse path.
+- Current value.
+- OPC data type.
+- Engineering units.
+- Exact quality code.
+- Timestamp.
+- Current instrument operating state.
+- Parameter semantics.
+- Existing UDT member path.
+
+Monitor the values for at least 60–120 seconds.
+
+Do not classify Good_NoData as valid live data.
+
+Do not treat sentinel values as actual process measurements.
+
+Determine whether valid scalar measurements become available following View-mode initialization while the instrument is idle.
+
+If valid measurements require an active method or manual run, document the limitation and prepare a follow-on observation during a TBMC-operated run.
+
+Do not initiate equipment operation to generate data.
+
+## 8. Phase D — Engineering Unit and Parameter Reconciliation
+
+Compare the actual OPC measurements against the existing customer parameter list and deployed UDT configuration.
+
+Pay particular attention to:
+
+| Parameter | Required verification |
+|---|---|
+| pH | Correct measurement and valid quality |
+| Conductivity | Source and display units |
+| Flow Rate | Source ml/min versus existing lpm |
+| UV Absorbance | Correct UV channel |
+| Pressure | System pressure versus other pressure channels; units |
+| Gradient | Confirm required buffer composition measurement |
+
+For Flow Rate, the anticipated conversion is:
+
+lpm = ml/min ÷ 1000
+
+Use an existing supported instance-level conversion mechanism only if verified and approved.
+
+Do not change the existing SCADA engineering units or graphical bindings.
+
+Do not arbitrarily select a UV channel.
+
+Do not substitute conductivity percentage for buffer concentration.
+
+Leave unresolved parameters unchanged.
+
+## 9. Phase E — Integrate Existing UDT Members
+
+Use the existing Room 815 AVANT_CHROM_SKID instance.
+
+Apply the successful Commission 06A and 06A.2 integration methodology.
+
+Modify only required instance-level properties:
+
+- opcServer.
+- opcItemPath.
+- valueSource, where required.
+- enabled.
+- Existing supported scaling properties, if approved.
+- Existing KeyCPP reference enablement.
+
+Preserve all other properties.
+
+Use native supported Ignition configuration merge operations.
+
+Do not replace the equipment instance.
+
+Do not modify the parent AVANT_CHROM_SKID definition.
+
+Verify whether Flow Rate is currently a memory tag before converting it to OPC.
+
+Ensure simulation writers cannot overwrite transitioned live values.
+
+Initially integrate the parameters that have verified addresses, compatible units, confirmed semantics and valid live quality.
+
+Prioritize the existing overview parameters where possible:
+
+- Conductivity.
+- Flow Rate.
+- Pressure.
+
+Expand to the other eligible parameters after successful initial verification.
+
+Do not deploy invalid or unverified process data as live measurements.
+
+## 10. Phase F — Enable Existing Equipment Monitoring
+
+Replicate the successful Commission 06A.1 equipment enablement procedure.
+
+For the Room 815 AVA25 instance:
+
+- Set EquipIsEnabled = 1 through the existing administrative monitoring enablement mechanism.
+- Enable verified live process measurement members.
+- Enable applicable existing KeyCPP references.
+- Disable simulation for transitioned process measurements.
+- Preserve existing KeyCPP assignments.
+- Preserve existing status calculations.
+
+Do not artificially force:
+
+- EquipIsActive.
+- EquipInUse.
+- EquipBatchAquired.
+- Instrument running status.
+- Communication health.
+- Alarm states.
+- Equipment colors.
+
+Allow the existing application logic to determine actual equipment status.
+
+Do not represent mixed simulated and live measurements as fully verified live data.
+
+## 11. Phase G — End-to-End SCADA Verification
+
+Open the existing Gene Therapy — 815 SCADA overview.
+
+Locate the Room 815 AVA25 equipment graphic.
+
+Verify:
+
+- Existing equipment image renders correctly.
+- Equipment remains in its original location.
+- Existing KeyCPP displays receive actual live measurements.
+- Source quality indication reflects actual data quality.
+- Equipment monitoring is enabled.
+- Existing equipment navigation remains functional.
+
+Open the existing AVA25 detail popup.
+
+Verify:
+
+- Live process measurements.
+- Existing process gauges.
+- Existing units.
+- Existing simulation indicators.
+- Existing alarm and status bindings.
+- Existing equipment image.
+
+Compare direct OPC readings against UDT values and displayed SCADA values.
+
+Capture before-and-after screenshots.
+
+Confirm that BRX5-02-01 and BRX5-02-02 remain enabled and live in Plasmid-814.
+
+Do not modify their configuration.
+
+## 12. Phase H — Configuration Preservation
+
+Generate a property-level before-and-after comparison.
+
+Verify that:
+
+- Parent UDT definitions are unchanged.
+- Equipment hierarchy is unchanged.
+- SCADA project resources are unchanged.
+- Alarm definitions are unchanged.
+- Status logic is unchanged.
+- Existing KeyCPP assignments are unchanged.
+- Images and color logic are unchanged.
+- Historical configuration is unchanged.
+- Both MFCS Twin integrations are unchanged.
+- All unrelated chromatography instances are unchanged.
+
+Only explicitly authorized Room 815 instance-level source and enablement properties may differ.
+
+Report all configuration differences.
+
+## 13. Mandatory Final Equipment Disposition
+
+Following successful integration:
+
+- Leave the Room 815 AVA25 monitoring instance enabled.
+- Leave EquipIsEnabled = 1.
+- Leave verified process members configured for live OPC acquisition.
+- Leave the applicable existing KeyCPP references enabled.
+- Leave simulation disabled for transitioned measurements.
+- Maintain the confirmed View-only instrument assignment.
+- Restore any temporarily modified read-only protections.
+- Leave both MFCS Twin bioreactors enabled and live.
+
+Do not revert successfully integrated equipment to simulation at commission completion.
+
+Do not deploy an automatic rollback guard.
+
+Trial expiration or temporary communications loss must not remove configured live OPC addresses or administrative enablement.
+
+Allow existing data quality and availability logic to indicate communications failures.
+
+Do not automatically deploy a ConnectSystem retry script or permanent instrument reconnection mechanism.
+
+Document the instrument session lifecycle requirements for a subsequent production-hardening commission.
+
+If valid live data cannot be established, do not report the integration as passed. Preserve the existing SCADA configuration and report the remaining initialization or run-state blocker.
+
+## 14. Operating Restrictions
+
+Prohibited operations:
+
+- Acquiring instrument control.
+- Starting or stopping chromatography runs.
+- Executing process instructions.
+- Modifying process setpoints.
+- Acknowledging alarms.
+- Unauthorized OPC writes.
+- Changing UNICORN authentication.
+- Changing global password policies.
+- Modifying certificates or licenses.
+- Restarting equipment services or the Ignition Gateway.
+- Modifying parent UDT definitions.
+- Modifying SCADA bindings.
+- Modifying unrelated equipment.
+- Deploying automatic rollback or reconnect projects.
+
+The only instrument-level operation potentially permitted is the specifically authorized and verified View-only connection procedure.
+
+## 15. Required Deliverables
+
+Create a timestamped results package under:
+
+`artifacts/controlled-unicorn-integration-06B/`
+
+Include:
+
+- 01_Baseline_Configuration/
+- 02_Instrument_Identity_Verification.md
+- 03_View_Mode_Initialization_Evidence.json
+- 04_UNICORN_OPC_Verification.csv
+- 05_Run_State_Data_Availability.csv
+- 06_Customer_Parameter_Mapping.csv
+- 07_Approved_Change_Set.json
+- 08_End_to_End_Verification.csv
+- 09_Configuration_Diff.json
+- 10_SCADA_Evidence/
+- 11_Rollback/
+- 12_Final_Equipment_Status.json
+- 13_Commission_06B_Report.md
+
+Capture screenshots of:
+
+1. Gene Therapy — 815 overview before integration.
+2. UNICORN instrument assignment and OPC data quality.
+3. Gene Therapy — 815 overview after successful integration.
+4. AVA25 equipment detail popup.
+5. Final equipment enablement status.
+6. Existing Plasmid-814 overview showing both MFCS Twin vessels remain live.
+
+Package all deliverables into a timestamped ZIP archive.
+
+Do not include credentials, private keys or secret-bearing configuration exports.
+
+## 16. Acceptance Criteria
+
+| ID | Acceptance Criterion |
+|---|---|
+| AC-01 | Room 815 instrument identity and SCADA association verified |
+| AC-02 | Existing UNICORN OPC UA connection verified |
+| AC-03 | Instrument monitoring established in confirmed View mode |
+| AC-04 | No instrument control or process commands executed |
+| AC-05 | Six customer parameters evaluated |
+| AC-06 | Valid live process measurements established |
+| AC-07 | Eligible existing UDT members transitioned to OPC |
+| AC-08 | Existing overview displays matching live values |
+| AC-09 | Existing detail popup displays matching live values |
+| AC-10 | Equipment monitoring enabled |
+| AC-11 | FAT-approved hierarchy and UDT definitions preserved |
+| AC-12 | Existing MFCS integrations preserved |
+| AC-13 | No unauthorized configuration changes |
+| AC-14 | Targeted rollback package available |
+| AC-15 | Successfully integrated equipment left enabled |
+
+Report each criterion independently as PASS, FAIL, BLOCKED or NOT TESTED.
+
+Do not report successful OPC authentication or address space browsing as successful end-to-end live integration.
+
+## 17. Final Execution Instruction
+
+Proceed with the Room 815 UNICORN commissioning scope.
+
+Use the existing authenticated Unicorn-2 connection and the existing Room 815 chromatography UDT.
+
+Complete all read-only discovery and configuration assessment activities without redundant confirmation.
+
+Observe the authorization gate for instrument-level View initialization.
+
+Preserve the FAT-approved application and both successful MFCS integrations.
+
+Leave successfully integrated chromatography measurements live and equipment monitoring enabled at completion.
+
+If an active customer-operated run is required to obtain valid process data, document the exact remaining work and preserve the evidence for the next commissioning session.
