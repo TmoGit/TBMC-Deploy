@@ -1,0 +1,118 @@
+# TBMC — Commission 06B.1: UNICORN View Initialization and Live Integration
+
+**Project:** TmoGit/TBMC-Deploy  
+**Predecessor:** Commission 06B  
+**Target:** Room 815 AVA25  
+**Execution:** Controlled continuation of Commission 06B
+
+## Objective
+
+Resume Commission 06B from the documented initialization blocker. Do not repeat completed discovery and baseline assessment unnecessarily.
+
+Use the results contained in:
+
+TBMC-COM06B-UNICORN-20261126-0512-Review.zip
+
+## 1. Resolve Equipment Association
+
+Confirm the following association with TBMC:
+
+- Workstation: 815-AVANT25-01
+- Current IP: 172.16.81.70
+- UNICORN instrument: Avant3119961
+- OPC connection: Unicorn-2
+- SCADA area: Gene Therapy-815
+- SCADA equipment: AVA25
+
+Document the discrepancy between the current workstation IP and the customer equipment inventory.
+
+Do not modify the equipment inventory without approval.
+
+## 2. Instrument Monitoring Authorization
+
+Confirm that TBMC has authorized the documented View-only instrument connection.
+
+Confirm that no conflicting OPC clients are connected to the instrument, including any previously used Matrikon UA Explorer sessions.
+
+Observe the shared-session and disconnect restrictions documented on page 39 of the UNICORN OPC Server 1.3 manual.
+
+Do not interrupt existing operator activities.
+
+## 3. View Initialization
+
+Use the previously discovered ConnectSystem method through the existing Ignition OPC session.
+
+Reverify current method metadata, namespace resolution and authorization before invocation.
+
+Follow the documented manufacturer procedure.
+
+Do not acquire Control assignment.
+
+Do not execute process instructions or start a chromatography run.
+
+Do not weaken existing read-only protections without specific approval.
+
+Verify the resulting AssignState, instrument status, run state and actual OPC quality.
+
+Stop if View-only monitoring cannot be established safely.
+
+## 4. Live Data Verification
+
+Following successful View initialization, re-evaluate all six customer parameters.
+
+Capture exact OPC quality codes and timestamps.
+
+Determine whether valid measurements are available while the instrument is idle.
+
+Reject Good_NoData and invalid placeholder values.
+
+If an active run is required, arrange observation during an approved TBMC-operated run. Do not initiate one through Ignition.
+
+## 5. Controlled UDT Integration
+
+Resume the existing Commission 06B integration procedure for eligible parameters.
+
+Prioritize:
+
+- Conductivity.
+- Pressure.
+- pH.
+
+Implement Flow Rate conversion only using a verified and approved instance-level scaling mechanism.
+
+Leave unresolved UV and Gradient mappings unchanged.
+
+Preserve all FAT-approved UDT definitions, hierarchy, graphical bindings, alarms, status logic, colors and images.
+
+Enable the existing process members and applicable KeyCPP references.
+
+## 6. Final Disposition
+
+Leave successfully verified live measurements enabled and configured for OPC acquisition.
+
+Retain EquipIsEnabled = 1.
+
+Leave both MFCS Twin vessels enabled and unchanged.
+
+Do not deploy an automatic rollback guard or reconnect script.
+
+Do not substitute simulated measurements following communication loss.
+
+If live measurements remain unavailable, preserve the existing chromatography configuration and report the exact remaining blocker.
+
+## 7. Evidence
+
+Generate a timestamped results package containing:
+
+- Equipment association confirmation.
+- Operator authorization.
+- View initialization results.
+- Before-and-after OPC quality.
+- Updated parameter mapping.
+- Configuration change set.
+- End-to-end SCADA verification.
+- Existing UDT and project preservation evidence.
+- Final equipment disposition.
+- Updated Commission 06B acceptance criteria.
+
+Do not report successful live integration unless actual measurements are verified on the existing SCADA graphics.
