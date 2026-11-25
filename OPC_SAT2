@@ -1,0 +1,485 @@
+# TBMC — Controlled Live OPC Data Integration and End-to-End SCADA Verification
+
+**Commission ID:** TBMC-COM-06A  
+**Project:** TmoGit/TBMC-Deploy  
+**Organization:** Acropolis Engineers  
+**Execution type:** Controlled configuration change and commissioning verification  
+**Design baseline:** Existing FAT-approved Ignition application
+
+## 1. Objective
+
+Demonstrate end-to-end acquisition of live equipment data through the existing deployed Ignition equipment UDTs and FAT-approved SCADA application.
+
+Transition selected simulated process measurement tags to verified live OPC UA data sources without changing the existing application structure, equipment hierarchy, alarm definitions, status logic or visualization configuration.
+
+The existing UDTs and SCADA design shall remain authoritative.
+
+This commission is not a UDT redesign, application refactoring or full equipment deployment exercise.
+
+## 2. Existing Environment
+
+- Ignition Gateway: 172.16.81.201:8088
+- Ignition version: 8.3.4
+- MFCS OPC connection: MFCS_OPCUA
+- UNICORN OPC connection: Unicorn-2
+- Verified MFCS instrument candidates: U01 and U02
+- UNICORN instrument: Avant3119961
+
+Use the results of the previous OPC verification commission, including:
+
+- Customer_Parameter_Mapping.csv
+- OPC_Discovered_Nodes.json
+- OPC_Live_Data_Evidence.csv
+- Proposed_Ignition_Tag_Mapping.json
+- OPC_Mapping_Deficiencies.csv
+- UNICORN_Initialization_Assessment.md
+
+Locate the actual files in the project repository or previous commissioning artifacts.
+
+Treat proposed tag mappings as reference information only. Do not directly import them over existing UDT configurations.
+
+## 3. Mandatory Design Preservation Requirements
+
+Preserve the existing:
+
+- Tag provider names.
+- Equipment folder hierarchy.
+- UDT definition names.
+- UDT member names.
+- UDT inheritance relationships.
+- UDT instance paths.
+- Equipment identifiers.
+- Tag data types.
+- Alarm definitions and thresholds.
+- Alarm notification configuration.
+- Equipment status expressions.
+- Equipment availability logic.
+- Color and image configurations.
+- Perspective and Vision bindings, as applicable.
+- SCADA navigation.
+- Historical data configuration.
+- Security permissions.
+- Existing scripts and calculation logic.
+
+Do not replace, rename, relocate or recreate any existing UDT instance.
+
+Do not modify parent UDT definitions during the initial controlled live test.
+
+Do not deploy a new equipment hierarchy.
+
+## 4. Phase A — FAT Baseline Capture
+
+Before making changes:
+
+1. Identify the currently deployed Ignition project and tag providers.
+2. Export the existing UDT definitions.
+3. Export the selected equipment instance and its complete effective configuration.
+4. Capture relevant project resources and equipment screen bindings.
+5. Identify inherited properties and existing instance-level overrides.
+6. Capture current simulated tag values, quality and timestamps.
+7. Capture current equipment status, alarms and visualization state.
+8. Record historian settings and existing data destinations.
+9. Record the gateway licensing or trial state.
+10. Generate a timestamped baseline manifest with configuration hashes.
+
+Use supported Ignition interfaces for configuration exports and changes.
+
+Prepare and verify a targeted rollback procedure before implementing any live data source changes.
+
+Do not rely solely on a complete gateway restore as the rollback mechanism.
+
+## 5. Phase B — Existing UDT Architecture Review
+
+Inspect the actual deployed UDT definitions and equipment instances.
+
+Determine how the application currently implements:
+
+- Simulated process measurements.
+- Memory tags.
+- Expression tags.
+- OPC tags.
+- Reference and derived tags.
+- Equipment communication status.
+- Equipment operating state.
+- Alarm evaluation.
+- Equipment image and color selection.
+- Historical data collection.
+- Simulation enable or disable mechanisms.
+
+Trace simulated values back to their actual source.
+
+Identify any gateway scripts, timer scripts, tag events, device simulators or other mechanisms that write simulated values into the equipment tags.
+
+Do not allow a simulation writer to continue writing into a tag after transitioning that tag to a live OPC source.
+
+Produce an Existing_UDT_Architecture_Report.md documenting the actual structure.
+
+Compare the existing architecture against the following conceptual capabilities:
+
+1. Process measurement source.
+2. Equipment status and availability.
+3. Alarm evaluation.
+4. Visualization interface.
+5. Equipment configuration.
+6. Historical data acquisition.
+
+The conceptual capabilities are not mandatory folder or tag names.
+
+Do not recommend structural changes simply because the deployed hierarchy differs from this conceptual model.
+
+## 6. Phase C — Determine Minimum Required Change
+
+For each verified customer process parameter, identify:
+
+- Existing full Ignition tag path.
+- Parent UDT definition.
+- UDT instance.
+- Current effective value source.
+- Current simulation source.
+- Existing data type.
+- Existing engineering units.
+- Existing alarm configuration.
+- Existing history configuration.
+- Verified OPC connection.
+- Verified OPC NodeId.
+- Proposed instance-level property overrides.
+- Required unit conversion, if any.
+- Potential impact on status, alarm or graphical bindings.
+
+Determine whether Ignition supports the required value source change through an instance-level override of the existing UDT member.
+
+The preferred implementation is:
+
+- Preserve the existing member tag path.
+- Preserve the existing tag name.
+- Override valueSource to OPC.
+- Override opcServer to the verified connection.
+- Override opcItemPath to the verified NodeId.
+- Preserve all other effective properties.
+
+If the existing application uses a separate simulation source or source-selection mechanism, prefer configuring that existing mechanism rather than introducing another one.
+
+If instance-level overrides cannot support the required change, stop before modifying the UDT definition and provide a proposed alternative for review.
+
+## 7. Phase D — Select Pilot Equipment
+
+Select exactly one existing MFCS bioreactor equipment instance for the controlled test.
+
+Use either U01 or U02, subject to confirmed physical equipment mapping.
+
+Do not guess which SCADA equipment instance corresponds to a discovered OPC instrument.
+
+Verify the association using available equipment inventory, serial number, endpoint, equipment identifiers and customer-approved mapping information.
+
+If the physical equipment association cannot be established confidently, complete the discovery and proposed change plan but do not bind live values to an incorrectly identified SCADA asset.
+
+Do not change any other MFCS or UNICORN equipment instances.
+
+## 8. Phase E — Pre-Execution Safety and Impact Assessment
+
+Before making the selected tags live:
+
+- Verify that the OPC connection is configured for read-only acquisition.
+- Identify all downstream alarm and status dependencies.
+- Identify whether switching to live data may generate alarm notifications, emails or other external actions.
+- Identify whether any existing scripts could write back to the equipment.
+- Identify whether historian writes could be incorrectly attributed to a production equipment record.
+- Confirm the approved commissioning window and affected equipment.
+
+Do not perform equipment commands or OPC writes.
+
+Do not disable or modify existing alarm definitions to conceal undesirable test results.
+
+If the test may trigger unauthorized external notifications, production records or equipment commands, stop and document the required mitigation.
+
+## 9. Phase F — Initial Live Data Test
+
+Select two or three representative verified parameters from the selected equipment instance.
+
+Preferred initial parameters:
+
+- Temperature.
+- pH.
+- Dissolved oxygen.
+
+Use the exact names already present in the existing UDT.
+
+Verify that the selected parameters have:
+
+- Confirmed OPC addresses.
+- Valid Good quality.
+- Compatible engineering units.
+- Compatible data types.
+- Confirmed physical equipment association.
+
+Apply the minimum required instance-level data source changes.
+
+Do not modify the parent UDT definition.
+
+Perform the changes using a supported configuration mechanism that preserves inherited properties and existing overrides.
+
+Immediately re-export the affected instance and verify the actual configuration differences.
+
+If any unapproved property has changed, restore the baseline before continuing.
+
+## 10. Phase G — End-to-End Verification
+
+For each transitioned tag, verify the complete data path:
+
+1. Actual equipment OPC measurement.
+2. Ignition OPC connection.
+3. Existing equipment UDT member.
+4. Existing equipment process value display.
+5. Existing SCADA equipment detail screen.
+6. Existing overview or dashboard display, where applicable.
+7. Existing alarm evaluation.
+8. Existing equipment status logic.
+9. Existing historian destination, where already configured.
+
+Compare direct OPC values with the corresponding UDT values and displayed SCADA values.
+
+Allow for normal polling latency, display rounding and documented engineering unit conversions.
+
+Record:
+
+- Direct OPC value.
+- OPC quality.
+- OPC timestamp.
+- UDT value.
+- UDT quality.
+- UDT timestamp.
+- Displayed SCADA value.
+- Expected display precision.
+- Alarm state.
+- Equipment status.
+- Screenshot reference.
+
+Observe the data over a bounded monitoring period.
+
+Confirm that live values originate from OPC rather than the previous simulation mechanism.
+
+Do not initiate equipment operation to generate changing process measurements.
+
+## 11. Phase H — SCADA Regression Assessment
+
+Using the existing FAT-approved screens, verify:
+
+- Equipment remains in its original location.
+- Equipment navigation remains functional.
+- Equipment graphics remain unchanged.
+- Images render correctly.
+- Status colors reflect the existing status logic.
+- Process values display correctly.
+- Units remain correct.
+- Alarm indicators remain functional.
+- No broken tag bindings appear.
+- No new expression errors appear.
+- Other simulated equipment remains unaffected.
+
+Distinguish expected changes caused by live process values from unintended configuration changes.
+
+For example, an existing equipment color changing in response to a genuine status change is acceptable. Modification of the underlying color-selection logic is not.
+
+Do not deliberately force a process alarm or alter an alarm threshold to demonstrate alarm functionality.
+
+Capture relevant before-and-after screenshots.
+
+## 12. Phase I — Expand Pilot to Remaining Verified Parameters
+
+If the initial live test succeeds, evaluate the remaining verified parameters for the same equipment instance.
+
+Extend the live mapping only to parameters that meet all of the following:
+
+- Physical equipment association confirmed.
+- Exact OPC address verified.
+- Valid OPC data quality.
+- Parameter semantics confirmed.
+- Engineering units compatible.
+- Existing tag data type compatible.
+- No unauthorized downstream effects.
+
+Retain unresolved or ambiguous parameters in their existing configuration.
+
+Specifically review MFCS CO2SP engineering units and determine whether the intended customer parameter is a setpoint or controller value.
+
+Do not implement undocumented unit conversions or substitute measurements without approval.
+
+Do not extend the test to a second equipment instance.
+
+## 13. Phase J — UNICORN Assessment Only
+
+Inspect the existing deployed chromatography UDT and compare it against the discovered UNICORN candidate NodeIds.
+
+Preserve its existing configuration.
+
+Identify how the existing tags could be transitioned from simulation to OPC when valid process data becomes available.
+
+Identify username-dependent addressing and any initialization requirements.
+
+Do not call ConnectSystem.
+
+Do not write ConnectSystemTag.
+
+Do not change AssignState.
+
+Do not convert existing simulated chromatography process tags to live OPC sources that currently return Good_NoData.
+
+Prepare a separate targeted UNICORN integration change plan for execution after View-mode data acquisition has been verified.
+
+## 14. Phase K — Configuration Difference Verification
+
+Compare the pre-test and post-test configurations.
+
+Verify that:
+
+- Parent UDT definitions are unchanged.
+- Equipment hierarchy is unchanged.
+- SCADA project resources are unchanged.
+- Alarm definitions are unchanged.
+- Status expressions are unchanged.
+- Visualization properties are unchanged.
+- Other equipment instances are unchanged.
+- Only approved data source properties have changed on the selected equipment instance.
+
+Generate both human-readable and machine-readable configuration differences.
+
+Any unapproved structural or functional configuration change shall be considered a commissioning failure and shall trigger rollback.
+
+## 15. Phase L — Rollback
+
+Prepare a targeted rollback package that restores:
+
+- Original tag value sources.
+- Original OPC connection references, if applicable.
+- Original OPC item paths, if applicable.
+- Original simulation behavior.
+- Original instance override configuration.
+
+Preserve the distinction between inherited properties and explicitly overridden properties.
+
+Do not restore an inherited property by unnecessarily creating a permanent override.
+
+Do not restart the entire gateway or restore the complete gateway backup unless separately approved.
+
+If the pilot succeeds, leave the verified pilot equipment connected to live OPC data for Acropolis review, provided the approved commissioning window permits it.
+
+If the test fails, data quality deteriorates, unauthorized effects occur or the configuration differs from the approved change set, restore the original simulation configuration.
+
+Document the final disposition.
+
+## 16. Required Deliverables
+
+Create the following under:
+
+artifacts/controlled-live-integration/
+
+### 01_Existing_UDT_Architecture_Report.md
+
+Document the deployed UDT architecture, existing simulation mechanism, equipment hierarchy and SCADA dependencies.
+
+### 02_UDT_Configuration_Comparison.csv
+
+Include:
+
+- Equipment instance.
+- UDT definition.
+- Existing tag path.
+- Customer parameter.
+- Current value source.
+- Proposed value source.
+- Verified OPC server.
+- Verified OPC NodeId.
+- Existing data type.
+- Existing engineering units.
+- Existing alarms.
+- Existing historical settings.
+- Required overrides.
+- Downstream bindings.
+- Implementation eligibility.
+- Notes.
+
+### 03_FAT_Baseline/
+
+Store timestamped configuration exports and baseline manifests.
+
+Protect sensitive information. Do not commit credentials or secret values.
+
+### 04_Approved_Change_Set.json
+
+Record the exact authorized pilot changes and corresponding original properties.
+
+### 05_End_to_End_Verification.csv
+
+Include:
+
+- Equipment.
+- Parameter.
+- Direct OPC value and quality.
+- Existing UDT value and quality.
+- SCADA displayed value.
+- Timestamps.
+- Engineering units.
+- Alarm state.
+- Equipment status.
+- Test result.
+- Screenshot reference.
+
+### 06_SCADA_Evidence/
+
+Store before-and-after screenshots of the existing equipment screens, where available.
+
+### 07_Configuration_Diff.json
+
+Record actual configuration differences and verification that unrelated UDTs, alarm logic and SCADA resources remain unchanged.
+
+### 08_Rollback/
+
+Store the targeted rollback procedure and supported restoration configuration.
+
+### 09_UNICORN_Integration_Change_Plan.md
+
+Document proposed source-level changes to the existing chromatography UDT without implementing them.
+
+### 10_Controlled_Integration_Report.md
+
+Summarize:
+
+- Existing architecture findings.
+- Pilot equipment selected.
+- Parameters transitioned.
+- Live values verified.
+- SCADA displays verified.
+- Alarm and status behavior.
+- Historian verification, if applicable.
+- Configuration preservation results.
+- Outstanding deficiencies.
+- Final pilot disposition.
+- Recommended next commissioning activities.
+
+## 17. Acceptance Criteria
+
+The controlled test passes when:
+
+- One existing equipment instance receives verified live OPC process measurements.
+- The original SCADA screens display those measurements without binding changes.
+- The FAT-approved hierarchy and UDT structure remain unchanged.
+- Existing alarm and status logic remain intact.
+- Existing data types and engineering units are preserved.
+- No unrelated equipment is affected.
+- No unauthorized equipment writes occur.
+- Configuration differences are limited to approved data source changes.
+- A targeted rollback package is available.
+
+Report separately any acceptance criteria that could not be tested.
+
+Do not characterize this controlled test as completion of formal SAT execution.
+
+## 18. Final Instructions
+
+The existing application is the design authority.
+
+Adapt the OPC mappings to the deployed UDTs. Do not adapt the deployed UDT structure to the OPC mappings.
+
+Prefer configuration changes over architectural changes.
+
+If the proposed integration cannot be implemented without modifying the FAT-approved structure, stop and provide the technical justification and minimum alternative change for review.
