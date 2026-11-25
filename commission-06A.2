@@ -1,0 +1,632 @@
+# TBMC — Commission 06A.2: MFCS Right Twin Live Integration
+
+**Project:** TmoGit/TBMC-Deploy  
+**Organization:** Acropolis Engineers  
+**Target equipment:** BRX5-02-02  
+**OPC connection:** MFCS_OPCUA  
+**MFCS instrument:** U02 — Biostat B TWIN_R_814  
+**Predecessors:** Commission 06A and 06A.1  
+**Execution:** Authorized controlled commissioning  
+**Design authority:** Existing FAT-approved Ignition application  
+**Final disposition:** Leave both equipment instances enabled and live
+
+## 1. Objective
+
+Connect the existing BRX5-02-02 equipment UDT instance to the right BIOSTAT Twin bioreactor through MFCS OPC UA.
+
+Replicate the successful instance-level integration methodology established for BRX5-02-01 during Commission 06A, including the equipment enablement procedure successfully implemented during Commission 06A.1.
+
+Demonstrate end-to-end live data acquisition:
+
+Physical bioreactor → MFCS OPC UA → Existing Ignition UDT → Existing SCADA graphics.
+
+Leave both bioreactors enabled and displaying live process measurements on the existing SCADA overview and detail screens.
+
+Do not redesign the equipment UDTs, equipment hierarchy or SCADA application.
+
+## 2. Authorized Equipment Mapping
+
+Use the following equipment association for this commissioning test:
+
+| SCADA Equipment | MFCS Unit | Instrument |
+|---|---|---|
+| BRX5-02-01 | U01 | Biostat B TWIN_L_814 |
+| BRX5-02-02 | U02 | Biostat B TWIN_R_814 |
+
+BRX5-02-02 is the designated target for this commission.
+
+Acropolis has designated U02 as the source for BRX5-02-02 for this controlled integration test.
+
+Verify the actual discovered U02 instrument identity and record the association in the commissioning evidence. Distinguish the authorized commissioning mapping from any independently verified physical asset identification.
+
+Do not request redundant confirmation of the selected U02 source unless conflicting equipment identity evidence is discovered.
+
+## 3. Existing Environment
+
+| Component | Configuration |
+|---|---|
+| Ignition Gateway | 172.16.81.201:8088 |
+| Ignition version | 8.3.4 |
+| MFCS OPC connection | MFCS_OPCUA |
+| Existing left Twin | BRX5-02-01 |
+| Target right Twin | BRX5-02-02 |
+| Process area | Plasmid-814 |
+| Equipment category | UPSTREAM/BIOREACTORS |
+| UDT definition | 5L_BIOREACTOR |
+
+Expected target tag path:
+
+`[default]TBMC-SCADA/TW-LAB01/Plasmid-814/UPSTREAM/BIOREACTORS/BRX5-02-02`
+
+Verify the actual deployed tag path and UDT definition before making changes.
+
+Do not create a replacement UDT or equipment instance.
+
+## 4. Reference Previous Commission Results
+
+Locate and review the existing project artifacts for:
+
+- Commission 06A controlled integration report.
+- Commission 06A approved change set.
+- Commission 06A.1 final configuration and execution evidence.
+- Commission 06A.1 equipment enablement procedure.
+- Customer_Parameter_Mapping.csv.
+- OPC_Discovered_Nodes.json.
+- OPC_Live_Data_Evidence.csv.
+- Existing targeted rollback procedures.
+- Existing FAT-approved project and UDT configuration.
+
+Use the successful BRX5-02-01 implementation as the technical reference.
+
+Do not blindly copy the complete BRX5-02-01 instance configuration. Preserve BRX5-02-02-specific configuration, KeyCPP assignments and instance overrides.
+
+## 5. Mandatory FAT Design Preservation
+
+Preserve the existing:
+
+- Tag provider names.
+- Equipment folder hierarchy.
+- Parent UDT definitions.
+- UDT inheritance.
+- Equipment instance paths.
+- Tag names.
+- Tag data types.
+- Engineering units.
+- Tag group assignments.
+- Alarm definitions and thresholds.
+- Alarm notification configuration.
+- Equipment status expressions.
+- Equipment availability logic.
+- Equipment-specific KeyCPP assignments.
+- Historical data configuration.
+- Equipment images.
+- Equipment color configuration.
+- SCADA navigation.
+- Perspective and Vision resources, as applicable.
+- Graphical bindings.
+- Security configuration.
+- Existing scripts and calculation logic.
+
+Do not modify, rename, relocate, replace or recreate any existing UDT instance.
+
+Adapt the verified OPC data sources to the existing application. Do not adapt the FAT-approved application to the OPC data sources.
+
+## 6. Phase A — Baseline Capture
+
+Before execution:
+
+1. Export the existing BRX5-02-02 configuration.
+2. Capture inherited properties and instance overrides.
+3. Capture the current simulation sources.
+4. Capture the current enabled states of existing process tags.
+5. Capture existing KeyCPP assignments and enabled states.
+6. Capture alarm and historian configuration.
+7. Capture equipment enablement and status properties.
+8. Record configuration hashes for parent UDT definitions and SCADA resources.
+9. Capture the current working BRX5-02-01 configuration.
+10. Record the current MFCS OPC connection status.
+11. Record the current Ignition and Kymera trial or licensing status.
+12. Capture baseline SCADA screenshots.
+13. Prepare a targeted rollback package for BRX5-02-02.
+
+Do not disturb the existing left Twin live integration.
+
+Do not use an earlier gateway backup that would remove the successful Commission 06A or 06A.1 configuration.
+
+## 7. Phase B — Verify Live U02 OPC Data
+
+Confirm that MFCS_OPCUA is connected and U02 returns valid live values.
+
+The previously verified addressing convention is:
+
+`nsu=http://www.sartorius.com/BioPAT_MFCS_OPC_Server/Units;s=U02.TEMP.Value`
+
+Verify each actual NodeId against the existing discovery evidence and current OPC server.
+
+The proposed live mapping is:
+
+| Existing UDT Member | MFCS OPC Identifier |
+|---|---|
+| TEMP | U02.TEMP.Value |
+| pH | U02.pH.Value |
+| pO2 | U02.pO2.Value |
+| AFOAMT | U02.AFOAMT.Value |
+| BASET | U02.BASET.Value |
+| SUBS_A | U02.SUBS_A.Value |
+| SUBS_B | U02.SUBS_B.Value |
+| SUBS_C | U02.SUBS_C.Value |
+| VWEIGHT | U02.VWEIGHT.Value |
+| JTEMP | U02.JTEMP.Value |
+| AIROV | U02.AIROV.Value |
+| STIRR | U02.STIRR.Value |
+
+Use the complete verified namespace URI-based NodeIds when configuring Ignition.
+
+For every parameter:
+
+- Confirm the OPC NodeId.
+- Confirm current value.
+- Confirm valid data quality.
+- Confirm engineering units.
+- Confirm data type compatibility.
+- Confirm parameter semantics.
+- Confirm that the address references U02 rather than U01.
+
+Do not treat Good_NoData or other unavailable data statuses as valid live measurements.
+
+Do not reject an otherwise valid static measurement solely because it does not change during the observation period.
+
+### Parameters excluded from this commission
+
+Leave the following parameters unchanged pending engineering reconciliation:
+
+- CO2SP
+- AIRSP
+- N2SP
+- O2SP
+
+Do not implement undocumented engineering unit conversions or substitute controller process values for setpoints.
+
+## 8. Phase C — Implement Minimum Instance-Level Changes
+
+Apply the same successful source integration approach used in Commission 06A.
+
+Modify only the required properties of existing BRX5-02-02 members:
+
+| Property | Authorized change |
+|---|---|
+| opcServer | Set to MFCS_OPCUA |
+| opcItemPath | Set to verified U02 NodeId |
+| valueSource | Change to OPC only where required |
+| enabled | Enable verified live process members |
+
+For STIRR, verify whether the existing source is a memory tag before converting it to OPC.
+
+Preserve all other effective member properties.
+
+Use supported Ignition configuration merge operations. Do not replace the entire equipment instance.
+
+Ensure simulation scripts or writers cannot overwrite transitioned live measurements.
+
+Do not modify shared simulation logic or disable simulation for unrelated equipment.
+
+Apply a small initial subset of verified parameters if needed to establish the correct configuration mechanism, then expand to all 12 eligible parameters on the same equipment instance.
+
+After applying the changes, re-export the equipment instance and verify the actual property-level differences.
+
+## 9. Phase D — Mandatory Equipment Enablement
+
+Replicate the successful equipment enablement procedure from Commission 06A.1.
+
+Trace and use the existing administrative equipment monitoring enablement mechanism.
+
+Configure BRX5-02-02 so that:
+
+- EquipIsEnabled = 1.
+- All 12 verified process measurement members are enabled.
+- The existing KeyCPP reference members are enabled.
+- Simulation is disabled for transitioned live measurements.
+- The existing equipment availability logic recognizes the live OPC source.
+- The existing SCADA overview displays live values.
+
+Verify that BRX5-02-01 remains enabled and connected to U01.
+
+If BRX5-02-01 is unexpectedly disabled, investigate and restore only the previously authorized Commission 06A.1 configuration where applicable. Document the restoration separately from the right Twin integration changes.
+
+Do not artificially force:
+
+- EquipIsActive.
+- EquipInUse.
+- EquipBatchAquired.
+- Communication health.
+- Equipment running status.
+- Alarm states.
+- Equipment status colors.
+
+Allow the existing application logic to determine actual equipment status.
+
+Administrative equipment enablement is authorized for monitoring purposes. Equipment control is not authorized.
+
+## 10. Phase E — Preserve Existing KeyCPP Assignments
+
+The current BRX5-02-02 overview graphic displays:
+
+- AFOAMT
+- BASET
+- TEMP
+
+Verify these assignments against the actual deployed KeyCPP references.
+
+Enable the existing KeyCPP reference tags as required.
+
+Do not replace the right Twin assignments with the pH, pO2 and TEMP assignments used by BRX5-02-01.
+
+Preserve the existing equipment-specific overview configuration.
+
+Expected overview configuration:
+
+| Equipment | Displayed CPPs |
+|---|---|
+| BRX5-02-01 | pH, pO2, TEMP |
+| BRX5-02-02 | AFOAMT, BASET, TEMP |
+
+Do not modify the graphical bindings to achieve the expected result.
+
+## 11. Phase F — End-to-End SCADA Verification
+
+Open the existing Plasmid-814 overview.
+
+Verify that both equipment instances display live data simultaneously.
+
+### BRX5-02-01 — Left Twin
+
+Verify:
+
+- pH.
+- pO2.
+- TEMP.
+- Source quality indication.
+- Equipment monitoring enabled.
+- U01 addressing.
+
+### BRX5-02-02 — Right Twin
+
+Verify:
+
+- AFOAMT.
+- BASET.
+- TEMP.
+- Source quality indication.
+- Equipment monitoring enabled.
+- U02 addressing.
+
+Open the existing BRX5-02-02 CPP detail popup.
+
+Verify:
+
+- All 12 transitioned process measurements.
+- Existing process value gauges.
+- Existing equipment image.
+- Existing engineering units.
+- Source quality indication.
+- Existing equipment enablement.
+- Existing simulation indicators for transitioned measurements.
+- Existing alarm and status bindings.
+
+Compare direct U02 OPC readings against the corresponding UDT values and displayed SCADA values.
+
+Allow for existing display rounding and Float4 data type precision.
+
+Observe both vessels for a bounded monitoring period of at least 60 seconds.
+
+Confirm that:
+
+- BRX5-02-01 continues to receive U01 data.
+- BRX5-02-02 receives U02 data.
+- The equipment instances are not accidentally sharing the same OPC addresses.
+- Live values continue to refresh where supported by the source.
+- No simulation values are overwriting transitioned measurements.
+
+Do not initiate equipment operation to generate changing process measurements.
+
+Do not deliberately force alarms or modify alarm thresholds.
+
+## 12. Phase G — SCADA Regression Verification
+
+Using the existing FAT-approved screens, verify that:
+
+- Both bioreactors remain in their original locations.
+- Equipment navigation remains functional.
+- Equipment images remain unchanged.
+- Equipment detail popups remain functional.
+- Existing process gauges respond to live values.
+- KeyCPP displays show the correct equipment-specific parameters.
+- Existing colors and status indicators use their original logic.
+- No broken tag bindings appear.
+- No new expression errors appear.
+- No unrelated equipment is affected.
+- UNICORN configuration remains unchanged.
+
+Do not correct existing gauge ranges, alarm thresholds, engineering unit discrepancies or other design configuration issues during this commission.
+
+Document such issues separately for engineering review.
+
+Distinguish preservation of alarm configuration from functional alarm testing.
+
+Where alarms and historical collection are currently disabled, preserve that configuration and report those functions as not tested.
+
+## 13. Phase H — Configuration Difference Verification
+
+Generate a native property-level comparison of the before-and-after configuration.
+
+Confirm:
+
+- Parent UDT definitions are unchanged.
+- Equipment hierarchy is unchanged.
+- SCADA project resources are unchanged.
+- Tag names and data types are unchanged.
+- Alarm definitions are unchanged.
+- Status expressions are unchanged.
+- KeyCPP assignments are unchanged.
+- Image and color selection logic is unchanged.
+- Historical configuration is unchanged.
+- UNICORN configuration is unchanged.
+- Existing BRX5-02-01 live configuration is preserved.
+- Unrelated equipment instances are unchanged.
+
+Only the authorized BRX5-02-02 source, enablement and existing reference activation properties may differ, together with any separately documented restoration of the previously authorized BRX5-02-01 configuration.
+
+If an unauthorized change is detected, restore the affected configuration using the targeted rollback procedure.
+
+## 14. Operating Restrictions
+
+The following activities are prohibited:
+
+- Equipment control commands.
+- OPC process writes.
+- Starting or stopping equipment operation.
+- Modifying process setpoints.
+- Changing parent UDT definitions.
+- Modifying equipment hierarchy.
+- Modifying SCADA graphics or bindings.
+- Modifying alarm definitions or thresholds.
+- Enabling unauthorized alarm notifications.
+- Modifying historical collection configuration.
+- Changing equipment images or colors.
+- Modifying unrelated equipment instances.
+- Changing certificates or authentication settings.
+- Restarting the Ignition Gateway.
+- Deploying new equipment UDTs.
+- Deploying additional Ignition projects.
+- Deploying automatic rollback guards.
+- Automatically substituting simulated values during communication failures.
+
+Verify that the monitoring integration cannot inadvertently execute equipment commands or write process values back to MFCS.
+
+If an unauthorized downstream effect is identified, stop the affected operation and document the required mitigation.
+
+## 15. Mandatory Final Equipment Enablement and Disposition
+
+**This section is mandatory and takes precedence over any earlier commissioning instruction to disable or restore simulation at completion.**
+
+The objective is to leave both BIOSTAT Twin vessels enabled and available for Acropolis visual verification.
+
+Before completing the commission, verify the following final state:
+
+| Configuration | BRX5-02-01 | BRX5-02-02 |
+|---|---|---|
+| MFCS source | U01 — Left Twin | U02 — Right Twin |
+| OPC connection | MFCS_OPCUA | MFCS_OPCUA |
+| EquipIsEnabled | 1 | 1 |
+| Live process members | 12 | 12 |
+| Enabled KeyCPP references | 3 | 3 |
+| Simulation on transitioned tags | Off | Off |
+| Source quality | Good when source available | Good when source available |
+| Automatic rollback guard | Not active | Not active |
+| Final disposition | Leave enabled | Leave enabled |
+
+Do not revert either equipment instance to simulation or a disabled state upon commission completion.
+
+Verify that the temporary Commission 06A rollback guard, TBMC_COM06A_PilotGuard_0224, remains retired and cannot undo the successful live integrations.
+
+Do not deploy another automatic rollback guard.
+
+Ignition or Kymera trial expiration must not cause the live OPC configuration to be removed.
+
+Retain the configured addresses and administrative equipment enablement through temporary communications interruptions.
+
+If OPC communication is interrupted:
+
+- Retain the live OPC configuration.
+- Allow existing quality and availability logic to reflect the interruption.
+- Do not substitute simulated process measurements.
+- Do not artificially force a Good source quality indication.
+- Allow normal OPC reconnection and data recovery.
+
+Leave both vessels enabled and configured for live SCADA monitoring, subject to the authorized commissioning conditions.
+
+Maintain a targeted manual rollback package, but do not execute rollback solely because the commission has completed.
+
+Execute rollback only if an unauthorized configuration change, equipment control risk or other unacceptable operational effect occurs.
+
+**Capture a final screenshot showing both bioreactors displaying live measurements simultaneously on the existing Plasmid-814 overview.**
+
+The commission shall not be reported as fully passed unless this final visual state has been demonstrated.
+
+## 16. Required Deliverables
+
+Create a timestamped results package under:
+
+`artifacts/controlled-live-integration-06A2/`
+
+Include the following:
+
+### 01_Baseline_Configuration/
+
+- Existing BRX5-02-02 configuration.
+- Existing BRX5-02-01 configuration.
+- Parent UDT hashes.
+- SCADA project resource hashes.
+- Effective member configuration.
+- Inheritance and instance override evidence.
+
+### 02_Approved_Change_Set.json
+
+Record the exact authorized configuration changes and corresponding original property values.
+
+### 03_U02_OPC_Verification.csv
+
+Include:
+
+- Equipment.
+- Parameter.
+- OPC connection.
+- Exact OPC NodeId.
+- Direct OPC value.
+- Data quality.
+- Engineering units.
+- Data type.
+- Timestamp.
+- Mapping eligibility.
+
+### 04_End_to_End_Verification.csv
+
+Include:
+
+- Equipment.
+- MFCS unit.
+- Parameter.
+- Direct OPC value.
+- Existing UDT value.
+- SCADA displayed value.
+- Data quality.
+- Timestamp.
+- Engineering units.
+- Display precision.
+- Existing KeyCPP reference, if applicable.
+- Verification result.
+
+### 05_Configuration_Diff.json
+
+Document actual configuration differences and preservation of unrelated application resources.
+
+### 06_SCADA_Evidence/
+
+Capture screenshots of:
+
+1. Plasmid-814 overview before integration.
+2. Plasmid-814 overview with both Twin bioreactors displaying live values.
+3. BRX5-02-01 detail popup.
+4. BRX5-02-02 detail popup.
+5. Current MFCS OPC connection status.
+6. Representative live tag readings for both instruments.
+7. Final equipment enablement status.
+
+### 07_Rollback/
+
+Store the targeted manual restoration configuration and instructions.
+
+Preserve the distinction between inherited properties and explicit instance overrides.
+
+### 08_Final_Equipment_Status.json
+
+Record:
+
+- Equipment identifiers.
+- MFCS instrument identifiers.
+- EquipIsEnabled values.
+- Process tag enabled states.
+- Process tag source configuration.
+- KeyCPP enabled states.
+- Current data quality.
+- Simulation status.
+- Rollback guard status.
+- Current trial or licensing state.
+- Final commissioning disposition.
+
+### 09_Commission_06A2_Report.md
+
+Summarize:
+
+- Execution activities.
+- Equipment association.
+- OPC verification.
+- Live parameter mappings.
+- Exact configuration changes.
+- Equipment enablement.
+- SCADA graphical verification.
+- FAT baseline preservation.
+- Outstanding engineering issues.
+- Final state of both vessels.
+- SAT implications.
+- Recommended next commissioning activities.
+
+Package all results into a timestamped ZIP archive for Acropolis review.
+
+Do not include passwords, credentials, private keys or secret-bearing configuration exports.
+
+## 17. Acceptance Criteria
+
+| ID | Acceptance criterion |
+|---|---|
+| AC-01 | U02 OPC connectivity verified |
+| AC-02 | U02 instrument identity verified |
+| AC-03 | Twelve eligible BRX5-02-02 process parameters connected to live OPC |
+| AC-04 | BRX5-02-02 administrative monitoring enabled |
+| AC-05 | BRX5-02-02 existing KeyCPP references enabled |
+| AC-06 | BRX5-02-02 overview displays actual live measurements |
+| AC-07 | BRX5-02-02 detail popup displays actual live measurements |
+| AC-08 | BRX5-02-01 remains enabled and receives U01 data |
+| AC-09 | Both BIOSTAT Twin vessels display live data simultaneously |
+| AC-10 | Simulation disabled for transitioned process measurements |
+| AC-11 | Parent UDT definitions unchanged |
+| AC-12 | Equipment hierarchy unchanged |
+| AC-13 | SCADA resources and bindings unchanged |
+| AC-14 | Existing alarm, status, image and color logic preserved |
+| AC-15 | No unauthorized notifications or historian records generated |
+| AC-16 | No equipment commands or OPC process writes performed |
+| AC-17 | Targeted manual rollback package available |
+| AC-18 | Automatic rollback guard remains retired |
+| AC-19 | Both equipment instances left enabled at commission completion |
+| AC-20 | Final simultaneous live SCADA screenshot captured |
+
+Report each criterion independently as PASS, FAIL, BLOCKED or NOT TESTED.
+
+Do not report unverified criteria as passed.
+
+## 18. Final Execution Summary
+
+Return the following:
+
+- BRX5-02-01 final equipment status.
+- BRX5-02-02 final equipment status.
+- U01 and U02 OPC connection verification.
+- Number of live process measurements per equipment instance.
+- Number of enabled KeyCPP references per equipment instance.
+- Current equipment enablement values.
+- Current OPC data quality.
+- SCADA overview verification results.
+- SCADA detail popup verification results.
+- Total configuration properties changed.
+- FAT baseline preservation results.
+- Automatic rollback guard status.
+- Outstanding deficiencies.
+- Current gateway trial or licensing state.
+- Final disposition.
+- Generated artifact location.
+
+## 19. Final Execution Instruction
+
+Proceed using the authorized right Twin commissioning scope.
+
+The existing application is the design authority.
+
+Replicate the successful Commission 06A and 06A.1 implementation methodology using U02 for BRX5-02-02.
+
+Preserve the existing FAT-approved application.
+
+Do not request redundant confirmation for the designated right Twin mapping.
+
+**Leave both BRX5-02-01 and BRX5-02-02 enabled, configured for live OPC acquisition, and displaying live values on the existing SCADA application. Do not restore simulation at the end of the commission.**
+
+Stop only if an operation exceeds the authorized scope, valid data cannot be established, conflicting equipment identity evidence is discovered, or an unauthorized operational effect is identified.
