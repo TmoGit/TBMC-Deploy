@@ -1,0 +1,43 @@
+# Commission 06B.2 — UNICORN Address Deployment and SCADA Verification
+
+Revise the previous Commission 06B execution criteria to distinguish OPC address verification from live instrument measurement verification.
+
+The OPC UA connection is authenticated, the instrument address space is accessible, and the requested parameter nodes are readable.
+
+Good_NoData shall not prevent deployment of independently verified OPC addresses into the existing Room 815 AVA25 equipment instance. However, values with this status shall not be accepted as valid process measurements.
+
+Proceed as follows:
+
+1. Use the existing Gene Therapy-815 AVA25 UDT instance and Unicorn-2 OPC connection, subject to the authorized instrument-to-asset association.
+
+2. Verify the existing discovered NodeIds for conductivity, pressure, pH and other unambiguous customer parameters.
+
+3. Configure the verified OPC addresses through existing UDT instance-level overrides, following the successful MFCS integration methodology.
+
+4. Enable the configured process members and applicable existing KeyCPP references.
+
+5. Retain EquipIsEnabled = 1.
+
+6. Preserve all FAT-approved UDT definitions, hierarchy, graphics, alarm definitions, status logic, images and colors.
+
+7. Leave unresolved parameter semantics and engineering unit conversions pending.
+
+8. Determine how the existing SCADA quality logic handles Good_NoData. Do not present placeholder values as verified live measurements or force the source-quality indication to Good. If the existing logic cannot distinguish unavailable measurements, document the issue before making the affected values visible.
+
+9. Do not enable historian collection for unverified process measurements.
+
+10. Do not repeat ConnectSystem during this commission. Preserve existing read-only OPC protections.
+
+11. Leave successfully configured OPC mappings in place for subsequent verification when TBMC powers on the physical instrument, provided unavailable measurements are not misleadingly displayed as valid.
+
+12. Preserve both working MFCS Twin integrations.
+
+13. Do not deploy an automatic rollback guard or reconnect script.
+
+14. Capture the existing SCADA graphics, configured OPC addresses, returned values, quality codes and final equipment configuration.
+
+Report addressing and configuration deployment separately from live process measurement verification.
+
+Classify live data acceptance as PENDING_INSTRUMENT_AVAILABILITY until valid measurements are established.
+
+Do not initiate equipment operation, acquire instrument control or perform OPC process writes.
