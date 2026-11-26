@@ -1,0 +1,339 @@
+# TBMC — Commission 06B.4: Permanent Room 815 UNICORN Integration
+
+**Project:** TmoGit/TBMC-Deploy  
+**Organization:** Acropolis Engineers  
+**Target:** Gene Therapy-815 / AVA25  
+**OPC connection:** Unicorn-2  
+**Instrument:** Avant3119961  
+**Predecessors:** Commission 06B, 06B.1, 06B.2 and 06B.3  
+**Execution:** Permanent commissioning configuration  
+**Final disposition:** Leave equipment and process tags enabled
+
+## 1. Objective
+
+Complete the permanent OPC integration of all six existing chromatography process parameters for the Room 815 AVA25 equipment instance.
+
+Previous commissions have demonstrated OPC authentication, parameter addressing and end-to-end graphical data transport.
+
+This commission shall complete the equipment configuration and leave it enabled for ongoing monitoring and subsequent live instrument verification.
+
+Instrument availability is not a prerequisite for configuring independently verified OPC addresses.
+
+This commission supersedes previous instructions requiring temporary enablement or restoration of disabled process tags at commission completion.
+
+## 2. Equipment Association
+
+Use the following designated commissioning association:
+
+- Process area: Gene Therapy-815
+- SCADA equipment: AVA25
+- Workstation: 815-AVANT25-01
+- Workstation IP: 172.16.81.70
+- UNICORN instrument: Avant3119961
+- OPC connection: Unicorn-2
+- Existing UDT: AVANT_CHROM_SKID
+
+Retain the existing equipment inventory IP discrepancy as an outstanding documentation reconciliation item.
+
+Record the designated commissioning association separately from independently verified physical asset identification.
+
+## 3. Complete All Six Process Parameter Mappings
+
+Configure the existing UDT members as follows:
+
+| Existing UDT Parameter | UNICORN OPC Source | Expected Units |
+|---|---|---|
+| Conductivity | RunData/Cond | mS/cm |
+| Pressure | RunData/System pressure | MPa |
+| pH | RunData/pH | Dimensionless |
+| Flow Rate | RunData/System flow | Convert ml/min to lpm |
+| UV Absorbance | RunData/UV 1, 2 or 3 | mAU |
+| Gradient | RunData/Conc B | % |
+
+Use the actual discovered OPC NodeIds from the previous commissioning artifacts and current OPC address space.
+
+Do not construct unverified NodeIds based solely on the names in this table.
+
+Preserve the Default authentication context in the OPC item paths.
+
+For UV Absorbance, use UV 1 as the provisional commissioning channel unless the customer parameter list or instrument configuration identifies another required channel.
+
+Record this channel selection for customer confirmation.
+
+For Gradient, use Conc B as the provisional commissioning source for buffer B concentration unless the customer requirements identify a different parameter.
+
+Document any remaining semantic ambiguity as a SAT verification item.
+
+## 4. Flow Rate Configuration
+
+The existing Flow Rate member was previously identified as a memory tag.
+
+Convert the existing member to an OPC source using an instance-level override.
+
+Configure:
+
+- valueSource = opc
+- opcServer = Unicorn-2
+- opcItemPath = verified System flow NodeId
+- enabled = True
+
+Preserve the existing Flow Rate tag name, data type, engineering units, hierarchy and SCADA bindings.
+
+The UNICORN source reports flow in ml/min, while the existing SCADA uses lpm.
+
+Implement the appropriate supported instance-level scaling:
+
+Flow Rate (lpm) = System flow (ml/min) / 1000
+
+Prefer Ignition's native OPC tag scaling functionality.
+
+Verify scaling behavior, numerical precision, applicable range handling and data-quality propagation before deployment.
+
+Do not introduce a scaling configuration that clips valid readings.
+
+Do not modify the parent UDT or existing graphical bindings.
+
+If native scaling cannot implement the conversion correctly, document the specific limitation and minimum supported alternative.
+
+## 5. Permanent Process Tag Enablement
+
+Enable all six existing process measurement members with verified addresses.
+
+Retain the following permanent configuration:
+
+- Conductivity enabled.
+- Pressure enabled.
+- pH enabled.
+- Flow Rate enabled.
+- UV Absorbance enabled.
+- Gradient enabled.
+- EquipIsEnabled = True.
+- Simulation disabled for transitioned process members.
+
+Do not disable mapped process tags merely because their current OPC values return Good_NoData.
+
+Do not restore simulated OPC addresses.
+
+Do not create temporary replacement tags.
+
+Use the existing instance-level configuration merge methodology demonstrated during Commissions 06A and 06A.2.
+
+## 6. Permanent KeyCPP Enablement
+
+Enable all three existing KeyCPP references.
+
+Preserve the existing overview assignments:
+
+- Conductivity.
+- Flow Rate.
+- Pressure.
+
+Do not change the existing KeyCPP assignments.
+
+Verify that all three references point to their intended existing process members.
+
+## 7. Data Quality Assessment
+
+The previous commission established that the existing application may interpret Good_NoData as Good.
+
+Investigate the minimum supported instance-level mechanism for propagating unavailable measurement quality correctly while keeping the process tags and KeyCPP references enabled.
+
+Preserve the raw OPC status information.
+
+Good_NoData and known initialization placeholders shall not be represented as verified physical measurements.
+
+If the existing configuration cannot safely distinguish unavailable data:
+
+- Retain the permanent OPC mappings and enabled acquisition tags.
+- Document the quality discrimination deficiency.
+- Use an existing supported commissioning or unavailable-data indication if available.
+- Restrict affected graphical displays from normal operator reliance until corrected.
+- Do not silently present placeholder measurements as valid.
+- Provide a separate minimum-change proposal for correcting quality discrimination if necessary.
+
+Do not modify parent UDT definitions or SCADA bindings without separate authorization.
+
+Do not force data quality to Good.
+
+Do not disable OPC acquisition as a workaround for instrument unavailability.
+
+## 8. End-to-End Graphical Verification
+
+Open the existing Gene Therapy-815 overview and AVA25 equipment detail popup.
+
+Verify the complete data path for all six configured parameters:
+
+UNICORN OPC Server → Existing UDT member → Existing KeyCPP reference, where applicable → Existing SCADA graphic.
+
+Compare:
+
+- Direct OPC value.
+- Raw OPC quality code.
+- Existing UDT value.
+- Existing UDT quality.
+- KeyCPP reference value.
+- Displayed SCADA value.
+- Engineering units.
+- Scaling behavior.
+- Source timestamps.
+
+For unavailable measurements, verify transport and configuration separately from physical measurement validity.
+
+Do not characterize placeholder values as valid process data.
+
+Capture the existing overview and equipment detail graphics, subject to the controlled commissioning display restrictions.
+
+## 9. FAT Configuration Preservation
+
+Preserve all existing:
+
+- Parent UDT definitions.
+- UDT inheritance.
+- Equipment hierarchy.
+- Equipment tag paths.
+- Tag names.
+- Alarm definitions and thresholds.
+- Equipment status expressions.
+- Equipment images.
+- Equipment colors.
+- SCADA views and navigation.
+- Existing graphical bindings.
+- Historical configuration.
+- Security settings.
+- MFCS Twin integrations.
+
+Do not enable historian collection for unverified UNICORN process measurements during this commission.
+
+Generate a property-level comparison of the before-and-after configurations.
+
+Only the necessary AVA25 instance-level OPC addressing, scaling, enablement and approved existing quality configuration properties may change.
+
+## 10. Preserve Both MFCS Integrations
+
+Verify the following equipment instances remain unchanged:
+
+- BRX5-02-01 — MFCS U01.
+- BRX5-02-02 — MFCS U02.
+
+Both shall retain their existing live OPC addresses, process tag enablement and KeyCPP assignments.
+
+Do not modify either MFCS equipment instance.
+
+## 11. Operating Restrictions
+
+- No ConnectSystem calls during this commission.
+- No equipment control acquisition.
+- No OPC process writes.
+- No instrument commands.
+- No method initiation.
+- No process setpoint changes.
+- No service restarts.
+- No authentication changes.
+- No certificate changes.
+- No automatic rollback guard.
+- No automatic substitution of simulated measurements.
+
+Maintain the existing read-only OPC connection.
+
+## 12. Mandatory Permanent Final Disposition
+
+This section supersedes the temporary enablement and automatic restoration instructions from earlier commissions.
+
+Leave the Room 815 AVA25 instance permanently configured for OPC acquisition.
+
+Required final state:
+
+| Configuration | Required State |
+|---|---|
+| EquipIsEnabled | True |
+| Conductivity | OPC / Enabled |
+| Pressure | OPC / Enabled |
+| pH | OPC / Enabled |
+| Flow Rate | OPC / Enabled / Correct scaling |
+| UV Absorbance | OPC / Enabled |
+| Gradient | OPC / Enabled |
+| KeyCPP1 | Enabled |
+| KeyCPP2 | Enabled |
+| KeyCPP3 | Enabled |
+| Simulation on integrated tags | Disabled |
+| OPC connection | Unicorn-2 |
+| Automatic rollback | None |
+| Historian | Preserve existing disabled configuration |
+
+Retain independently verified mappings even when the physical instrument is powered off or unavailable.
+
+Good_NoData, communication loss, instrument shutdown and trial expiration are not reasons to remove live OPC configuration or disable acquisition.
+
+The existing configuration shall remain in place for subsequent verification when TBMC powers on and connects the physical instrument.
+
+Maintain a targeted manual rollback package for unauthorized configuration changes or unacceptable operational effects.
+
+Do not execute rollback solely because live process data is unavailable or the commission has completed.
+
+## 13. Acceptance Criteria
+
+Evaluate configuration acceptance separately from live measurement acceptance.
+
+### Configuration Acceptance
+
+- Six customer process parameters evaluated and mapped.
+- All eligible verified OPC addresses permanently deployed.
+- Flow Rate configured with correct engineering unit scaling.
+- Existing process measurement members enabled.
+- Existing KeyCPP references enabled.
+- Equipment monitoring enabled.
+- Existing UDT structure preserved.
+- Existing SCADA bindings preserved.
+- Existing MFCS integrations preserved.
+- No unauthorized equipment writes.
+- Permanent configuration retained at commission completion.
+
+### Live Measurement Acceptance
+
+- Physical instrument identity verified.
+- Instrument monitoring established.
+- Valid live process measurements received.
+- Raw OPC quality verified.
+- Actual instrument readings compared against SCADA.
+- UV channel confirmed.
+- Gradient semantics confirmed.
+- Flow Rate conversion verified against an actual instrument reading.
+- Unavailable data discrimination verified.
+
+Mark outstanding live measurement criteria as pending instrument availability or engineering verification.
+
+Do not roll back completed configuration acceptance items because live measurement acceptance remains pending.
+
+## 14. Required Deliverables
+
+Create a timestamped Commission 06B.4 results package containing:
+
+- Baseline equipment configuration.
+- Complete six-parameter OPC mapping.
+- Flow Rate scaling evidence.
+- Before-and-after configuration differences.
+- OPC-to-UDT-to-SCADA comparison.
+- SCADA overview and detail evidence.
+- Data quality discrimination assessment.
+- Final equipment enablement configuration.
+- Targeted manual rollback package.
+- Outstanding SAT deficiencies.
+- Commission 06B.4 final report.
+
+Exclude credentials and secret-bearing configuration exports.
+
+## 15. Final Execution Instruction
+
+Proceed with permanent configuration of all six chromatography parameters using verified OPC addresses.
+
+Do not request additional confirmation solely because the instrument is unavailable.
+
+Where a parameter cannot be mapped or scaled correctly, document that specific blocker and complete the remaining eligible configuration.
+
+Leave the equipment and configured acquisition tags enabled.
+
+Preserve the existing FAT-approved application.
+
+Do not restore simulation or disable configured acquisition tags at the conclusion of this commission.
+
+Permanent configuration deployment and valid physical measurement acceptance are separate commissioning milestones.
