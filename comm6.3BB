@@ -1,0 +1,63 @@
+# TBMC — Commission 06B.3: UNICORN SCADA Enablement and Graphical Verification
+
+**Target:** Gene Therapy-815 / AVA25  
+**OPC connection:** Unicorn-2  
+**Instrument:** Avant3119961  
+**Predecessor:** Commission 06B.2
+
+## Objective
+
+Verify the existing FAT-approved chromatography graphics using the previously deployed OPC addresses.
+
+Separate graphical integration verification from valid physical process measurement acceptance.
+
+## Execution
+
+1. Verify Unicorn-2 remains connected and authenticated.
+2. Verify the previously deployed OPC addresses for Conductivity, Pressure and pH.
+3. Capture the current direct OPC values, exact quality codes and timestamps.
+4. Export the current AVA25 instance configuration and prepare targeted rollback.
+5. Enable the existing mapped process tags and applicable KeyCPP references for a controlled engineering test, provided the test display is clearly identified as unverified and isolated from normal operator use.
+6. Retain EquipIsEnabled = True.
+7. Preserve the existing KeyCPP assignments. Do not substitute pH for Flow Rate merely to populate the overview.
+8. Open the existing Gene Therapy-815 overview and AVA25 CPP detail popup.
+9. Compare the displayed values against direct OPC readings, including returned placeholder values.
+10. Document how the existing SCADA handles Good_NoData, including any misleading Source quality good indication.
+11. Investigate whether an existing instance-level quality or availability configuration can distinguish Good_NoData without modifying parent UDTs or SCADA bindings. Report the available options before implementing them.
+12. Verify that both MFCS Twin bioreactors remain enabled and connected.
+
+## Restrictions
+
+- No parent UDT modifications.
+- No SCADA graphical or binding changes.
+- No equipment hierarchy changes.
+- No alarm configuration changes.
+- No historian enablement.
+- No process writes.
+- No ConnectSystem calls.
+- No instrument control.
+- No automatic rollback guard.
+- Do not force data quality to Good.
+
+## Final Disposition
+
+Retain the deployed live OPC addresses.
+
+Leave the mapped process tags and applicable references enabled only if unavailable measurements can be safely distinguished from valid process data.
+
+Otherwise, restore their previous disabled states after capturing the graphical verification evidence. Retain EquipIsEnabled and the configured OPC addresses.
+
+Do not report Good_NoData measurements as valid live process data.
+
+## Deliverables
+
+- SCADA overview screenshot.
+- AVA25 detail popup screenshot.
+- Direct OPC versus displayed value comparison.
+- Exact OPC quality codes.
+- Existing SCADA quality handling assessment.
+- Configuration difference report.
+- Final equipment enablement state.
+- Confirmation that both MFCS Twin integrations remain intact.
+
+Report graphical integration and physical measurement verification as separate acceptance criteria.
