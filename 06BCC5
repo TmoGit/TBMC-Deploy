@@ -1,0 +1,45 @@
+# Commission 06B.5 — Final UNICORN Enablement
+
+All six OPC mappings have been deployed. Flow Rate scaling has been implemented and tested.
+
+Complete the remaining configuration of the existing Gene Therapy-815 AVA25 equipment instance.
+
+1. Enable all six existing OPC process tags:
+   - Conductivity
+   - Pressure
+   - pH
+   - Flow Rate
+   - UV Absorbance
+   - Gradient
+
+2. Enable all three existing KeyCPP references.
+
+3. Retain EquipIsEnabled = True.
+
+4. Preserve all six deployed OPC addresses and the existing Flow Rate /1000 scaling.
+
+5. Disable simulation for all six integrated parameters.
+
+6. Review the quality correction proposal generated during Commission 06B.4. Implement the minimum supported instance-specific correction necessary to distinguish Good_NoData from valid measurements while keeping acquisition enabled. If instance-level configuration is insufficient, report the exact additional change required rather than disabling acquisition.
+
+7. Verify the existing Room 815 AVA25 overview and detail graphics.
+
+8. Leave all six OPC process tags and all three KeyCPP references permanently enabled.
+
+Good_NoData, instrument unavailability, trial expiration and communication interruptions shall not trigger configuration rollback or process tag disablement.
+
+Live measurement acceptance remains pending instrument availability. Unavailable measurements must not be represented as valid process data.
+
+Preserve the existing FAT-approved UDT hierarchy, equipment graphics, alarms, engineering units, images and color logic.
+
+Preserve both working MFCS Twin integrations.
+
+Keep historian collection disabled for UNICORN until live measurement acceptance.
+
+No equipment commands, process writes, ConnectSystem calls or automatic rollback guards.
+
+Do not repeat completed discovery, mapping or scaling tests.
+
+Capture the final SCADA screenshots and configuration differences.
+
+The required final state is permanent OPC acquisition with equipment monitoring enabled. Do not restore the previous disabled configuration at commission completion.
