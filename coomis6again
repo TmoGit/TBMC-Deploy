@@ -1,0 +1,21 @@
+Continue Commission 06H.4 corrective troubleshooting.
+
+Do not close the commission or refer the issue to vendor support before completing the following diagnostics.
+
+1. Investigate the 21 historian storage failures. Retrieve the associated exception messages, stack traces and Kymera logger entries.
+2. Inspect the retained diagnostic tag's effective history configuration and Last Storage Time using Ignition Tag Diagnostics.
+3. Perform a controlled memory tag value change and observe historical sampling, Last Storage Time and historian counters.
+4. Temporarily enable targeted DEBUG logging for the relevant historian and Kymera loggers if existing logs are insufficient. Restore normal logging afterward.
+5. Determine whether the existing historian provider is receiving historical samples and whether it is attempting HTTP writes to InfluxDB.
+6. Verify the actual Kymera module trial status and installed module version.
+7. Inspect Store and Forward status, queues and quarantined records where applicable.
+8. Correct any identified registration, sampling, provider configuration or authentication issue within the existing deployment.
+9. Repeat the retained diagnostic tag test after correction and verify historical storage and retrieval.
+
+Do not require physical equipment confirmation for this diagnostic.
+
+Do not create additional buckets or historian providers, purge historical data, or modify production equipment source values.
+
+The existing TEMP chart is confirmed to reference the direct TEMP tag. Retain that finding for subsequent permanent production history activation.
+
+Return the actual technical exception or demonstrated root cause, rather than another report that historical queries returned zero rows.
