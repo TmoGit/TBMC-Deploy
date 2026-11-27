@@ -1,0 +1,19 @@
+Continue Commission 06H.4 with production TEMP historian activation.
+
+The historian write and retrieval pipeline has recovered following provider reinitialization.
+
+Target Room 814, BRX5-02-01, direct TEMP process tag.
+
+The previous trace confirmed that the SCADA trend uses the direct TEMP tag rather than KeyCPP3. OPC and SCADA readings agreed at 19.35 degrees Celsius.
+
+Permanently configure history on the direct TEMP tag using the existing production InfluxDB provider. Use the documented historical sampling configuration, or five-second periodic sampling for initial engineering verification.
+
+Keep KeyCPP3 history disabled to prevent duplicate collection.
+
+Verify source quality, record provenance and instrument availability. If physical validity remains unconfirmed, treat collected records as engineering commissioning data and exclude them from accepted production batch reporting. If that exclusion cannot be assured, retain the diagnostic tag and defer equipment acquisition.
+
+Verify historical storage, Ignition historical retrieval and the existing SCADA TEMP chart.
+
+Do not modify the FAT-tested chart, shared UDT definition, OPC source or equipment mapping.
+
+Leave successful historian configuration permanently enabled. Document physical measurement acceptance separately for SAT.
