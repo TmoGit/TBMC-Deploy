@@ -1,0 +1,12 @@
+**Commission 06H.4 database verification passed.** A read-only query of `TBMC-Sensor-Data` found all four expected values. The 58 matching samples were **5.000–5.002 seconds apart**.
+
+Every match was stored under measurement `ignition-tp-ign01.default` and tag path `commissioning/historianrecovery_20261127_201719`, with value field `fVal` and stored quality `192`. The database confirms the samples are attributed to the retained Ignition diagnostic tag path. The tag’s memory type is a Gateway configuration property.
+
+| Value | Samples | UTC timestamps on 2026-11-27 |
+|---:|---:|---|
+| 92.125 | 2 | `20:56:15.255Z`, `20:56:20.256Z` |
+| 93.25 | 2 | `20:56:25.257Z`, `20:56:30.259Z` |
+| 94.5 | 2 | `20:56:35.259Z`, `20:56:40.26Z` |
+| 95.875 | 52 | First two at `20:56:45.261Z` and `20:56:50.262Z`. The same value continued through `21:01:00.313Z`. |
+
+[Download all 58 matching records](C:/Users/tpignclouduser/Desktop/TBMC-InfluxDB-Reports/06H4_Recovery_Matching_Records.csv), with the measurement, tag path, field, quality, UTC timestamp, and value on each row. No database or configuration changes were made.
