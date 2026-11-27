@@ -1,0 +1,16 @@
+Execute a supplemental diagnostic for Commission 06H.3.
+
+Ignition has successfully initialized the Kymera InfluxDB provider, but historical queries return zero rows. The SCADA TEMP trend also reports Error_TimeoutExpired.
+
+Perform the following:
+
+1. Query the production bucket TBMC-Sensor-Data for HistorianTest_20261127_200012 between 2026-11-27T20:01:22Z and 2026-11-27T20:02:05Z. Expand the time range if necessary.
+2. Search across measurements, fields and tag identifiers without assuming Kymera's storage schema.
+3. Determine whether the four expected values (10.25, 20.50, 30.75 and 40.00) were stored.
+4. Inspect recent InfluxDB service logs for write failures, authorization errors or query errors originating from the Ignition server.
+5. Identify the actual measurement schema and timestamp format if records exist.
+6. Report whether the production bucket contains any Ignition-originated historical records.
+
+Do not modify the production bucket, credentials, firewall or service configuration. Do not generate synthetic database records.
+
+Return the diagnostic results and sanitized query evidence.
