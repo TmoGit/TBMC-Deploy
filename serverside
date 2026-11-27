@@ -1,0 +1,14 @@
+Prepare the existing production InfluxDB credential and 06H1_Handoff.json for secure transfer to the Ignition server.
+
+Identify the following configuration information:
+
+- InfluxDB server URL
+- Organization name and ID
+- Production bucket name and ID
+- Existing production token description
+- Location and supported retrieval procedure for the encrypted production token
+- Location of 06H1_Handoff.json
+
+Provide a secure local procedure for retrieving the existing production token so I can enter it directly into the Ignition Gateway historian configuration.
+
+Do not regenerate the token, create another bucket, modify the database service or firewall, or expose credentials in GitHub, logs or review packages.
