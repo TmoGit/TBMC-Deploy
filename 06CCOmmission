@@ -1,0 +1,108 @@
+Commission 06C — TBMC OPC Equipment Identity and Physical Location Reconciliation
+Project: TBMC Equipment Monitoring System
+Organization: Acropolis Engineers
+Date: 27 November 2026
+Execution mode: Read-only discovery and reconciliation
+Predecessors: Commissions 06A.1, 06A.2, 06B and subsequent permanent live parameter mapping work
+1. Objective
+Establish the as-built relationship between physical laboratory equipment, room assignments, vendor workstations, OPC endpoints, instrument identifiers, Ignition equipment UDT instances, Level 2 graphics and batch/reporting identities. Identify any existing live mappings that point to the wrong equipment or room before additional live integration is performed.
+
+Do not treat a GOOD OPC quality code, matching parameter name, connection alias, or IP address alone as proof of physical equipment identity.
+2. Baseline and field observations
+Review the original TBMC Network Architecture Rev C (13 August 2026), Digital Design Specification equipment inventory and reconciliation requirements (PD Lab Equipment section), the latest available Ignition tag export, deployment files, Commission 06A/06B results and current gateway configuration. Record source revision and retrieval time. If a source is unavailable, identify it explicitly and continue with available evidence.
+
+The customer-provided network information may be incorrect. The following observations supersede the documented device-role assumptions for discovery purposes, but do not establish every physical instrument assignment.
+Address	Documented assignment	Field-verified observation	Remaining verification
+172.16.81.50	Room 814 DCU-TWIN 5L	MFCS workstation (user verified)	Actual MFCS endpoint, managed instruments and physical rooms
+172.16.81.69	Room 815 Avant 25	UNICORN workstation, hostname 815-Avant150-01; new Ignition connection Unicorn-4	Actual instrument model, serial/asset ID, physical room, connection endpoint
+172.16.81.70	Room 815 Repligen Krosflo KR2i TFF	UNICORN workstation, hostname 815-Avant25-01 (site verified)	Actual endpoint, instrument model/asset ID, physical room and current UDT bindings
+
+
+For .69, screenshot evidence shows configured DA/AE port 60409 and endpoint path /OPC/DAAndAEServer. Ignition Quick Client shows Unicorn-4 > DataAccess > Instruments > Avant3124800 > ConnectSystemTag, value 0, GOOD quality, timestamp 28 Nov 2026 01:51:25 as displayed at site. Treat this as evidence of successful browsing/read quality, not proof of an active physical instrument connection, model, or process data acquisition. Confirm the gateway endpoint directly. Do not write ConnectSystemTag or any other command node.
+
+The prior connection Unicorn-2 is known to have been operational; verify its actual endpoint rather than assuming it is .70. Preserve all currently working connections and mappings.
+Supplemental Site Verification — November 27, 2026
+The following workstation identities have been independently verified through Windows ipconfig /all and remote workstation access:
+- 172.16.81.69 — 815-Avant150-01; UNICORN 7.1.2; OPC DA/AE UA endpoint configured on port 60409; associated with Unicorn-4 in the observed Quick Client evidence.
+- 172.16.81.70 — 815-Avant25-01; UNICORN 7.1.2; verify whether the existing Unicorn-2 connection actually targets this workstation.
+- 172.16.81.50 — confirmed MFCS workstation by Acropolis site verification.
+The original Network Architecture Rev C and DDS equipment IP assignments contain discrepancies with the observed site configuration. Both UNICORN workstation hostnames indicate Room 815 — Gene Therapy. Treat .69 as the candidate Avant 150 workstation and .70 as the candidate Avant 25 workstation, subject to confirmation of vendor system configuration, physical instrument asset identity and room. The documented .68 Avant 150 assignment, .70 Repligen TFF assignment, and Room 814 UNICORN addresses remain unresolved; do not infer replacement addresses.
+
+Audit all existing UNICORN OPC mappings against these findings, particularly any Room 814 equipment receiving data from either Room 815 workstation. Prioritize tracing the six previously commissioned live parameter mappings, including Flow and Cond where applicable, to their actual equipment UDT and graphic. Preserve scaling and existing live configuration throughout this audit.
+
+Both UNICORN workstations currently report their dedicated AKTA Ethernet adapter as Media disconnected. Distinguish OPC server connectivity from actual physical instrument connectivity; a GOOD status on a command/status node is not proof of live process data. Do not power on, connect, or command equipment to establish identity. Record physical connectivity as unverified/offline as supported by evidence and request site verification during an authorized instrument operating window if needed.
+
+Verify instrument model and identifier through available UNICORN configuration records. Do not modify existing live mappings, UDT structures, graphics, equipment enablement, or historian configuration during Commission 06C.
+Documented inventory baseline
+All abbreviated addresses below use prefix 172.16.81. These are design assignments, not validated as-built addresses.
+Room	Functional area	Equipment	Design IP
+801	Biologics	BioPAT MFCS	.10
+801	Biologics	DCU-TWIN 5L	.12
+801	Biologics	50L BIOSTAT STR3	.13
+801	Biologics	200L BIOSTAT STR3	.14
+801	Biologics	ÄKTA Avant 150	.15
+801	Biologics	ÄKTA Avant 25-01	.18
+801	Biologics	ÄKTA Avant 25-02	.19
+805	Nucleic Acid	ÄKTA Avant 150	.37
+805	Nucleic Acid	ÄKTA Avant 25	TBD
+814	Plasmid	DCU-TWIN 5L	.50
+814	Plasmid	ÄKTA Avant 25	TBD
+814	Plasmid	ÄKTA Avant 150	TBD
+815	Gene Therapy	BioPAT MFCS	.65
+815	Gene Therapy	DCU-TWIN 5L	.66
+815	Gene Therapy	50L BIOSTAT STR3	.67
+815	Gene Therapy	ÄKTA Avant 150	.68
+815	Gene Therapy	ÄKTA Avant 25	.69
+815	Gene Therapy	Repligen Krosflo KR2i TFF	.70
+
+
+This is the focused reconciliation baseline, not the full equipment inventory. Obtain all remaining equipment from the original documents and current configuration. Include every existing live equipment mapping, even outside Rooms 814 and 815.
+3. Execution boundaries
+- Read-only audit. No gateway restart, service restart, certificate change, endpoint change, trial reset, new connection, tag write, UDT edit, graphic edit, database write, batch action, or historian configuration change.
+- Do not disable, revert, temporarily replace, or otherwise disturb any working live mapping established in prior commissions.
+- Preserve FAT-tested UDT definitions, instance paths, graphic bindings, scaling, engineering units, historian settings and batch/reporting behavior.
+- Do not issue OPC writes, including ConnectSystemTag, DisconnectTag, setpoints or instrument commands. Do not start or stop equipment or processes.
+- Use existing authorized gateway access and existing connected OPC sessions. Do not enable disabled connections for this audit. No broad network/port scans. Any additional host access or tests requiring authorization shall be proposed separately.
+- Use bounded read-only browsing and reads; avoid high-frequency polling, recursive namespace dumps without limits, or load on active equipment. Do not capture credentials, private keys or tokens in deliverables.
+- Do not fabricate equipment identities or substitute simulated values for evidence. Record inaccessible, offline or unverified equipment as such.
+4. Execution steps
+4.1 Capture current gateway state
+Export or inspect through supported read-only mechanisms the current OPC client connection metadata and relevant tag configuration. Record gateway identity, timestamp, connection name, actual configured endpoint, enabled state, connection state, security policy/mode, and available server application identity. Redact secrets. Inventory all connections, including disabled legacy/test aliases. Identify MFCS_OPCUA, Unicorn-2 and Unicorn-4 specifically. Distinguish configured address from server-advertised address and workstation hostname. Do not infer that a disabled alias represents a different physical machine.
+4.2 Establish vendor workstation and instrument inventory
+For each connected UNICORN server, browse DataAccess/ Instruments and record exact instrument object names and stable node identifiers (namespace URI plus identifier where available). Identify model, serial number, system name, system connection status and equipment asset number from existing readable metadata, vendor configuration or authorized site evidence. If unavailable, create a specific site verification question. A hostname such as 815-avant150-01 is corroborating evidence only; it is not proof of actual instrument model or location.
+
+For each connected MFCS server, inventory the exposed equipment identifiers, including both vessels of any DCU-TWIN. Determine which physical controllers and vessels are served by each workstation. Explicitly investigate .50 and .65 without assuming that an MFCS workstation is itself a bioreactor. Determine whether the active MFCS_OPCUA connection serves one or multiple physical rooms. Record actual endpoints, not the historical DA tunnel design if the deployment now uses UA.
+
+Distinguish workstation IP, controller/instrument IP, vendor system ID and OPC endpoint. Multiple instruments may share one vendor workstation. Multiple OPC aliases may point to the same endpoint.
+4.3 Trace existing Ignition equipment bindings
+Enumerate the current equipment UDT instances and enabled state. Focus on Rooms 814 and 815, but include every live MFCS and UNICORN instance across the facility. For each live process parameter, resolve the effective OPC server name and OPC item path after UDT parameter substitution and instance overrides. Identify value source (OPC, memory/simulation, expression, derived or other), scaling, engineering units and available read quality/timestamp. Include Flow and Cond and all other mapped process parameters. Preserve the existing mapping exactly during this commission.
+
+Trace each UDT to the Level 2 graphic, room/suite label, equipment identity, and batch setup/reporting configuration. Where available, inspect the historian measurement/tag identity and reporting association without modifying or generating records. Determine whether the previously commissioned left/right twins and UNICORN graphics are sourcing the correct physical equipment. Pay particular attention to cross-room mappings and duplicate instrument bindings. Do not assume a shared workstation means a shared instrument.
+4.4 Cross-reference evidence and validate identity
+Compare actual gateway configuration and vendor identity evidence against the original design inventory and physical site evidence. Maintain separate columns for design and observed values. Use a hierarchy of evidence: site-verified physical asset identity/room and vendor system configuration; live endpoint and stable instrument identity; effective Ignition bindings; customer design documentation; hostname or naming inference. Resolve conflicts only when evidence supports the conclusion. If site evidence and vendor metadata conflict, mark unresolved and request confirmation.
+
+For each connected instrument, attempt a bounded read of representative process parameters using existing authorized connections. Record value, unit, quality and timestamp when available. GOOD quality alone is not an identity check. Idle/offline equipment may return zero, cached or unavailable data. Do not force a process run. Where a physical instrument cannot be confirmed, classify the mapping as unverified rather than aligned.
+4.5 Classify discrepancies
+Use statuses: ALIGNED, CONFIRMED_MISMATCH, DOCUMENTATION_MISMATCH, UNVERIFIED_IDENTITY, OFFLINE_OR_UNAVAILABLE, NOT_MAPPED, and NOT_APPLICABLE. Allow multiple findings per equipment. Identify separately whether the discrepancy is in workstation address, device role, physical room, model, instrument identity, UDT source, graphic association, batch/reporting association, or historian identity. Distinguish documentation-only corrections from changes requiring live configuration remediation.
+
+If a probable wrong-room live mapping is found, flag it prominently for owner review, including potential impact on displayed process values and existing historical/batch data. Do not automatically disable it or rewrite historical records. Recommend any required operational restriction to the owner for approval.
+5. Required deliverables
+Create a review package named TBMC-COM06C-IDENTITY-RECONCILIATION-<timestamp>-Review.zip containing:
+1. 06C_Execution_Summary.md — scope, sources, gateway state, principal findings, counts, limitations and explicit no-change statement.
+2. 06C_Equipment_Reconciliation.csv — one row per physical equipment candidate or UDT instance; include unmatched vendor instruments and unmatched UDTs. Columns: DesignRoom, ObservedRoom, FunctionalArea, DesignEquipmentName, ObservedModel, AssetID, SerialNumber, DesignIP, WorkstationIP, WorkstationHostname, ControllerIP, VendorSystemID, OPCConnection, Endpoint, InstrumentNodeID, UDTPath, EnabledState, Level2Graphic, BatchEquipmentID, HistorianIdentity, Status, Confidence, EvidenceRef, Discrepancy, RecommendedAction, VerificationOwner.
+3. 06C_Live_Parameter_Trace.csv — one row per mapped parameter. Columns: UDTPath, Parameter, ValueSource, EffectiveOPCServer, EffectiveOPCItemPath, InstrumentID, ObservedValue, Quality, Timestamp, Units, Scaling, GraphicAssociation, IdentityStatus, EvidenceRef.
+4. 06C_OPC_Connection_Inventory.csv — all configured connections, actual endpoints, enabled/connected state, server identity and exposed instruments where available. Include disabled aliases without activating them.
+5. 06C_AsBuilt_Network_Equipment_Map.md — room-by-room proposed as-built map, separating verified facts from unresolved assignments. Show workstation-to-instrument-to-UDT relationships, including .50, .69 and .70.
+6. 06C_Discrepancy_Register.csv — unique finding ID, affected equipment, design vs observed configuration, evidence, impact, priority, proposed correction and approval dependency.
+7. 06C_TBMC_Site_Verification.md — concise customer questions with specific room, workstation, instrument/system name and requested evidence (asset plate, room confirmation or vendor system configuration screenshot).
+8. 06D_Proposed_Correction_Plan.md — unexecuted, targeted correction plan. For each proposed mapping change, show exact current and proposed OPC server/item paths, affected UDT and graphic, scaling preservation, historian/batch implications, required backup, rollback and read-only validation criteria. Do not invent target paths or present unresolved changes as approved.
+9. Evidence/ — sanitized configuration extracts, OPC browse/read results, relevant screenshots and evidence index with timestamps and provenance. Include before/after read-only configuration comparison where feasible; report any externally occurring changes separately.
+6. Acceptance criteria and stop condition
+- Actual endpoint and role of each currently connected OPC server identified or explicitly marked unavailable.
+- Site-verified observations for .50, .69 and .70 captured separately from the original design assignments.
+- Every enabled live MFCS/UNICORN UDT mapped to its effective source and physical identity status, or explicitly recorded as blocked with reason.
+- Room 814 and 815 equipment assignments reconciled individually; no conclusion based solely on connection aliases, hostname, IP or GOOD quality.
+- Existing live mappings, UDT definitions, graphics, batch/reporting and historian configuration left unchanged by this commission.
+- All proposed corrections traceable to evidence and separated from unresolved questions.
+- Report overall execution as COMPLETE, PARTIAL or BLOCKED according to evidence coverage; no claim of completed identity verification where physical evidence is missing.
+STOP after producing the review package. Return its path, key findings, count of aligned and unresolved equipment, confirmed cross-room mismatches, and specific decisions needed from Acropolis/TBMC. Do not execute Commission 06D or modify live configuration without separate authorization.
