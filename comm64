@@ -1,0 +1,46 @@
+# Commission 06H.3 — Production historian activation and verification
+Revision 00 | 27 November 2026 | Execute on TP-IGN01 (172.16.81.201)
+
+## 1. Objective and authority
+Resume the incomplete 06H.2 Rev01 commissioning work. Permanently activate the existing Kymera InfluxDB production historian and demonstrate actual Ignition-originated writes and retrieval. This is a supplemental execution commission, not another provisioning exercise. Use the previously completed 06H.1 and 06H.2 evidence where available; refresh only checks necessary to establish current readiness. The following nonsecret handoff is transcribed from the DB-side Codex screenshots; verify against the actual configuration if a discrepancy occurs. Do not require the original JSON merely to repeat this information.
+
+| Setting | Value |
+|---|---|
+| DB endpoint (current HTTP; protected route approval required) | http://10.1.0.132:8086 |
+| Organization | TBMC |
+| Organization ID | 0d928763db22136b |
+| Bucket | TBMC-Sensor-Data |
+| Bucket ID | 7dac3900b1b2323d |
+| Existing provider name reported | InfluxDB |
+| Token description | Ignition-TP-IGN01-Production |
+| Authorization ID | 11b3958040a21000 |
+| Token scope | Read/write on production bucket only |
+
+06H.1 reports healthy automatic service, private listener, persistent firewall scoped to TP-IGN01 and successful local write/read/delete probe. 06H.2 reports remote TCP and HTTP 200, 36 enabled OPC process members and 12 KeyCPP references, all with history disabled. No configuration changes were made by that attempt. These are reported findings, not fresh verification.
+
+## 2. Resolve credential handoff without repeated blockers
+- Verify the owner-approved protected route for HTTP or trusted TLS before sending credentials. Private IPs, an established connection and a firewall allow rule are not encryption evidence. Also require a trusted administrative path for entering the token into the gateway. Do not disable validation or expand firewall access. If the route cannot be established from evidence, request one concise owner confirmation or report the specific blocker. Continue nonsecret diagnostics meanwhile.
+- Inspect the existing provider's status and sanitized logs. If the owner has already saved the new credential, use the saved credential through the provider; do not extract it. Verify that authentication is actually successful rather than assuming a masked field means the correct token is installed.
+- If manual entry is needed, identify the exact installed Kymera UI location and fields, and ask the owner to enter the existing token once. The token is stored on DB server 10.1.0.132 under the original Windows account as `%LOCALAPPDATA%\TBMC\InfluxProduction\clients\Ignition-TP-IGN01-Production.dpapi`. Use the DB-side Codex-provided local retrieval procedure in that account and machine, with clipboard history/sync and remote clipboard redirection disabled; paste into the gateway via a trusted administrative browser session, clear the clipboard immediately. Do not copy the DPAPI file to Ignition and expect it to decrypt. If reverse routing prevents browser access, use an approved secret-transfer mechanism instead. Never request the token in Codex chat, source code, public Git, command arguments, plaintext handoff or evidence.
+- Once the owner confirms entry, continue execution in this session. Do not demand another commission or repeat bucket/firewall setup. If an API query is needed, use an approved runtime secret mechanism; if unavailable, obtain independent query evidence via the DB owner/UI rather than extracting the saved provider secret.
+
+## 3. Activate and diagnose existing provider
+- Confirm installed Ignition/Kymera versions, supported settings and license/trial availability. Use existing authorized supported trial management only. Verify gateway identity and current provider name. Capture protected backup and native effective config export; keep secrets and backups out of Git/ZIP. Inspect active consumers and queued writes before changing destination; do not misroute or purge queued history.
+- Configure the existing production provider using the verified endpoint, organization, bucket and owner-entered scoped credential. Do not create a second bucket or provider. Use supported configuration interfaces only. Preserve provider identity and dependent references. Verify initialization and runtime logs.
+- Distinguish network, TLS, 401/403, wrong organization/bucket, module licensing and schema errors. Prior Codex output reports Kymera may require identity metadata beyond bucket-level read/write. If that occurs, capture exact sanitized error, failing API endpoint/method and required resource/action; verify against installed module behavior or vendor docs. Provide a concise DB-side supplemental instruction to create an appropriately scoped replacement credential if needed, limited to existing bucket read/write plus proven necessary read-only metadata. Do not grant all-access or admin rights, revoke existing credentials prematurely, or expose tokens. Retest after owner enters replacement. If minimum scope cannot be established, report blocked rather than guessing.
+- Leave working provider permanently enabled. No unnecessary restart or automatic reversion to simulation. Preserve all existing equipment mappings, shared UDT definitions, graphics, KeyCPP, alarms, batches and reports.
+
+## 4. Prove end-to-end historization in production bucket
+- Establish no conflict with active batches or wildcard consumers. Use isolated unique numeric memory tag `[default]Commissioning/HistorianTest_<runID>`; no physical OPC writes. Enable history only on this tag against existing production provider, periodic approximately 5 seconds, zero deadband if supported. Record actual settings.
+- Write 10.25, 20.50, 30.75, 40.00 at intervals sufficient for sampling (e.g. 10 seconds), recording actual UTC timestamps and readback quality. Wait bounded settling up to two minutes, inspect store/forward and logs. Do not substitute direct Influx API writes for this test.
+- Independently query TBMC-Sensor-Data using supported Influx query tooling, scoped to the unique tag/run and timestamps. Record actual measurement schema, four values and timestamps. Use owner-assisted DB-side query if needed. Query same history through supported Ignition/Kymera API with raw/as-stored semantics (avoid interpolation). Compare values, order, timestamps, duplicates and missing points. Record actual evidence; do not infer success from provider status alone.
+- Disable history on only the synthetic tag when done or safely remove it. Delete only uniquely identified test series in exact time window if supported and demonstrably safe; otherwise retain clearly documented test points. No broad deletion. Leave production provider enabled.
+
+## 5. Production history readiness and next step
+- Reconcile actual history settings for 36 process members and 12 KeyCPP references; identify canonical acquisition tags versus references, existing chart/report dependencies, intended provider, sample rates/deadbands and potential duplicates. Do not enable physical histories yet: 06F data validity remains unresolved (both UNICORN servers can return GOOD-quality placeholders while instrument adapters are disconnected). Do not treat placeholder values as accepted production measurements. Flag operational risks and propose a targeted rollout after validity handling. SARTOFLOW excluded.
+- Verify all existing equipment mappings and resource contents unchanged outside authorized provider and synthetic tag changes. Capture fresh effective export and protected backup; record persistence verification scope, not a claim of restart/recovery acceptance.
+
+## 6. Deliverables and closure
+Generate `TBMC-COM06H3-PRODUCTION-HISTORIAN-<timestamp>-Review.zip`: summary and status; nonsecret verified handoff; transport approval/evidence; provider before/after and sanitized logs; auth/permission results; timed test tag writes; independent Influx query/results; Ignition query/results; comparison CSV; cleanup evidence; 36+12 history readiness audit; preservation diff; rollback instructions and exact next action if blocked. Exclude secrets and sensitive backups. No automatic rollback of successful provider configuration; rollback only authorized changes causing regression.
+
+PASS requires verified protected transport, scoped authentication, persistent enabled production provider, all four Ignition-originated values independently confirmed in Influx and retrieved through Ignition, and no unintended changes. Otherwise report PARTIAL/BLOCKED with exact dependency and retain safe successful changes. PASS does not imply production equipment history enabled or physical SAT accepted.
