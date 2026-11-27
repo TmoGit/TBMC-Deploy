@@ -1,0 +1,15 @@
+**Commission 06H.3 — the four expected samples were absent from `TBMC-Sensor-Data`.** The bucket does contain older Ignition history, but it contains no rows for `HistorianTest_20261127_200012` and no matches for `10.25`, `20.50`, `30.75`, or `40.00`.
+
+| Read-only Flux query | HTTP | Result |
+|---|---:|---|
+| `2026-11-27T20:01:22Z` through `20:02:05Z`, all measurements, fields, and series | 200 | 0 rows |
+| Expanded window, `19:45:00Z` through `20:30:00Z` | 200 | 0 rows |
+| Full bucket scan, with no measurement, field, or tag filter | 200 | 6 field rows across 3 timestamps. No test identifier or expected value matched. |
+
+The full scan checked the test identifier across every returned column, including measurement names, field names, and tag values. The exact-window query used a stop time one nanosecond after `20:02:05Z` to include that endpoint. [Flux range semantics](https://docs.influxdata.com/flux/v0/stdlib/universe/range/)
+
+**Observed schema.** The only measurement was `ignition-tp-ign01.default`, with a `tagPath` tag and two fields, `bVal` (boolean) and `quality` (integer). Annotated CSV reported `_time` as RFC3339. The three stored timestamps were `2026-11-04T20:59:59.933Z`, `2026-11-04T20:59:59.935Z`, and `2026-11-04T20:59:59.939Z`. This confirms older Ignition history and provides no stored example of the current numeric test.
+
+**Service logs.** The available InfluxDB logs showed no write failures, authorization errors, or query errors attributable to `172.16.81.201` around the test. There were no log entries during the exact test window, so the logs cannot establish whether Ignition submitted a write. The DB server did observe an established TCP 8086 connection from `172.16.81.201` during the diagnostic. The cause of the SCADA `Error_TimeoutExpired` remains undetermined.
+
+The diagnostic was read-only. No database records or configuration were changed.
