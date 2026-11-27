@@ -1,0 +1,25 @@
+Stop the historical data search and resume Commission 06H.4 as a corrective deployment, not another read-only diagnostic.
+
+The objective is to make the existing Room 814 BRX5-02-01 TEMP trend work using the remote production InfluxDB historian.
+
+1. Verify the current Kymera module trial/license status.
+2. Verify the existing InfluxDB historian provider configuration.
+3. Trace the existing TEMP chart binding to its actual historical tag path, including KeyCPP3.
+4. Identify why history is disabled on the required tag.
+5. Permanently enable history on the appropriate existing TEMP source or reference tag, after confirming valid physical measurement data.
+6. Configure a five-second periodic historical sampling interval for this initial test.
+7. Verify historical registration and inspect the Kymera write pipeline and gateway logs.
+8. Diagnose and correct any historian registration, provider assignment, sampling or write errors.
+9. Verify newly generated historical records through Ignition and the existing SCADA TEMP trend.
+
+If actual TEMP measurement validity cannot be established, use a retained diagnostic memory tag with the same historian configuration to isolate the write failure.
+
+Do not search November 4 historical records again. Do not repeat completed network or database provisioning tests.
+
+Do not remove the test tag before successful historical retrieval.
+
+Do not create another bucket or historian provider. Do not modify shared UDT definitions or redesign the FAT-tested chart.
+
+Leave successful production configurations permanently enabled.
+
+If an actual technical blocker prevents completion, identify the precise error, responsible component and corrective action rather than returning another empty historical query.
