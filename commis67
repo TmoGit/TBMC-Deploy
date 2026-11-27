@@ -1,0 +1,135 @@
+# Commission 06H.4 — Historian Write Pipeline Recovery
+
+## Objective
+
+Diagnose and permanently resolve the failure of Ignition/Kymera to store historical tag values in the production InfluxDB bucket.
+
+## Confirmed configuration
+
+- Ignition: TP-IGN01, 172.16.81.201
+- Ignition version: 8.3.4
+- InfluxDB: 10.1.0.132:8086
+- Organization: TBMC
+- Bucket: TBMC-Sensor-Data
+- Historian provider: InfluxDB
+- Provider status: Enabled and RUNNING
+
+## Confirmed diagnostic findings
+
+The database-side diagnostic established:
+
+- Remote connectivity and authenticated queries succeed.
+- No records exist for HistorianTest_20261127_200012.
+- None of the four expected values were stored: 10.25, 20.50, 30.75 and 40.00.
+- Existing historical measurement: ignition-tp-ign01.default.
+- Existing tag identifier: tagPath.
+- Existing fields: bVal and quality.
+- Historical records exist from November 4, 2026.
+- SCADA TEMP trend reports Error_TimeoutExpired.
+
+## 1. Diagnose the historical acquisition pipeline
+
+Inspect and record:
+
+- Installed Kymera module version and compatibility.
+- Ignition and Kymera licensing/trial status.
+- Effective historian provider configuration.
+- Historian registration and execution status.
+- Store and Forward engine status, pending records, quarantined records and write counters, where applicable.
+- Gateway logs associated with Kymera, historian execution, authentication, sampling and historical queries.
+- Effective configuration of the previous historian test tag from retained evidence.
+
+Compare the current configuration against available November 4 deployment records.
+
+Do not purge queued or quarantined historical data.
+
+## 2. Isolate and correct the root cause
+
+Determine whether historical samples are:
+
+- Not being generated.
+- Not being registered with the historian.
+- Being buffered or quarantined.
+- Being rejected by Kymera.
+- Being rejected by InfluxDB.
+- Being routed to an incorrect provider or destination.
+
+Apply the minimum permanent correction necessary within the existing historian configuration.
+
+Do not create another bucket, provider or database.
+
+Do not upgrade modules or expand credential permissions without identifying and documenting the requirement first.
+
+Preserve secure transport requirements and all existing production database records.
+
+## 3. Verify historical acquisition
+
+Create an isolated, uniquely named memory tag using the existing InfluxDB historian provider.
+
+Verify effective history settings and registration.
+
+Write four identifiable floating-point values at controlled intervals. Allow sufficient time for sampling, buffering and historian writes.
+
+Capture:
+
+- Tag value and quality.
+- Historical registration.
+- Sampling configuration.
+- Store and Forward counters, if applicable.
+- Historian write evidence.
+- Actual historical query results.
+- UTC timestamps.
+- Expected InfluxDB measurement and tag path.
+
+Retain the test tag until independent database verification is completed.
+
+Do not substitute direct InfluxDB API writes for Ignition-originated historization.
+
+## 4. Permanent production equipment test
+
+After successful synthetic history verification, identify the existing Room 814 equipment:
+
+BRX5-02-01 — TEMP
+
+Trace its source OPC tag, existing KeyCPP reference and SCADA trend binding.
+
+Verify actual source quality and instrument availability.
+
+Permanently enable history on the appropriate existing tag required by the FAT-tested trend configuration. Avoid duplicate acquisition through both the process tag and KeyCPP reference.
+
+Preserve the existing sampling and deadband design where documented.
+
+Verify that historical values are stored and retrieved through the existing SCADA TEMP trend.
+
+If physical measurement validity cannot be established, leave equipment history activation blocked and document the specific dependency.
+
+## 5. Acceptance criteria
+
+- Root cause identified and documented.
+- Historical acquisition pipeline operational.
+- Four Ignition-generated test samples independently verified in InfluxDB.
+- Historical query through Ignition successful.
+- Existing SCADA TEMP trend verified when valid equipment data is available.
+- Successful configuration remains permanently enabled.
+- Existing 36 OPC mappings preserved.
+- Shared UDT definitions and FAT-tested graphics preserved.
+- No unrelated production changes.
+
+## 6. Deliverables
+
+Generate:
+
+- Execution summary.
+- Root cause analysis.
+- Before and after historian configuration.
+- Historian diagnostic logs.
+- Store and Forward evidence.
+- Historical write and retrieval evidence.
+- TEMP trend verification.
+- Remaining deficiencies.
+
+Package results as:
+
+TBMC-COM06H4-HISTORIAN-RECOVERY-[timestamp]-Review.zip
+
+Exclude credentials, API tokens and unredacted secret-bearing configuration from the review package.
