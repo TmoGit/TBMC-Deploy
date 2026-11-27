@@ -1,0 +1,20 @@
+Perform final independent database verification for Commission 06H.4.
+
+The Ignition InfluxDB historian provider recovered following reinitialization.
+
+Query TBMC-Sensor-Data for records generated during the latest recovery test, approximately November 27, 2026, 20:40–21:05 UTC.
+
+Locate the following numeric values:
+
+92.125
+93.25
+94.5
+95.875
+
+Each value should appear approximately twice at five-second sampling intervals.
+
+Report the actual measurement, tagPath, field name, quality, UTC timestamp and value for each matching record.
+
+Confirm whether the records originated from the retained Ignition diagnostic memory tag.
+
+Perform read-only verification. Do not modify the database, credentials, bucket or service configuration.
