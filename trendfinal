@@ -1,0 +1,40 @@
+# Commission 06H.5 — Permanent Historization Rollout
+Revision 00 | 27 November 2026
+Execution host: TP-IGN01 (172.16.81.201), existing Codex historian session.
+
+## Objective
+Permanently configure all available trendable process points on the four commissioned equipment instances using the existing Kymera InfluxDB production historian. Extend the demonstrated BRX5-02-01 TEMP trend solution without changing FAT-tested graphics, shared UDT definitions or OPC mappings. Physical measurement acceptance remains a separate SAT activity.
+
+## Baseline and scope
+- Existing provider: InfluxDB; remote endpoint 10.1.0.132:8086; organization TBMC; bucket TBMC-Sensor-Data. Preserve the approved transport, credential and provider configuration.
+- Room 814 BRX5-02-01 and BRX5-02-02: 12 mapped process points each.
+- Room 815 AVA25 and AVA150: six mapped process points each (Gradient, Flow Rate, Pressure, pH, Conductivity, UV Absorbance).
+- Expected inventory: 36 mapped process points including working TEMP; 12 KeyCPP references to reconcile, not automatically historize.
+- 06H.4 recovered storage after provider reinitialization; previous NullPointerException in AbstractStorageEngine.StorageMetrics.update involved a null StorageResult. Underlying trigger and durability are not yet established.
+- Latest user screenshot shows a functioning TEMP trend. Capture effective configuration rather than assuming the sampling settings used.
+- Exclude SARTOFLOW Smart, uncommissioned equipment, simulated sources and all new EM/UDT development.
+
+## 1. Capture baseline and trace
+Take a protected gateway backup and native tag/provider exports; record existing effective history properties and instance override provenance where available. Keep secrets outside reports and public Git. Inventory every candidate with room, asset, source path, OPC server/node, data type, engineering units, quality, availability, chart pen/history path, KeyCPP references, effective history provider, sampling, deadband and enabled state. Identify existing trends and chart selection paths. Preserve working TEMP exactly. Verify actual provider/module/trial status and baseline storage counters; do not repeat completed network or bucket provisioning.
+
+## 2. Permanent rollout
+Use the working TEMP configuration as the verified implementation pattern, retaining documented parameter-specific sampling/deadband requirements. Where no approved settings exist, use five-second periodic sampling as a provisional engineering setting for continuous numeric points, documenting it for review; preserve appropriate discrete sampling for discrete points. Do not globally change sampling or shared UDTs. Configure history at the existing instance-level canonical process tag used by the trend, avoiding redundant KeyCPP history. If a chart uses a reference path, trace supported resolution before choosing a single canonical series; report any binding conflict rather than silently redesigning the chart.
+
+Apply in small asset batches, beginning with the remaining BRX5-02-01 points, then BRX5-02-02, AVA25 and AVA150. Verify effective properties and historian registration after each batch. Leave successful permanent settings enabled; no simulation fallback. Do not write to OPC instruments, start/stop equipment, claim batches, or change physical source values.
+
+## 3. Availability and data integrity
+Separate permanent history configuration from physical measurement acceptance. Do not require an operator reading to configure or test historian infrastructure. Both UNICORN workstations previously had disconnected AKTA NICs and placeholder values despite good OPC quality. Do not infer validity from OPC Good alone or reject all zero/negative values categorically. Determine whether an existing supported availability/quality mechanism can prevent invalid values being treated as valid history or entering accepted batch reporting. Preserve raw quality and provenance. Do not invent a new status signal or modify shared quality/batch logic in this commission.
+
+For points with unverified availability, enable permanent acquisition only if existing supported controls reliably exclude invalid measurements from accepted production use and reporting, with documented quality handling; otherwise prepare exact permanent history properties and defer activation for those points to 06F. Do not silently collect disconnected UNICORN placeholders as valid production measurements. No separate bucket or provider. Keep commissioning evidence clearly distinguishable from accepted process records.
+
+## 4. Verify each batch
+Check historical registration, Last Storage Time, gateway logs, storage success/failure deltas and queue health where applicable. Allow sufficient samples under effective sampling/deadband. Query new history using exact canonical paths and UTC windows. Verify existing SCADA trends for available points (actual UI when accessible; otherwise label API-only evidence). Confirm values, units, timestamp, quality and no duplicate source/reference series. Obtain independent InfluxDB confirmation through the approved credential/DB owner if available; distinguish that from Ignition readback. Do not use direct database writes as proof. Constant readings are acceptable only with valid provenance and documented sampling behavior. No fabricated data or forced process changes.
+
+If the prior storage exception recurs, capture logs/counters first; use the previously demonstrated supported provider reinitialization only if safe with respect to ongoing collection and queued data, then verify recovery. Do not purge queues, repeatedly restart the gateway, bypass licensing or change module versions. Stop affected batch on unexpected errors, preserve completed batches, and report precise blockers.
+
+## 5. Closeout
+Re-export configuration; verify all 36 OPC mappings, FAT-tested resources, shared definitions and unrelated history settings remain unchanged except authorized instance history properties. Keep the existing production provider enabled. Retain protected rollback artifacts; document any override provenance limitations rather than claiming exact rollback if not established. Do not restart solely to demonstrate persistence; report restart/trial durability as pending if not tested. Remove diagnostic tags only after evidence is secured and without deleting production history; no broad data deletion.
+
+Produce a per-point CSV with all 36 candidates and separate columns for trendability, configured history, acquisition verified, Ignition retrieval verified, SCADA trend verified, independent DB verification, physical SAT status and blocker. Include 12 KeyCPP reference disposition, before/after diffs, sampling/deadband settings, quality/availability findings, storage counters, screenshots, query evidence, rollback plan and remaining 06F/SAT items. Report counts by asset and overall; do not claim 36/36 verified unless evidence supports it.
+
+Package sanitized results as TBMC-COM06H5-HISTORIZATION-ROLLOUT-[timestamp]-Review.zip. Exclude credentials, tokens, unredacted configuration and protected backups from the review ZIP/public repository.
