@@ -1,0 +1,20 @@
+Resume Commission 06H.1 with elevated Windows privileges.
+
+The production bucket and API token have already been created and successfully tested. Do not recreate either.
+
+Complete the remaining server-side configuration:
+
+- Inspect the InfluxDB Windows service wrapper, startup configuration and service logs.
+- Confirm InfluxDB is listening on TCP port 8086 on the appropriate network interface, not exclusively on localhost.
+- Correct the existing firewall rule reporting NoInterface and ProfileInactive.
+- Identify the active Windows firewall profile and network interface.
+- Permit inbound TCP 8086 from the authorized Ignition server or its verified translated source IP if NAT is present.
+- Do not disable Windows Firewall or expose InfluxDB publicly.
+- Confirm the approved protected network route or trusted TLS configuration before transferring credentials.
+- Verify that the service and firewall configurations are persistent.
+- Preserve the existing production bucket, API token and database contents.
+- Update the 06H1_Handoff.json and review package.
+
+Leave the database ready for permanent remote production historization.
+
+Do not create a separate test bucket or regenerate the existing API token.
